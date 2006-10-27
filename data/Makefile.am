@@ -19,13 +19,19 @@
 # 02110-1301 USA
 #
 
-SUBDIRS = data src 
+EXTRA_DIST = hildon-control-panel.pc.in \
+	com.nokia.controlpanel.service.in \
+	hildon-control-panel.desktop.in
 
-EXTRA_DIST = debian/changelog debian/control debian/copyright debian/rules \
-	debian/hildon-control-panel.install \
-	debian/hildon-control-panel-dev.install 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = hildon-control-panel.pc
 
-deb: dist
-	 -mkdir $(top_builddir)/debian-build
-	cd $(top_builddir)/debian-build && tar zxf ../$(top_builddir)/$(PACKAGE)-$(VERSION).tar.gz
-	cd $(top_builddir)/debian-build/$(PACKAGE)-$(VERSION) && dpkg-buildpackage -rfakeroot 
+servicefiledir=$(prefix)/share/dbus-1/services
+servicefile_DATA=com.nokia.controlpanel.service
+
+gconfschemasdir=$(sysconfdir)/gconf/schemas
+gconfschemas_DATA=hildon-control-panel.schemas
+
+hildondesktopentry_DATA = hildon-control-panel.desktop
+
+hildon_othersmenudir = $(sysconfdir)/others-menu

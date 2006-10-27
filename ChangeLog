@@ -1,5 +1,13 @@
 2006-10-27  Lucas Rocha  <lucas.rocha@nokia.com>
 
+	* configure.ac, Makefile.am: updated for new directory tree.
+	* com.nokia.controlpanel.service.in, hildon-control-panel.pc.in,
+	hildon-control-panel.desktop.in, hildon-control-panel.schemas: moved
+	files to new data directory.
+	* data/Makefile.am: Makefile for new data directory.
+
+2006-10-27  Lucas Rocha  <lucas.rocha@nokia.com>
+
 	* depmod, config.h.in, aclocal.m4, Makefile.in, config.guess,
 	config.sub, configure, controlpanel.sh.in, depcomp, install-sh, 
 	ltmain.sh, missing, mkinstalldirs: removed from repository.
