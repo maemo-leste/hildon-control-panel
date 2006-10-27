@@ -75,7 +75,7 @@ AC_SUBST(hildoncpdesktopentrydir)
 AC_SUBST(hildoncplibdir)
 
 AC_OUTPUT(Makefile \
+	src/Makefile \
 	hildon-control-panel.pc \
 	hildon-control-panel.desktop \
-        com.nokia.controlpanel.service \
-        controlpanel.sh )
+	com.nokia.controlpanel.service )
