@@ -39,10 +39,10 @@
 #include <gconf/gconf-client.h>
 
 /* Control Panel includes */
-#include "hildon-cp-applist.h"
-#include "hildon-cp-item.h"
-#include "cp-grid.h"
-#include "cp-grid-item.h"
+#include "hcp-applist.h"
+#include "hcp-item.h"
+#include "hcp-grid.h"
+#include "hcp-grid-item.h"
 
 #define _(String) gettext(String)
 

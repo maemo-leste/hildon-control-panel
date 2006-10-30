@@ -22,10 +22,10 @@
  */
 
 
-#include "hildon-cp-view.h"
-#include "hildon-cp-applist.h"
-#include "hildon-cp-item.h"
-#include "hildon-control-panel-main.h"
+#include "hcp-view.h"
+#include "hcp-applist.h"
+#include "hcp-item.h"
+#include "hcp-main.h"
 
 #include <libintl.h>
 

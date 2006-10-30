@@ -33,7 +33,7 @@
 #define CP_GRID_H_
 
 #include <gtk/gtkcontainer.h>
-#include "cp-grid-item.h"
+#include "hcp-grid-item.h"
 
 G_BEGIN_DECLS
 

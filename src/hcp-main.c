@@ -33,10 +33,10 @@
 #include <gconf/gconf-client.h>
 #include <libosso.h>
 
-#include "hildon-control-panel-main.h"
-#include "hildon-cp-applist.h"
-#include "hildon-cp-view.h"
-#include "hildon-cp-item.h"
+#include "hcp-main.h"
+#include "hcp-applist.h"
+#include "hcp-view.h"
+#include "hcp-item.h"
 
 
 /* Delay to wait from callback to actually reading the entries in msecs */

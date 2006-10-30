@@ -54,8 +54,8 @@
 /* Osso logg functions */
 #include <osso-log.h>
 
-#include "cp-grid-item-private.h"
-#include "cp-grid-item.h"
+#include "hcp-grid-item-private.h"
+#include "hcp-grid-item.h"
 
 
 #define CP_GRID_ITEM_GET_PRIVATE(obj) \

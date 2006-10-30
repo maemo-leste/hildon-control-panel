@@ -24,8 +24,8 @@
 #ifndef __HILDON_CP_VIEW_H__
 #define __HILDON_CP_VIEW_H__
 
-#include "hildon-cp-applist.h"
-#include "cp-grid.h"
+#include "hcp-applist.h"
+#include "hcp-grid.h"
 
 
 GtkWidget *                 hcp_view_new (void);

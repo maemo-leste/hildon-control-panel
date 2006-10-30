@@ -33,7 +33,7 @@
 #ifndef CP_GRID_ITEM_PRIVATE_H_
 #define CP_GRID_ITEM_PRIVATE_H_
 
-#include "cp-grid-item.h"
+#include "hcp-grid-item.h"
 
 
 G_BEGIN_DECLS

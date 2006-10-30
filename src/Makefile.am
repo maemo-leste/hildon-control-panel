@@ -34,24 +34,24 @@ bin_PROGRAMS = \
 	controlpanel
 
 controlpanel_SOURCES = \
-	hildon-control-panel-main.h \
-	hildon-control-panel-main-utils.h \
-	hildon-control-panel-main.c \
-	hildon-cp-applist.h \
-	hildon-cp-applist.c \
-	hildon-cp-rfs.c \
-	hildon-cp-plugin-interface.h \
-	hildon-cp-view.c \
-	hildon-cp-view.h \
-	hildon-cp-item.c \
-	hildon-cp-item.h \
-	cp-grid.h \
-	cp-grid.c \
-	cp-grid-item-private.h \
-	cp-grid-item.h \
-	cp-grid-item.c \
-	cp-marshalers.h \
-	cp-marshalers.c
+	hcp-main.h \
+	hcp-main-utils.h \
+	hcp-main.c \
+	hcp-applist.h \
+	hcp-applist.c \
+	hcp-rfs.c \
+	hcp-view.c \
+	hcp-view.h \
+	hcp-item.c \
+	hcp-item.h \
+	hcp-grid.h \
+	hcp-grid.c \
+	hcp-grid-item-private.h \
+	hcp-grid-item.h \
+	hcp-grid-item.c \
+	hcp-marshalers.h \
+	hcp-marshalers.c \
+	hildon-cp-plugin-interface.h
 
 controlpanel_LDFLAGS = $(MAEMO_LAUNCHER_LDFLAGS)
 

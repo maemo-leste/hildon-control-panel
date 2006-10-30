@@ -55,9 +55,9 @@
 #include <hildon-base-lib/hildon-base-types.h>
 
 /* Control Panel includes */
-#include "hildon-cp-applist.h"
-#include "hildon-cp-item.h"
-#include "cp-grid.h"
+#include "hcp-applist.h"
+#include "hcp-item.h"
+#include "hcp-grid.h"
 
 
 G_BEGIN_DECLS

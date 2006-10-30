@@ -21,8 +21,8 @@
  *
  */
 
-#include "hildon-cp-item.h"
-#include "hildon-control-panel-main.h"
+#include "hcp-item.h"
+#include "hcp-main.h"
 
 #include <dlfcn.h>
 #include <osso-log.h>

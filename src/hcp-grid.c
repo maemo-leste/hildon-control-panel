@@ -79,10 +79,10 @@
 
 #include <hildon-widgets/hildon-app.h>
 
-#include "cp-grid.h"
-#include "cp-grid-item.h"
-#include "cp-grid-item-private.h"
-#include "cp-marshalers.h"
+#include "hcp-grid.h"
+#include "hcp-grid-item.h"
+#include "hcp-grid-item-private.h"
+#include "hcp-marshalers.h"
 
 #include <libintl.h>
 #define _(String) dgettext(PACKAGE, String)

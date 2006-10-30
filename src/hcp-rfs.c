@@ -21,7 +21,7 @@
  *
  */
 
-#include "hildon-control-panel-main.h"
+#include "hcp-main.h"
 
 #include <hildon-widgets/hildon-code-dialog.h>
 #include <hildon-widgets/hildon-banner.h>

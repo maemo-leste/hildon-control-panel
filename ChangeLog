@@ -1,3 +1,8 @@
+2006-10-30  Lucas Rocha  <lucas.rocha@nokia.com>
+
+	* src/*.[ch], src/Makefile.am: all source code files use the 
+	same prefix.
+
 2006-10-27  Lucas Rocha  <lucas.rocha@nokia.com>
 
 	* configure.ac, Makefile.am: updated for new directory tree.
