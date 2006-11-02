@@ -30,10 +30,17 @@ INCLUDES = \
 	-DCONTROLPANEL_ENTRY_DIR=\"$(hildoncpdesktopentrydir)\" \
 	-DHCP_PLUGIN_DIR=\"$(hildoncplibdir)\"
 
-bin_PROGRAMS = \
-	controlpanel
+hcp-marshalers.h: hcp-marshalers.list
+	$(GLIB_GENMARSHAL) $< --header --prefix=_cp_marshal > $@
+
+hcp-marshalers.c: hcp-marshalers.list
+	$(GLIB_GENMARSHAL) $< --header --body --prefix=_cp_marshal > $@
+
+bin_PROGRAMS = controlpanel
 
 controlpanel_SOURCES = \
+	hcp-marshalers.h \
+	hcp-marshalers.c \
 	hcp-main.c \
 	hcp-main.h \
 	hcp-program.c \
@@ -53,9 +60,10 @@ controlpanel_SOURCES = \
 	hcp-grid-item-private.h \
 	hcp-grid-item.h \
 	hcp-grid-item.c \
-	hcp-marshalers.h \
-	hcp-marshalers.c \
 	hildon-cp-plugin-interface.h
+
+BUILT_SOURCES = hcp-marshalers.c \
+                hcp-marshalers.h
 
 controlpanel_LDFLAGS = $(MAEMO_LAUNCHER_LDFLAGS)
 
@@ -65,3 +73,7 @@ controlpanel_LDADD = \
 
 hildon_cp_pluginincludeinstdir=$(includedir)/hildon-cp-plugin
 hildon_cp_pluginincludeinst_DATA = hildon-cp-plugin-interface.h
+
+EXTRA_DIST = hcp-marshalers.list
+
+CLEANFILES = $(BUILT_SOURCES)

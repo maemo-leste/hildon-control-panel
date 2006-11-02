@@ -1,5 +1,10 @@
 2006-11-02  Lucas Rocha  <lucas.rocha@nokia.com>
 
+	* configure.ac, src/Makefile.am, src/hcp-marshalers.list: make 
+	marshalers automaticaly generated.
+
+2006-11-02  Lucas Rocha  <lucas.rocha@nokia.com>
+
 	* src/*.[ch], src/Makefile.am: first commit of 
 	code refactoring. Still very unstable.
 
