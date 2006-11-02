@@ -34,16 +34,20 @@ bin_PROGRAMS = \
 	controlpanel
 
 controlpanel_SOURCES = \
-	hcp-main.h \
-	hcp-main-utils.h \
 	hcp-main.c \
-	hcp-applist.h \
-	hcp-applist.c \
+	hcp-main.h \
+	hcp-program.c \
+	hcp-program.h \
+	hcp-window.c \
+	hcp-window.h \
+	hcp-app.c \
+	hcp-app.h \
+	hcp-app-list.c \
+	hcp-app-list.h \
+	hcp-app-view.c \
+	hcp-app-view.h \
 	hcp-rfs.c \
-	hcp-view.c \
-	hcp-view.h \
-	hcp-item.c \
-	hcp-item.h \
+	hcp-rfs.h \
 	hcp-grid.h \
 	hcp-grid.c \
 	hcp-grid-item-private.h \

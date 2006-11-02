@@ -58,6 +58,7 @@
 #include "hcp-applist.h"
 #include "hcp-item.h"
 #include "hcp-grid.h"
+#include "hcp-config-keys.h"
 
 
 G_BEGIN_DECLS
@@ -68,33 +69,6 @@ G_BEGIN_DECLS
 #define APP_NAME     "controlpanel"
 #define APP_VERSION  "0.1"
 
-#define HILDON_CONTROL_PANEL_TITLE             _("copa_ap_cp_name")
-#define HILDON_CONTROL_PANEL_MENU_OPEN         _("copa_me_open")
-#define HILDON_CONTROL_PANEL_MENU_SUB_VIEW     _("copa_me_view")
-#define HILDON_CONTROL_PANEL_MENU_SMALL_ITEMS  _("copa_me_view_small")
-#define HILDON_CONTROL_PANEL_MENU_LARGE_ITEMS  _("copa_me_view_large")
-#define HILDON_CONTROL_PANEL_MENU_SUB_TOOLS    _("copa_me_tools")
-#define HILDON_CONTROL_PANEL_MENU_SETUP_WIZARD _("copa_me_tools_setup_wizard")
-#define HILDON_CONTROL_PANEL_MENU_RFS          _("copa_me_tools_rfs")
-#define HILDON_CONTROL_PANEL_MENU_CUD          _("copa_me_tools_cud")
-#define HILDON_CONTROL_PANEL_MENU_HELP         _("copa_me_tools_help")
-#define HILDON_CONTROL_PANEL_MENU_CLOSE        _("copa_me_close")
-
-#define RESET_FACTORY_SETTINGS_INFOBANNER_OK     _("rfs_bd_ok")
-#define RESET_FACTORY_SETTINGS_INFOBANNER_CANCEL _("rfs_bd_cancel")
-#define HILDON_CP_RFS_WARNING _("refs_ia_text")
-#define HILDON_CP_CUD_WARNING _("cud_ia_text")
-
-#define HILDON_CP_RFS_WARNING_TITLE _("rfs_ti_restore")
-#define HILDON_CP_CUD_WARNING_TITLE _("cud_ti_clear")
-
-#define HILDON_CP_RFS_HELP_TOPIC "Features_restorefactorysettings_closealldialog"
-#define HILDON_CP_CUD_HELP_TOPIC "Features_clearuserdata_dialog"
-
-#define HILDON_CP_CODE_DIALOG_HELP_TOPIC "Features_restorefactorysettings_passwordquerydialog"
-
-#define RESET_FACTORY_SETTINGS_IB_WRONG_LOCKCODE dgettext("hildon-libs", "secu_info_incorrectcode")
-
 #define HILDON_CP_SYSTEM_DIR ".osso/hildon-cp"
 #define HILDON_CP_CONF_USER_FILENAME "hildon-cp.conf"
 #define HILDON_CP_SYSTEM_DIR_ACCESS   0755
@@ -104,23 +78,9 @@ G_BEGIN_DECLS
 #define HILDON_CP_MAX_FILE_LENGTH 30 /* CONF FILE FORMAT MUST NOT BE LARGER */
 
 
-#define HILDON_CP_DBUS_MCE_SERVICE "com.nokia.mce"
-#define HILDON_CP_DBUS_MCE_REQUEST_IF "com.nokia.mce.request"
-#define HILDON_CP_DBUS_MCE_REQUEST_PATH "/com/nokia/mce/request"
-#define HILDON_CP_MCE_PASSWORD_VALIDATE "validate_devicelock_code"
-#define HILDON_CP_DEFAULT_SALT "$1$JE5Gswee$"
-
-#define HCP_GCONF_ICON_SIZE         "/apps/osso/apps/controlpanel/icon_size"
-
-#define HCP_STATE_GROUP             "HildonControlPanel"
-#define HCP_STATE_FOCUSSED          "Focussed"
-#define HCP_STATE_SCROLL_VALUE      "ScrollValue"
-#define HCP_STATE_EXECUTE           "Execute"
-
 
 #define OSSO_HELP_ID_CONTROL_PANEL "Utilities_controlpanel_mainview"
 #define HILDON_CP_ASSUMED_LOCKCODE_MAXLENGTH 5 /* Note that max number of characters is removed from widget specs. */
-
 
 /* DBus RPC */
 #define HCP_RPC_SERVICE                     "com.nokia.controlpanel"

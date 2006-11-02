@@ -1,3 +1,8 @@
+2006-11-02  Lucas Rocha  <lucas.rocha@nokia.com>
+
+	* src/*.[ch], src/Makefile.am: first commit of 
+	code refactoring. Still very unstable.
+
 2006-10-30  Lucas Rocha  <lucas.rocha@nokia.com>
 
 	* src/*.[ch], src/Makefile.am: all source code files use the 
