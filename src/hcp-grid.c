@@ -429,7 +429,7 @@ cp_grid_class_init( CPGridClass * klass )
                      G_SIGNAL_RUN_LAST,
                      G_STRUCT_OFFSET(CPGridClass, popup_context_menu),
                      g_signal_accumulator_true_handled, NULL,
-                     _cp_marshal_BOOLEAN__INT_INT_INT,
+                     hcp_marshal_BOOLEAN__INT_INT_INT,
                      G_TYPE_BOOLEAN, 3,
                      G_TYPE_INT, G_TYPE_INT, G_TYPE_INT);
 }

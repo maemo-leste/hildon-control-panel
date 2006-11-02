@@ -29,11 +29,20 @@
 #include "hcp-app.h"
 #include "hcp-grid.h"
 #include "hcp-grid-item.h"
+#include "hcp-marshalers.h"
 
 #define HCP_APP_VIEW_GET_PRIVATE(object) \
         (G_TYPE_INSTANCE_GET_PRIVATE ((object), HCP_TYPE_APP_VIEW, HCPAppViewPrivate))
 
 G_DEFINE_TYPE (HCPAppView, hcp_app_view, GTK_TYPE_VBOX);
+
+typedef enum
+{
+  HCP_APP_VIEW_SIGNAL_FOCUS_CHANGED,
+  HCP_APP_VIEW_SIGNALS
+} HCPAppViewSignals;
+
+static gint hcp_app_view_signals[HCP_APP_VIEW_SIGNALS];
 
 struct _HCPAppViewPrivate 
 {
@@ -109,6 +118,10 @@ hcp_app_view_focus (GtkWidget *item_widget, GdkEventFocus *event, HCPApp *app)
            / vbox->allocation.height;
     gtk_adjustment_value_changed (adj);
   }
+
+  g_signal_emit (G_OBJECT (item_widget->parent->parent), 
+                 hcp_app_view_signals[HCP_APP_VIEW_SIGNAL_FOCUS_CHANGED], 
+                 0, app);
   
   return FALSE;
 }
@@ -223,6 +236,16 @@ hcp_app_view_class_init (HCPAppViewClass *class)
   GObjectClass *g_object_class = (GObjectClass *) class;
 
   g_object_class->finalize = hcp_app_view_finalize;
+
+  hcp_app_view_signals[HCP_APP_VIEW_SIGNAL_FOCUS_CHANGED] =
+        g_signal_new ("focus-changed",
+                      G_OBJECT_CLASS_TYPE (g_object_class),
+                      G_SIGNAL_RUN_FIRST,
+                      G_STRUCT_OFFSET (HCPAppViewClass, focus_changed),
+                      NULL, NULL,
+                      g_cclosure_marshal_VOID__OBJECT,
+                      G_TYPE_NONE, 1,
+                      HCP_TYPE_APP);
 
   g_type_class_add_private (g_object_class, sizeof (HCPAppViewPrivate));
 }

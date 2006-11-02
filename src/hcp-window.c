@@ -558,11 +558,25 @@ hcp_window_topmost_status_change (GObject *gobject,
 }
 
 static void 
+hcp_window_app_view_focus_cb (HCPAppView *view,
+                              HCPApp     *app, 
+                              HCPWindow  *window)
+{
+  if (window->priv->focused_item)
+    g_object_unref (window->priv->focused_item);
+
+  window->priv->focused_item = g_object_ref (app);
+}
+
+static void 
 hcp_window_app_list_updated_cb (HCPAppList *al, HCPWindow *window)
 {
   GHashTable *apps = NULL;
   HCPApp *app = NULL;
   gchar *focused = NULL;
+
+  if (!window->priv->focused_item)
+    g_printerr ("EU PRECISO DE AJUDAAAA!\n");
 
   g_object_get (G_OBJECT (window->priv->focused_item),
                 "plugin", &focused,
@@ -803,8 +817,11 @@ hcp_window_init (HCPWindow *window)
   priv->view = hcp_app_view_new ();
   hcp_app_view_populate (priv->view, priv->al);
 
+  g_signal_connect (G_OBJECT (priv->view), "focus-changed",
+                    G_CALLBACK (hcp_window_app_view_focus_cb), window);
+
   g_signal_connect (G_OBJECT (priv->al), "updated",
-                    G_CALLBACK (hcp_window_app_list_updated_cb), NULL);
+                    G_CALLBACK (hcp_window_app_list_updated_cb), window);
 
   hcp_window_retrieve_configuration (window);
 
@@ -846,13 +863,13 @@ hcp_window_finalize (GObject *object)
   window = HCP_WINDOW (object);
   priv = window->priv;
 
-  if (priv->al != NULL) 
+  if (priv->al) 
   {
     g_object_unref (priv->al);
     priv->al = NULL;
   }
 
-  if (priv->focused_item != NULL) 
+  if (priv->focused_item) 
   {
     g_object_unref (priv->focused_item);
     priv->focused_item = NULL;

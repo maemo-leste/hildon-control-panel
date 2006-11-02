@@ -28,6 +28,7 @@
 #include <gtk/gtk.h>
 
 #include "hcp-app-list.h"
+#include "hcp-app.h"
 
 G_BEGIN_DECLS
 
@@ -58,6 +59,8 @@ struct _HCPAppView
 struct _HCPAppViewClass 
 {
   GtkVBoxClass parent_class;
+
+  void (*focus_changed) (HCPAppView *view, HCPApp *app, gpointer user_data);
 };
 
 GType        hcp_app_view_get_type        (void);

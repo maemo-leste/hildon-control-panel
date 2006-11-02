@@ -31,10 +31,10 @@ INCLUDES = \
 	-DHCP_PLUGIN_DIR=\"$(hildoncplibdir)\"
 
 hcp-marshalers.h: hcp-marshalers.list
-	$(GLIB_GENMARSHAL) $< --header --prefix=_cp_marshal > $@
+	$(GLIB_GENMARSHAL) $< --header --prefix=hcp_marshal > $@
 
 hcp-marshalers.c: hcp-marshalers.list
-	$(GLIB_GENMARSHAL) $< --header --body --prefix=_cp_marshal > $@
+	$(GLIB_GENMARSHAL) $< --header --body --prefix=hcp_marshal > $@
 
 bin_PROGRAMS = controlpanel
 

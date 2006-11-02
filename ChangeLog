@@ -1,5 +1,10 @@
 2006-11-02  Lucas Rocha  <lucas.rocha@nokia.com>
 
+	* src/hcp-window.c, src/hcp-app-view.[ch], src/hcp-marshalers.list:
+	correct handling of focused item change.
+
+2006-11-02  Lucas Rocha  <lucas.rocha@nokia.com>
+
 	* configure.ac, src/Makefile.am, src/hcp-marshalers.list: make 
 	marshalers automaticaly generated.
 
