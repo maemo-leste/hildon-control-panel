@@ -185,7 +185,7 @@ hcp_app_view_add_category (HCPCategory *category, GtkWidget *view)
     /* Why do we explicitely need to do this, shouldn't GTK take
      * care of it? -- Jobi  */
     gtk_container_get_focus_chain (GTK_CONTAINER (view), &focus_chain);
-    focus_chain = g_list_append(focus_chain, grid);
+    focus_chain = g_list_append (focus_chain, grid);
     gtk_container_set_focus_chain (GTK_CONTAINER (view), focus_chain);
     g_list_free (focus_chain);
 
@@ -279,11 +279,9 @@ hcp_app_view_populate (GtkWidget *view, HCPAppList *al)
                    (GFunc) hcp_app_view_add_category,
                    view);
 
-#if 0
   /* Put focus on the first item of the first grid */
   if (HCP_APP_VIEW (view)->priv->first_grid)
     gtk_widget_grab_focus (HCP_APP_VIEW (view)->priv->first_grid);
-#endif
 }
 
 /* FIXME: use a widget better suited for this situation. Grid wants all the

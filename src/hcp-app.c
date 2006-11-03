@@ -316,7 +316,7 @@ hcp_app_set_property (GObject      *gobject,
     case HCP_APP_PROP_GRID_ITEM:
       if (app->priv->grid_item)
         g_object_unref (app->priv->grid_item);
-      app->priv->grid_item = g_value_get_object (value);
+      app->priv->grid_item = g_object_ref (g_value_get_object (value));
       g_printerr ("Setting app grid item\n");
       break;
 

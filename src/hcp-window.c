@@ -102,7 +102,7 @@ hcp_window_enforce_state (HCPWindow *window)
       hcp_app_view_set_icon_size (window->priv->view,
                                   HCP_APP_VIEW_ICON_SIZE_LARGE);
     else 
-        ULOG_ERR("Unknown iconsize");
+      ULOG_ERR("Unknown iconsize");
 
     /* If the saved focused item filename is defined, try to 
      * focus on the item. */
@@ -562,9 +562,11 @@ hcp_window_app_view_focus_cb (HCPAppView *view,
                               HCPApp     *app, 
                               HCPWindow  *window)
 {
-  if (window->priv->focused_item)
+  if (window->priv->focused_item != NULL)
     g_object_unref (window->priv->focused_item);
 
+  /* Get a increment reference count to avoid object
+   * destruction on HCPAppList update. */
   window->priv->focused_item = g_object_ref (app);
 }
 
@@ -575,12 +577,11 @@ hcp_window_app_list_updated_cb (HCPAppList *al, HCPWindow *window)
   HCPApp *app = NULL;
   gchar *focused = NULL;
 
-  if (!window->priv->focused_item)
-    g_printerr ("EU PRECISO DE AJUDAAAA!\n");
-
   g_object_get (G_OBJECT (window->priv->focused_item),
                 "plugin", &focused,
                 NULL);
+
+  g_object_unref (window->priv->focused_item);
 
   g_object_get (G_OBJECT (window->priv->al),
                 "apps", &apps,
@@ -835,20 +836,18 @@ hcp_window_init (HCPWindow *window)
                   "apps", &apps,
                   NULL);
 
-    priv->focused_item = g_hash_table_lookup (apps,
-                                              priv->saved_focused_filename);
+    priv->focused_item = g_object_ref (g_hash_table_lookup (apps,
+                                              priv->saved_focused_filename));
   }
 
   hcp_window_construct_ui (window);
 
   hcp_window_enforce_state (window);
   
-/* FIXME
-  if (hcp->execute == 1 && hcp->focused_item) {
-      priv->execute = FALSE;
-      hcp_app_launch (priv->focused_item, FALSE);
+  if (program->execute == 1 && priv->focused_item) {
+    program->execute = 0;
+    hcp_app_launch (priv->focused_item, FALSE);
   }
-*/
 }
 
 static void
@@ -863,13 +862,13 @@ hcp_window_finalize (GObject *object)
   window = HCP_WINDOW (object);
   priv = window->priv;
 
-  if (priv->al) 
+  if (priv->al != NULL) 
   {
     g_object_unref (priv->al);
     priv->al = NULL;
   }
 
-  if (priv->focused_item) 
+  if (priv->focused_item != NULL) 
   {
     g_object_unref (priv->focused_item);
     priv->focused_item = NULL;
