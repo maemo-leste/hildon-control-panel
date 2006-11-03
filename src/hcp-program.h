@@ -24,6 +24,10 @@
 #ifndef HCP_PROGRAM_H
 #define HCP_PROGRAM_H
 
+#ifndef DBUS_API_SUBJECT_TO_CHANGE
+#define DBUS_API_SUBJECT_TO_CHANGE
+#endif /* dbus_api_subject_to_change */
+
 #include <libosso.h>
 
 #include <glib-object.h>

@@ -1,5 +1,10 @@
 2006-11-03  Lucas Rocha  <lucas.rocha@nokia.com>
 
+	* src/hcp-window-c, src/hcp-main.c, src/hcp-app.c, 
+	src/hcp-app-view.c, src/hcp-app-list.c: several code cleanups.
+
+2006-11-03  Lucas Rocha  <lucas.rocha@nokia.com>
+
 	* src/hcp-window-c: fix crash on HCPAppList update triggered when
 	a new .desktop file is found.
 

@@ -138,8 +138,6 @@ hcp_app_view_add_app (HCPApp *app, GtkWidget *grid)
                 "icon", &icon,
                 NULL); 
 
-  g_printerr ("Adding app to grid: %s\n", name);
-
   grid_item = cp_grid_item_new_with_label (icon, _(name));
 
   g_signal_connect (grid_item, "focus-in-event",
@@ -171,8 +169,6 @@ hcp_app_view_add_category (HCPCategory *category, GtkWidget *view)
     GtkWidget *grid, *separator;
 
     grid = hcp_app_view_create_grid ();
-
-    g_printerr ("Adding category: %s\n", category->name);
 
     /* If we are creating a group with a defined name, we use
      * it in the separator */

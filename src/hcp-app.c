@@ -287,37 +287,31 @@ hcp_app_set_property (GObject      *gobject,
     case HCP_APP_PROP_NAME:
       g_free (app->priv->name);
       app->priv->name = g_strdup (g_value_get_string (value));
-      g_printerr ("Setting app name: %s\n", app->priv->name);
       break;
 
     case HCP_APP_PROP_PLUGIN:
       g_free (app->priv->plugin);
       app->priv->plugin = g_strdup (g_value_get_string (value));
-      g_printerr ("Setting app plugin: %s\n", app->priv->plugin);
       break;
 
     case HCP_APP_PROP_ICON:
       g_free (app->priv->icon);
       app->priv->icon = g_strdup (g_value_get_string (value));
-      g_printerr ("Setting app icon: %s\n", app->priv->icon);
       break;
 
     case HCP_APP_PROP_CATEGORY:
       g_free (app->priv->category);
       app->priv->category = g_strdup (g_value_get_string (value));
-      g_printerr ("Setting app category: %s\n", app->priv->category);
       break;
 
     case HCP_APP_PROP_IS_RUNNING:
       app->priv->is_running = g_value_get_boolean (value);
-      g_printerr ("Setting app is running: %d\n", app->priv->is_running);
       break;
 
     case HCP_APP_PROP_GRID_ITEM:
       if (app->priv->grid_item)
         g_object_unref (app->priv->grid_item);
       app->priv->grid_item = g_object_ref (g_value_get_object (value));
-      g_printerr ("Setting app grid item\n");
       break;
 
     default:

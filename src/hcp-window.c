@@ -125,7 +125,8 @@ hcp_window_enforce_state (HCPWindow *window)
       window->priv->saved_focused_filename = NULL;
     }
 
-    /* main() will start the possible plugin in hcp->execute */
+    /* HCPProgram will start the possible plugin in 
+     * program->execute */
 }
 
 static void 
@@ -181,8 +182,6 @@ hcp_window_retrieve_state (HCPWindow *window)
     goto cleanup;
   }
 
-  g_printerr ("Retrieve State focused: %s\n", focused);
-
   window->priv->saved_focused_filename = focused;
 
   scroll_value = g_key_file_get_integer (keyfile,
@@ -197,8 +196,6 @@ hcp_window_retrieve_state (HCPWindow *window)
     goto cleanup;
   }
   
-  g_printerr ("Retrieve State scroll value: %d\n", scroll_value);
-
   window->priv->scroll_value = scroll_value;
   
   execute = g_key_file_get_boolean (keyfile,
@@ -213,8 +210,6 @@ hcp_window_retrieve_state (HCPWindow *window)
     goto cleanup;
   }
   
-  g_printerr ("State scroll execute: %d\n", execute);
-
   program->execute = execute;
 
 cleanup:
@@ -420,25 +415,25 @@ hcp_window_launch_help (GtkWidget *widget, HCPWindow *window)
 
   switch (help_ret)
   {
-     case OSSO_OK:
-       break;
+    case OSSO_OK:
+      break;
 
-     case OSSO_ERROR:
-       ULOG_WARN ("HELP: ERROR (No help for such topic ID)\n");
-       break;
+    case OSSO_ERROR:
+      ULOG_WARN ("HELP: ERROR (No help for such topic ID)\n");
+      break;
 
-     case OSSO_RPC_ERROR:
-       ULOG_WARN ("HELP: RPC ERROR (RPC failed for HelpApp/Browser)\n");
-       break;
+    case OSSO_RPC_ERROR:
+      ULOG_WARN ("HELP: RPC ERROR (RPC failed for HelpApp/Browser)\n");
+      break;
 
-     case OSSO_INVALID:
-       ULOG_WARN ("HELP: INVALID (invalid argument)\n");
-       break;
+    case OSSO_INVALID:
+      ULOG_WARN ("HELP: INVALID (invalid argument)\n");
+      break;
 
-     default:
-       ULOG_WARN ("HELP: Unknown error!\n");
-       break;
-   }
+    default:
+      ULOG_WARN ("HELP: Unknown error!\n");
+      break;
+  }
 }
 
 static gboolean 
@@ -565,7 +560,7 @@ hcp_window_app_view_focus_cb (HCPAppView *view,
   if (window->priv->focused_item != NULL)
     g_object_unref (window->priv->focused_item);
 
-  /* Get a increment reference count to avoid object
+  /* Increment reference count to avoid object
    * destruction on HCPAppList update. */
   window->priv->focused_item = g_object_ref (app);
 }
@@ -582,6 +577,7 @@ hcp_window_app_list_updated_cb (HCPAppList *al, HCPWindow *window)
                 NULL);
 
   g_object_unref (window->priv->focused_item);
+  window->priv->focused_item = NULL;
 
   g_object_get (G_OBJECT (window->priv->al),
                 "apps", &apps,

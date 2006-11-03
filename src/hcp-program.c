@@ -295,11 +295,4 @@ hcp_program_run (HCPProgram *program)
 
   /* Always start the user interface for now */
   hcp_program_show_window (program);
-
-/*  
-  if (program->execute == 1 && hcp->focused_item) {
-    program->execute = 0;
-    hcp_app_launch (hcp->focused_item, FALSE); 
-  }
-*/
 }

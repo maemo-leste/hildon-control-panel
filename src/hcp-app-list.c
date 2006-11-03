@@ -340,8 +340,6 @@ hcp_app_list_read_desktop_entries (const gchar *dir_path, GHashTable *entries)
 
     desktop_path = g_build_filename (dir_path, filename, NULL);
 
-    g_printerr ("Reading: %s\n", desktop_path);
-
     g_key_file_load_from_file (keyfile,
                                desktop_path,
                                G_KEY_FILE_NONE,
@@ -362,8 +360,6 @@ hcp_app_list_read_desktop_entries (const gchar *dir_path, GHashTable *entries)
             NULL /* current locale */,
             &error);
 
-    g_printerr ("  + Name: %s\n", name);
-
     if (error)
     {
       ULOG_ERR (error->message);
@@ -375,8 +371,6 @@ hcp_app_list_read_desktop_entries (const gchar *dir_path, GHashTable *entries)
             HCP_DESKTOP_GROUP,
             HCP_DESKTOP_KEY_PLUGIN,
             &error);
-
-    g_printerr ("  + Plugin: %s\n", plugin);
 
     if (error)
     {
@@ -390,8 +384,6 @@ hcp_app_list_read_desktop_entries (const gchar *dir_path, GHashTable *entries)
             HCP_DESKTOP_KEY_ICON,
             &error);
 
-    g_printerr ("  + Icon: %s\n", icon);
-
     if (error)
     {
       ULOG_WARN (error->message);
@@ -404,8 +396,6 @@ hcp_app_list_read_desktop_entries (const gchar *dir_path, GHashTable *entries)
             HCP_DESKTOP_GROUP,
             HCP_DESKTOP_KEY_CATEGORY,
             &error);
-
-    g_printerr ("  + Category: %s\n", category);
 
     if (error)
     {
@@ -451,7 +441,6 @@ hcp_app_list_find_category (gpointer _category, gpointer _app)
   if (category_id && category->id &&
       !strcmp (category_id, category->id))
   {
-    g_printerr ("App found in category %s\n", category_id);
     g_free (category_id);
     return 0;
   }
