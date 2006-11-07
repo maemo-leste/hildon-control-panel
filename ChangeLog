@@ -1,5 +1,10 @@
 2006-11-07  Lucas Rocha  <lucas.rocha@nokia.com>
 
+	* src/hcp-grid.c, src/hcp-app-list.c, src/hcp-grid-item.c: fixed
+	some memory leaks and memory access errors.
+
+2006-11-07  Lucas Rocha  <lucas.rocha@nokia.com>
+
 	* src/hcp-app.list.c: fixed a memory leak.
 	* src/hcp-window.c (hcp_window_keyboard_listener): added 
 	fullscreen support.

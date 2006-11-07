@@ -223,6 +223,8 @@ hcp_app_list_free_category (HCPCategory* category)
 
   if (category->name)
     g_free (category->name);
+
+  g_free (category);
 }
 
 static void
@@ -238,6 +240,8 @@ hcp_app_list_empty_category (HCPCategory* category)
 static gboolean
 hcp_app_list_free_app (gchar *plugin, HCPApp *app)
 {
+  g_free (plugin);
+
   if (app)
     g_object_unref (app);
 
@@ -265,6 +269,7 @@ hcp_app_list_finalize (GObject *object)
   if (priv->categories != NULL) 
   {
     g_slist_foreach (priv->categories, (GFunc) hcp_app_list_free_category, NULL);
+    g_slist_free (priv->categories);
   }
 }
 
@@ -435,7 +440,7 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
                   "category", category,
                   NULL); 
 
-    g_hash_table_insert (al->priv->apps, plugin, app);
+    g_hash_table_insert (al->priv->apps, g_strdup (plugin), app);
 
     g_free (name);
     g_free (plugin);

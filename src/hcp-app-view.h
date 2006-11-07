@@ -67,7 +67,7 @@ GType        hcp_app_view_get_type        (void);
 
 GtkWidget*   hcp_app_view_new             (void);
 
-void         hcp_app_view_populate        (GtkWidget *view,
+void         hcp_app_view_populate        (HCPAppView *view,
                                            HCPAppList *al);
 
 void         hcp_app_view_set_icon_size   (GtkWidget *view,

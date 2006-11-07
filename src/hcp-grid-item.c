@@ -731,6 +731,7 @@ cp_grid_item_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
     if (priv->label == NULL && priv->icon == NULL) {
         return;
     }
+
     if (priv->label != NULL) {
         gtk_widget_get_child_requisition(priv->label, &l_req);
     } else {
@@ -741,6 +742,7 @@ cp_grid_item_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
     i_alloc.x = allocation->x + priv->focus_margin;
     i_alloc.y = allocation->y; /* +
         (priv->label_height - priv->icon_height) / 2;*/
+    i_alloc.height = priv->icon_height;
 
     if (priv->label != NULL) {
         l_alloc.x = allocation->x + priv->focus_margin +

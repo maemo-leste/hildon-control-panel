@@ -1407,6 +1407,16 @@ cp_grid_destroy( GtkObject * self )
     GTK_OBJECT_CLASS(parent_class)->destroy(self);
 }
 
+static void
+cp_grid_free_child (CPGridChild *child)
+{
+  if (child->widget) 
+  {
+    g_object_unref (child->widget);
+  }
+
+  g_free (child);
+}
 
 static void 
 cp_grid_finalize( GObject * object )
@@ -1423,6 +1433,16 @@ cp_grid_finalize( GObject * object )
     if (priv->style != NULL) {
         g_free(priv->style);
     }
+
+    if (priv->children != NULL) {
+        g_list_foreach (priv->children, (GFunc) cp_grid_free_child, NULL);
+        g_list_free (priv->children);
+    }
+    if (priv->empty_label != NULL) {
+        g_object_unref (priv->empty_label);
+        priv->empty_label = NULL;
+    }
+
     if (G_OBJECT_CLASS(parent_class)->finalize) {
         G_OBJECT_CLASS(parent_class)->finalize(object);
     }

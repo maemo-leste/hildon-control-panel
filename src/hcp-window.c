@@ -600,7 +600,7 @@ hcp_window_app_list_updated_cb (HCPAppList *al, HCPWindow *window)
                 NULL);
 
   /* Update the view */
-  hcp_app_view_populate (window->priv->view, al);
+  hcp_app_view_populate (HCP_APP_VIEW (window->priv->view), al);
   gtk_widget_show_all (window->priv->view);
 
   app = g_hash_table_lookup (apps,
@@ -617,6 +617,8 @@ hcp_window_app_list_updated_cb (HCPAppList *al, HCPWindow *window)
 static void hcp_window_quit (GtkWidget *widget, HCPWindow *window)
 {
   hcp_window_save_state (window, TRUE);
+
+  gtk_widget_destroy (GTK_WIDGET (window));
 
   gtk_main_quit ();
 }
@@ -829,7 +831,7 @@ hcp_window_init (HCPWindow *window)
   priv->al = g_object_ref (program->al);
 
   priv->view = hcp_app_view_new ();
-  hcp_app_view_populate (priv->view, priv->al);
+  hcp_app_view_populate (HCP_APP_VIEW (priv->view), priv->al);
 
   g_signal_connect (G_OBJECT (priv->view), "focus-changed",
                     G_CALLBACK (hcp_window_app_view_focus_cb), window);

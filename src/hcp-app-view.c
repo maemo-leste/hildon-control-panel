@@ -159,17 +159,16 @@ hcp_app_view_add_app (HCPApp *app, GtkWidget *grid)
 }
 
 static void
-hcp_app_view_add_category (HCPCategory *category, GtkWidget *view)
+hcp_app_view_add_category (HCPCategory *category, HCPAppView *view)
 {
-  GList *focus_chain = NULL;
-
   /* If a group has items */
   if (category->apps)
   {
     GtkWidget *grid, *separator;
+    GList *focus_chain = NULL;
 
     grid = hcp_app_view_create_grid ();
-
+ 
     /* If we are creating a group with a defined name, we use
      * it in the separator */
     separator = hcp_app_view_create_separator (_(category->name));
@@ -189,8 +188,8 @@ hcp_app_view_add_category (HCPCategory *category, GtkWidget *view)
                      (GFunc) hcp_app_view_add_app,
                      grid);
 
-    if (!HCP_APP_VIEW (view)->priv->first_grid)
-      HCP_APP_VIEW (view)->priv->first_grid = g_object_ref (grid);
+    if (!view->priv->first_grid)
+      view->priv->first_grid = grid;
   }
 }
 
@@ -210,20 +209,6 @@ hcp_app_view_init (HCPAppView *view)
 static void
 hcp_app_view_finalize (GObject *object)
 {
-  HCPAppView *view;
-  HCPAppViewPrivate *priv;
-  
-  g_return_if_fail (object != NULL);
-  g_return_if_fail (HCP_IS_APP_VIEW (object));
-
-  view = HCP_APP_VIEW (object);
-  priv = view->priv;
-
-  if (priv->first_grid) 
-  {
-    g_object_unref (priv->first_grid);
-    priv->first_grid = NULL;
-  }
 }
 
 static void
@@ -255,7 +240,7 @@ hcp_app_view_new ()
 }
 
 void
-hcp_app_view_populate (GtkWidget *view, HCPAppList *al)
+hcp_app_view_populate (HCPAppView *view, HCPAppList *al)
 {
   GSList *categories = NULL;
 
@@ -267,7 +252,7 @@ hcp_app_view_populate (GtkWidget *view, HCPAppList *al)
                          (GtkCallback) gtk_widget_destroy,
                          NULL);
 
-  HCP_APP_VIEW (view)->priv->first_grid = NULL;
+  view->priv->first_grid = NULL;
 
   gtk_container_set_focus_chain (GTK_CONTAINER (view), NULL);
 
@@ -276,8 +261,8 @@ hcp_app_view_populate (GtkWidget *view, HCPAppList *al)
                    view);
 
   /* Put focus on the first item of the first grid */
-  if (HCP_APP_VIEW (view)->priv->first_grid)
-    gtk_widget_grab_focus (HCP_APP_VIEW (view)->priv->first_grid);
+  if (view->priv->first_grid)
+    gtk_widget_grab_focus (view->priv->first_grid);
 }
 
 /* FIXME: use a widget better suited for this situation. Grid wants all the
