@@ -175,6 +175,7 @@ hcp_app_list_get_configured_categories (HCPAppList *al)
 
     category->id = (gchar *) group_ids_i->data;
     category->name = (gchar *) group_names_i->data;
+    category->apps = NULL;
 
     al->priv->categories = g_slist_append (al->priv->categories, category);
 
@@ -204,6 +205,7 @@ hcp_app_list_init (HCPAppList *al)
   /* Add the default category as the last one */
   extras_category->id   = g_strdup ("");
   extras_category->name = g_strdup (HCP_SEPARATOR_DEFAULT);
+  extras_category->apps = NULL;
 
   al->priv->categories = g_slist_append (al->priv->categories, extras_category);
 
@@ -211,16 +213,33 @@ hcp_app_list_init (HCPAppList *al)
 }
 
 static void
-hcp_app_list_empty_category (HCPCategory* category)
+hcp_app_list_free_category (HCPCategory* category)
 {
   g_slist_free (category->apps);
   category->apps = NULL;
+
+  if (category->id)
+    g_free (category->id);
+
+  if (category->name)
+    g_free (category->name);
+}
+
+static void
+hcp_app_list_empty_category (HCPCategory* category)
+{
+  if (category->apps)
+  {
+    g_slist_free (category->apps);
+    category->apps = NULL;
+  }
 }
 
 static gboolean
 hcp_app_list_free_app (gchar *plugin, HCPApp *app)
 {
-  g_object_unref (app);
+  if (app)
+    g_object_unref (app);
 
   return TRUE;
 }
@@ -241,8 +260,11 @@ hcp_app_list_finalize (GObject *object)
   {
     g_hash_table_foreach_remove (priv->apps, (GHRFunc) hcp_app_list_free_app, NULL);
     g_hash_table_destroy (priv->apps);
+  }
 
-    g_slist_foreach (priv->categories, (GFunc) hcp_app_list_empty_category, NULL);
+  if (priv->categories != NULL) 
+  {
+    g_slist_foreach (priv->categories, (GFunc) hcp_app_list_free_category, NULL);
   }
 }
 
@@ -307,7 +329,7 @@ hcp_app_list_class_init (HCPAppListClass *class)
 }
  
 static void 
-hcp_app_list_read_desktop_entries (const gchar *dir_path, GHashTable *entries)
+hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
 {
   GDir *dir;
   GError *error = NULL;
@@ -316,7 +338,7 @@ hcp_app_list_read_desktop_entries (const gchar *dir_path, GHashTable *entries)
 
   ULOG_DEBUG("hcp-app-list:read_desktop_entries");
 
-  g_return_if_fail (dir_path && entries);
+  g_return_if_fail (dir_path && al->priv->apps);
 
   dir = g_dir_open(dir_path, 0, &error);
 
@@ -331,6 +353,7 @@ hcp_app_list_read_desktop_entries (const gchar *dir_path, GHashTable *entries)
 
   while ((filename = g_dir_read_name (dir)))
   {
+    GObject *app = NULL;
     error = NULL;
     gchar *desktop_path = NULL;
     gchar *name = NULL;
@@ -391,7 +414,6 @@ hcp_app_list_read_desktop_entries (const gchar *dir_path, GHashTable *entries)
       error = NULL;
     }
     
-
     category = g_key_file_get_string (keyfile,
             HCP_DESKTOP_GROUP,
             HCP_DESKTOP_KEY_CATEGORY,
@@ -404,18 +426,16 @@ hcp_app_list_read_desktop_entries (const gchar *dir_path, GHashTable *entries)
       error = NULL;
     }
 
-    {
-      GObject *app = hcp_app_new ();
+    app = hcp_app_new ();
 
-      g_object_set (G_OBJECT (app), 
-                    "name", name,
-                    "plugin", plugin,
-                    "icon", icon,
-                    "category", category,
-                    NULL); 
+    g_object_set (G_OBJECT (app), 
+                  "name", name,
+                  "plugin", plugin,
+                  "icon", icon,
+                  "category", category,
+                  NULL); 
 
-      g_hash_table_insert (entries, plugin, app);
-    }
+    g_hash_table_insert (al->priv->apps, plugin, app);
 
     g_free (name);
     g_free (plugin);
@@ -487,10 +507,11 @@ hcp_app_list_update (HCPAppList *al)
   g_hash_table_foreach_remove (al->priv->apps, (GHRFunc) hcp_app_list_free_app, NULL);
 
   /* Read all the entries */
-  hcp_app_list_read_desktop_entries (CONTROLPANEL_ENTRY_DIR, al->priv->apps);
+  hcp_app_list_read_desktop_entries (al, CONTROLPANEL_ENTRY_DIR);
 
   /* Place them is the relevant category */
   g_slist_foreach (al->priv->categories, (GFunc) hcp_app_list_empty_category, NULL);
+
   g_hash_table_foreach (al->priv->apps,
                         (GHFunc) hcp_app_list_sort_by_category,
                         al);
