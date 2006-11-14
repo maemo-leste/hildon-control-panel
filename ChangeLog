@@ -1,5 +1,9 @@
 2006-11-14  Lucas Rocha  <lucas.rocha@nokia.com>
 
+	* src/hcp-grid.c: fix focus behavior among grids.
+
+2006-11-14  Lucas Rocha  <lucas.rocha@nokia.com>
+
 	Initial port to GtkIconView. Some focus/size issues to 
 	be solved.
 

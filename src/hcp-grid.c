@@ -308,19 +308,30 @@ hcp_grid_select_from_outside (GtkWidget *widget,
 
 static gboolean 
 hcp_grid_focus_in (GtkWidget     *widget, 
-                    GdkEventFocus *event)
+                   GdkEventFocus *event)
 {
+  GList *iter = NULL;
+  GList *list = NULL;
+
+  /*
+   * Unselect all on other grids 
+   */
+  list = iter = gtk_container_get_children (GTK_CONTAINER (widget->parent));
+
+  while (iter != 0)
+  {
+    if (HCP_IS_GRID (iter->data) && widget != iter->data)
+    {
+      gtk_icon_view_unselect_all (GTK_ICON_VIEW (iter->data));
+    }
+
+    iter = iter->next;
+  }
+
+  g_list_free (list);
+
   HCP_GRID (widget)->priv->focused_in = TRUE;
   HCP_GRID (widget)->priv->can_move_focus = TRUE;
-
-  return TRUE;
-}
-
-static gboolean 
-hcp_grid_focus_out (GtkWidget     *widget, 
-                    GdkEventFocus *event)
-{
-  gtk_icon_view_unselect_all (GTK_ICON_VIEW (widget));
 
   return TRUE;
 }
@@ -385,8 +396,8 @@ hcp_grid_keyboard_listener (GtkWidget   *widget,
       case HILDON_HARDKEY_RIGHT:
         if (y == 0 || y == last_row)
         {
-           if (!HCP_GRID (widget)->priv->can_move_focus)
-             HCP_GRID (widget)->priv->can_move_focus = TRUE;
+          if (!HCP_GRID (widget)->priv->can_move_focus)
+            HCP_GRID (widget)->priv->can_move_focus = TRUE;
         } 
         break;
     }
@@ -424,7 +435,6 @@ hcp_grid_class_init (HCPGridClass *class)
 
   widget_class->size_request = hcp_grid_size_request;
   widget_class->key_release_event = hcp_grid_keyboard_listener;
-  widget_class->focus_out_event = hcp_grid_focus_out;
   widget_class->focus_in_event = hcp_grid_focus_in;
   widget_class->button_press_event = hcp_grid_button_pressed;
 
