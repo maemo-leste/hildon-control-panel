@@ -30,7 +30,6 @@
 #include "hcp-app-list.h"
 #include "hcp-app.h"
 #include "hcp-grid.h"
-#include "hcp-grid-item.h"
 #include "hcp-marshalers.h"
 
 #define HCP_APP_VIEW_GET_PRIVATE(object) \

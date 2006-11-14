@@ -53,13 +53,10 @@ controlpanel_SOURCES = \
 	hcp-app-list.h \
 	hcp-app-view.c \
 	hcp-app-view.h \
-	hcp-rfs.c \
-	hcp-rfs.h \
 	hcp-grid.h \
 	hcp-grid.c \
-	hcp-grid-item-private.h \
-	hcp-grid-item.h \
-	hcp-grid-item.c \
+	hcp-rfs.c \
+	hcp-rfs.h \
 	hildon-cp-plugin-interface.h
 
 BUILT_SOURCES = hcp-marshalers.c \
