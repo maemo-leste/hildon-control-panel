@@ -181,10 +181,14 @@ hcp_app_view_grid_selection_changed (GtkWidget *widget, gpointer user_data)
 }
 
 static void
-hcp_app_view_add_app (HCPApp *app, GtkListStore *store)
+hcp_app_view_add_app (HCPApp *app, HCPGrid *grid)
 {
+  GtkTreeModel *store;
+  GtkTreePath *path;
   GtkTreeIter iter;
   gchar *name = NULL;
+
+  store = gtk_icon_view_get_model (GTK_ICON_VIEW (grid));
 
   g_object_get (G_OBJECT (app),
                 "name", &name,
@@ -196,11 +200,15 @@ hcp_app_view_add_app (HCPApp *app, GtkListStore *store)
                       HCP_STORE_LABEL, _(name),
                       HCP_STORE_APP, app,
                       -1);
-#if 0
+
+  path = gtk_tree_model_get_path (GTK_TREE_MODEL (store), &iter);
+
   g_object_set (G_OBJECT (app),
-                "grid-item", grid_item,
+                "grid", grid,
+                "item-pos", gtk_tree_path_get_indices (path) [0],
                 NULL);
-#endif
+
+  gtk_tree_path_free (path);
 
   g_free (name);
 }
@@ -239,12 +247,12 @@ hcp_app_view_add_category (HCPCategory *category, HCPAppView *view)
     gtk_container_set_focus_chain (GTK_CONTAINER (view), focus_chain);
     g_list_free (focus_chain);
 
-    g_slist_foreach (category->apps,
-                     (GFunc) hcp_app_view_add_app,
-                     store);
-
     gtk_icon_view_set_model (GTK_ICON_VIEW (grid), 
                              GTK_TREE_MODEL (store));
+
+    g_slist_foreach (category->apps,
+                     (GFunc) hcp_app_view_add_app,
+                     grid);
 
     if (!view->priv->first_grid)
       view->priv->first_grid = grid;

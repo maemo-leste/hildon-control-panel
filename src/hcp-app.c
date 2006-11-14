@@ -46,7 +46,8 @@ enum
   PROP_ICON,
   PROP_CATEGORY,
   PROP_IS_RUNNING,
-  PROP_GRID_ITEM
+  PROP_GRID,
+  PROP_ITEM_POS
 };
 
 struct _HCPAppPrivate 
@@ -55,8 +56,9 @@ struct _HCPAppPrivate
     gchar      *plugin;
     gchar      *icon;
     gchar      *category;
-    gboolean   is_running;
-    GtkWidget  *grid_item;
+    gboolean    is_running;
+    GtkWidget  *grid;
+    gint        item_pos;
 
     hcp_plugin_save_state_f *save_state;
 };
@@ -87,7 +89,8 @@ hcp_app_init (HCPApp *app)
   app->priv->icon = NULL;
   app->priv->category = NULL;
   app->priv->is_running = FALSE;
-  app->priv->grid_item = NULL;
+  app->priv->grid = NULL;
+  app->priv->item_pos = -1;
   app->priv->save_state = NULL;
 }
 
@@ -224,10 +227,10 @@ hcp_app_finalize (GObject *object)
     priv->category = NULL;
   }
 
-  if (priv->grid_item != NULL) 
+  if (priv->grid != NULL) 
   {
-    g_object_unref (priv->grid_item);
-    priv->grid_item = NULL;
+    g_object_unref (priv->grid);
+    priv->grid = NULL;
   }
 
   G_OBJECT_CLASS (hcp_app_parent_class)->finalize (object);
@@ -264,8 +267,12 @@ hcp_app_get_property (GObject    *gobject,
       g_value_set_boolean (value, app->priv->is_running);
       break;
 
-    case PROP_GRID_ITEM:
-      g_value_set_object (value, app->priv->grid_item);
+    case PROP_GRID:
+      g_value_set_object (value, app->priv->grid);
+      break;
+
+    case PROP_ITEM_POS:
+      g_value_set_int (value, app->priv->item_pos);
       break;
 
     default:
@@ -308,10 +315,14 @@ hcp_app_set_property (GObject      *gobject,
       app->priv->is_running = g_value_get_boolean (value);
       break;
 
-    case PROP_GRID_ITEM:
-      if (app->priv->grid_item)
-        g_object_unref (app->priv->grid_item);
-      app->priv->grid_item = g_object_ref (g_value_get_object (value));
+    case PROP_GRID:
+      if (app->priv->grid)
+        g_object_unref (app->priv->grid);
+      app->priv->grid = g_object_ref (g_value_get_object (value));
+      break;
+
+    case PROP_ITEM_POS:
+      app->priv->item_pos = g_value_get_int (value);
       break;
 
     default:
@@ -371,12 +382,22 @@ hcp_app_class_init (HCPAppClass *class)
                                                         (G_PARAM_READABLE | G_PARAM_WRITABLE)));
 
   g_object_class_install_property (g_object_class,
-                                   PROP_GRID_ITEM,
-                                   g_param_spec_object ("grid-item",
-                                                        "Grid Item",
-                                                        "The grid item associated with this application",
+                                   PROP_GRID,
+                                   g_param_spec_object ("grid",
+                                                        "Grid",
+                                                        "The grid associated with this application",
                                                         GTK_TYPE_WIDGET,
                                                         (G_PARAM_READABLE | G_PARAM_WRITABLE)));
+
+  g_object_class_install_property (g_object_class,
+                                   PROP_ITEM_POS,
+                                   g_param_spec_int ("item-pos",
+                                                     "Item position",
+                                                     "Application position inside the grid",
+                                                     -1,
+                                                     100,
+                                                     -1,
+                                                      (G_PARAM_READABLE | G_PARAM_WRITABLE)));
 
   g_type_class_add_private (g_object_class, sizeof (HCPAppPrivate));
 }
@@ -413,8 +434,15 @@ hcp_app_launch (HCPApp *app, gboolean user_activated)
 void
 hcp_app_focus (HCPApp *app)
 {
-  if (app->priv->grid_item)
-    gtk_widget_grab_focus (app->priv->grid_item);
+  if (app->priv->grid) 
+  {
+    GtkTreePath *path;
+
+    gtk_widget_grab_focus (app->priv->grid);
+    path = gtk_tree_path_new_from_indices (app->priv->item_pos, -1);
+    gtk_icon_view_select_path (GTK_ICON_VIEW (app->priv->grid), path);
+    gtk_tree_path_free (path);
+  }
 }
 
 void

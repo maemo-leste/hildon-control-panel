@@ -1,5 +1,10 @@
 2006-11-14  Lucas Rocha  <lucas.rocha@nokia.com>
 
+	* src/hcp-app.c, src/hcp-app-view.c: fix focus behavior when
+	application list is updated.
+
+2006-11-14  Lucas Rocha  <lucas.rocha@nokia.com>
+
 	* src/hcp-grid.c: fix focus behavior among grids.
 
 2006-11-14  Lucas Rocha  <lucas.rocha@nokia.com>
