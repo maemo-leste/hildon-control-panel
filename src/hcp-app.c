@@ -41,12 +41,12 @@ G_DEFINE_TYPE (HCPApp, hcp_app, G_TYPE_OBJECT);
 
 enum
 {
-  HCP_APP_PROP_NAME = 1,
-  HCP_APP_PROP_PLUGIN,
-  HCP_APP_PROP_ICON,
-  HCP_APP_PROP_CATEGORY,
-  HCP_APP_PROP_IS_RUNNING,
-  HCP_APP_PROP_GRID_ITEM
+  PROP_NAME = 1,
+  PROP_PLUGIN,
+  PROP_ICON,
+  PROP_CATEGORY,
+  PROP_IS_RUNNING,
+  PROP_GRID_ITEM
 };
 
 struct _HCPAppPrivate 
@@ -244,27 +244,27 @@ hcp_app_get_property (GObject    *gobject,
 
   switch (prop_id)
   {
-    case HCP_APP_PROP_NAME:
+    case PROP_NAME:
       g_value_set_string (value, app->priv->name);
       break;
 
-    case HCP_APP_PROP_PLUGIN:
+    case PROP_PLUGIN:
       g_value_set_string (value, app->priv->plugin);
       break;
 
-    case HCP_APP_PROP_ICON:
+    case PROP_ICON:
       g_value_set_string (value, app->priv->icon);
       break;
 
-    case HCP_APP_PROP_CATEGORY:
+    case PROP_CATEGORY:
       g_value_set_string (value, app->priv->category);
       break;
 
-    case HCP_APP_PROP_IS_RUNNING:
+    case PROP_IS_RUNNING:
       g_value_set_boolean (value, app->priv->is_running);
       break;
 
-    case HCP_APP_PROP_GRID_ITEM:
+    case PROP_GRID_ITEM:
       g_value_set_object (value, app->priv->grid_item);
       break;
 
@@ -284,31 +284,31 @@ hcp_app_set_property (GObject      *gobject,
   
   switch (prop_id)
   {
-    case HCP_APP_PROP_NAME:
+    case PROP_NAME:
       g_free (app->priv->name);
       app->priv->name = g_strdup (g_value_get_string (value));
       break;
 
-    case HCP_APP_PROP_PLUGIN:
+    case PROP_PLUGIN:
       g_free (app->priv->plugin);
       app->priv->plugin = g_strdup (g_value_get_string (value));
       break;
 
-    case HCP_APP_PROP_ICON:
+    case PROP_ICON:
       g_free (app->priv->icon);
       app->priv->icon = g_strdup (g_value_get_string (value));
       break;
 
-    case HCP_APP_PROP_CATEGORY:
+    case PROP_CATEGORY:
       g_free (app->priv->category);
       app->priv->category = g_strdup (g_value_get_string (value));
       break;
 
-    case HCP_APP_PROP_IS_RUNNING:
+    case PROP_IS_RUNNING:
       app->priv->is_running = g_value_get_boolean (value);
       break;
 
-    case HCP_APP_PROP_GRID_ITEM:
+    case PROP_GRID_ITEM:
       if (app->priv->grid_item)
         g_object_unref (app->priv->grid_item);
       app->priv->grid_item = g_object_ref (g_value_get_object (value));
@@ -331,7 +331,7 @@ hcp_app_class_init (HCPAppClass *class)
   g_object_class->set_property = hcp_app_set_property;
  
   g_object_class_install_property (g_object_class,
-                                   HCP_APP_PROP_NAME,
+                                   PROP_NAME,
                                    g_param_spec_string ("name",
                                                         "Name",
                                                         "Set app's name",
@@ -339,7 +339,7 @@ hcp_app_class_init (HCPAppClass *class)
                                                         (G_PARAM_READABLE | G_PARAM_WRITABLE)));
  
   g_object_class_install_property (g_object_class,
-                                   HCP_APP_PROP_PLUGIN,
+                                   PROP_PLUGIN,
                                    g_param_spec_string ("plugin",
                                                         "Plugin",
                                                         "Set app's plugin path",
@@ -347,7 +347,7 @@ hcp_app_class_init (HCPAppClass *class)
                                                         (G_PARAM_READABLE | G_PARAM_WRITABLE)));
  
   g_object_class_install_property (g_object_class,
-                                   HCP_APP_PROP_ICON,
+                                   PROP_ICON,
                                    g_param_spec_string ("icon",
                                                         "Icon",
                                                         "Set app's icon",
@@ -355,7 +355,7 @@ hcp_app_class_init (HCPAppClass *class)
                                                         (G_PARAM_READABLE | G_PARAM_WRITABLE)));
 
   g_object_class_install_property (g_object_class,
-                                   HCP_APP_PROP_CATEGORY,
+                                   PROP_CATEGORY,
                                    g_param_spec_string ("category",
                                                         "Category",
                                                         "Set app's category",
@@ -363,7 +363,7 @@ hcp_app_class_init (HCPAppClass *class)
                                                         (G_PARAM_READABLE | G_PARAM_WRITABLE)));
 
   g_object_class_install_property (g_object_class,
-                                   HCP_APP_PROP_IS_RUNNING,
+                                   PROP_IS_RUNNING,
                                    g_param_spec_boolean ("is-running",
                                                         "Running",
                                                         "Whether the application is running or not",
@@ -371,7 +371,7 @@ hcp_app_class_init (HCPAppClass *class)
                                                         (G_PARAM_READABLE | G_PARAM_WRITABLE)));
 
   g_object_class_install_property (g_object_class,
-                                   HCP_APP_PROP_GRID_ITEM,
+                                   PROP_GRID_ITEM,
                                    g_param_spec_object ("grid-item",
                                                         "Grid Item",
                                                         "The grid item associated with this application",

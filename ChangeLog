@@ -1,3 +1,14 @@
+2006-11-14  Lucas Rocha  <lucas.rocha@nokia.com>
+
+	Initial port to GtkIconView. Some focus/size issues to 
+	be solved.
+
+	* src/hcp-app-view.c, src/hcp-grid.h, src/hcp-app-view.h,
+	src/hcp-app-list.h, src/hcp-window.c, src/hcp-app.c,
+	src/hcp-grid.c
+
+	* src/hcp-grid-item.[ch], src/hcp-grid-item-private.c: removed.
+
 2006-11-07  Lucas Rocha  <lucas.rocha@nokia.com>
 
 	* src/hcp-grid.c, src/hcp-app-list.c, src/hcp-grid-item.c: fixed

@@ -62,13 +62,6 @@ struct _HCPAppListClass
 #define HCP_DESKTOP_KEY_CATEGORY        "Categories"
 #define HCP_DESKTOP_KEY_PLUGIN          "X-control-panel-plugin"
 
-enum
-{
-  HCP_ICON_SIZE_SMALL,
-  HCP_ICON_SIZE_NORMAL,
-  HCP_ICON_SIZE_LARGE
-};
-
 typedef struct _HCPCategory {
   gchar   *id;
   gchar   *name;

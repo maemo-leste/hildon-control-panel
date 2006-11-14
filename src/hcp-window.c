@@ -37,6 +37,7 @@
 #include "hcp-app-list.h"
 #include "hcp-app-view.h"
 #include "hcp-app.h"
+#include "hcp-grid.h"
 #include "hcp-rfs.h"
 #include "hcp-config-keys.h"
 
@@ -98,10 +99,10 @@ hcp_window_enforce_state (HCPWindow *window)
     /* Actually enforce the saved state */
     if (window->priv->icon_size == 0)
       hcp_app_view_set_icon_size (window->priv->view,
-                                  HCP_APP_VIEW_ICON_SIZE_SMALL);
+                                  HCP_ICON_SIZE_SMALL);
     else if (window->priv->icon_size == 1)
       hcp_app_view_set_icon_size (window->priv->view,
-                                  HCP_APP_VIEW_ICON_SIZE_LARGE);
+                                  HCP_ICON_SIZE_LARGE);
     else 
       ULOG_ERR("Unknown iconsize");
 
@@ -381,7 +382,7 @@ hcp_window_keyboard_listener (GtkWidget * widget,
           gtk_check_menu_item_set_active (
                   GTK_CHECK_MENU_ITEM (priv->large_icons_menu_item),
                   TRUE);
-          hcp_app_view_set_icon_size (priv->view, HCP_APP_VIEW_ICON_SIZE_LARGE);
+          hcp_app_view_set_icon_size (priv->view, HCP_ICON_SIZE_LARGE);
           hcp_window_save_configuration (window);
   
           return TRUE;
@@ -395,7 +396,7 @@ hcp_window_keyboard_listener (GtkWidget * widget,
           gtk_check_menu_item_set_active (
                   GTK_CHECK_MENU_ITEM (priv->small_icons_menu_item),
                   TRUE);
-          hcp_app_view_set_icon_size (priv->view, HCP_APP_VIEW_ICON_SIZE_SMALL);
+          hcp_app_view_set_icon_size (priv->view, HCP_ICON_SIZE_SMALL);
           hcp_window_save_configuration (window);
 
           return TRUE;
@@ -413,6 +414,7 @@ hcp_window_keyboard_listener (GtkWidget * widget,
           gtk_window_fullscreen (GTK_WINDOW (window));
           priv->fullscreen = TRUE;
         }
+
         break;
     }
   }
@@ -526,13 +528,13 @@ static void hcp_window_iconsize (GtkWidget *widget, HCPWindow *window)
   if (widget == window->priv->large_icons_menu_item)
   {
     hcp_app_view_set_icon_size (window->priv->view,
-                                HCP_APP_VIEW_ICON_SIZE_LARGE);
+                                HCP_ICON_SIZE_LARGE);
     window->priv->icon_size = 1;
   }
   else if (widget == window->priv->small_icons_menu_item)
   {
     hcp_app_view_set_icon_size (window->priv->view,
-                                HCP_APP_VIEW_ICON_SIZE_SMALL);
+                                HCP_ICON_SIZE_SMALL);
     window->priv->icon_size = 0;
   }
   
@@ -830,16 +832,18 @@ hcp_window_init (HCPWindow *window)
 
   priv->al = g_object_ref (program->al);
 
-  priv->view = hcp_app_view_new ();
-  hcp_app_view_populate (HCP_APP_VIEW (priv->view), priv->al);
+  hcp_window_retrieve_configuration (window);
+
+  if (priv->icon_size == 0)
+    priv->view = hcp_app_view_new (HCP_ICON_SIZE_SMALL);
+  else
+    priv->view = hcp_app_view_new (HCP_ICON_SIZE_LARGE);
 
   g_signal_connect (G_OBJECT (priv->view), "focus-changed",
                     G_CALLBACK (hcp_window_app_view_focus_cb), window);
 
   g_signal_connect (G_OBJECT (priv->al), "updated",
                     G_CALLBACK (hcp_window_app_list_updated_cb), window);
-
-  hcp_window_retrieve_configuration (window);
 
   hcp_window_retrieve_state (window);
 
@@ -856,6 +860,8 @@ hcp_window_init (HCPWindow *window)
   }
 
   hcp_window_construct_ui (window);
+
+  hcp_app_view_populate (HCP_APP_VIEW (priv->view), priv->al);
 
   hcp_window_enforce_state (window);
   

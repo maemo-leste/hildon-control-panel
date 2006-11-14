@@ -28,6 +28,7 @@
 #include <gtk/gtk.h>
 
 #include "hcp-app-list.h"
+#include "hcp-grid.h"
 #include "hcp-app.h"
 
 G_BEGIN_DECLS
@@ -42,12 +43,6 @@ typedef struct _HCPAppViewPrivate HCPAppViewPrivate;
 #define HCP_IS_APP_VIEW(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), HCP_TYPE_APP_VIEW))
 #define HCP_IS_APP_VIEW_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),  HCP_TYPE_APP_VIEW))
 #define HCP_APP_VIEW_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),  HCP_TYPE_APP_VIEW, HCPAppViewClass))
-
-typedef enum 
-{
-  HCP_APP_VIEW_ICON_SIZE_SMALL,
-  HCP_APP_VIEW_ICON_SIZE_LARGE
-} HCPAppViewIconSize;
 
 struct _HCPAppView 
 {
@@ -65,13 +60,13 @@ struct _HCPAppViewClass
 
 GType        hcp_app_view_get_type        (void);
 
-GtkWidget*   hcp_app_view_new             (void);
+GtkWidget*   hcp_app_view_new             (HCPIconSize icon_size);
 
 void         hcp_app_view_populate        (HCPAppView *view,
                                            HCPAppList *al);
 
 void         hcp_app_view_set_icon_size   (GtkWidget *view,
-                                           HCPAppViewIconSize size);
+                                           HCPIconSize size);
 
 G_END_DECLS
 

@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2005 Nokia Corporation.
  *
- * Contact: Karoliina Salminen <karoliina.t.salminen@nokia.com>
+ * Author: Lucas Rocha <lucas.rocha@nokia.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -21,98 +21,60 @@
  *
  */
 
-/*
- * @file cp-grid.h
- *
- * This file is a header file for cp-grid.c, the implementation of
- * #CPGrid. #CPGrid is used in views like Home and Control Panel
- * which have single-tap activated items.
- */
+#ifndef HCP_GRID_H
+#define HCP_GRID_H
 
-#ifndef CP_GRID_H_
-#define CP_GRID_H_
-
-#include <gtk/gtkcontainer.h>
-#include "hcp-grid-item.h"
+#include <gtk/gtk.h>
 
 G_BEGIN_DECLS
 
-#define GRID_MAXIMUM_NUMBER_OF_GRIDS 10
+typedef struct _HCPGrid HCPGrid;
+typedef struct _HCPGridClass HCPGridClass;
+typedef struct _HCPGridPrivate HCPGridPrivate;
 
-#define CP_GRID_FOCUS_FROM_ABOVE 0
-#define CP_GRID_FOCUS_FIRST      1
-#define CP_GRID_FOCUS_FROM_BELOW 2
-#define CP_GRID_FOCUS_LAST       3
+#define HCP_TYPE_GRID            (hcp_grid_get_type ())
+#define HCP_GRID(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), HCP_TYPE_GRID, HCPGrid))
+#define HCP_GRID_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass),  HCP_TYPE_GRID, HCPGridClass))
+#define HCP_IS_GRID(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), HCP_TYPE_GRID))
+#define HCP_IS_GRID_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),  HCP_TYPE_GRID))
+#define HCP_GRID_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),  HCP_TYPE_GRID, HCPGridClass))
 
-#define CP_TYPE_GRID            (cp_grid_get_type ())
-#define CP_GRID(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), \
-                                            CP_TYPE_GRID, \
-                                            CPGrid))
-#define CP_GRID_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), \
-                                            CP_TYPE_GRID, \
-                                            CPGridClass))
-#define CP_OBJECT_IS_GRID(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), \
-                                            CP_TYPE_GRID))
-#define CP_OBJECT_IS_GRID_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), \
-                                            CP_TYPE_GRID))
-#define CP_GRID_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), \
-                                            CP_TYPE_GRID, \
-                                            CPGridClass))
-typedef struct _CPGrid CPGrid;
-typedef struct _CPGridClass CPGridClass;
+#define HCP_DEFAULT_ICON_BASENAME  "qgn_list_gene_unknown_file"
 
+typedef enum 
+{
+  HCP_ICON_SIZE_SMALL = 27,
+  HCP_ICON_SIZE_LARGE = 128
+} HCPIconSize;
 
-struct _CPGrid {
-    GtkContainer parent;
+typedef enum {
+  HCP_STORE_ICON = 0,
+  HCP_STORE_LABEL,
+  HCP_STORE_APP,
+  HCP_STORE_NUM_COLUMNS
+} HCPStoreColumn;
+
+struct _HCPGrid 
+{
+  GtkIconView icon_view;
+
+  HCPGridPrivate *priv;
 };
 
-struct _CPGridClass {
-    GtkContainerClass parent_class;
-
-    void (*activate_child) (CPGrid * grid, CPGridItem * item);
-    void (*popup_context_menu) (CPGrid * grid, CPGridItem * item);
+struct _HCPGridClass 
+{
+   GtkIconViewClass icon_view_class;
 };
 
-GType cp_grid_get_type(void) G_GNUC_CONST;
-GtkWidget *cp_grid_new(void);
+GType         hcp_grid_get_type          (void);
 
-/*
- * Use GtkContainer API:
- *
- * void gtk_container_set_focus_child(GtkContainer *container,
- *                                    GtkWidget *child);
- *
- * GTK_CONTAINER (grid)->focus_child can be used to get focused child.
- */
+GtkWidget    *hcp_grid_new               (void);
 
-void cp_grid_set_style(CPGrid * grid, const gchar * style_name);
-const gchar *cp_grid_get_style(CPGrid * grid);
+GtkTreePath  *hcp_grid_get_selected_item (HCPGrid     *grid);
 
-void cp_grid_set_scrollbar_pos(CPGrid * grid, gint scrollbar_pos);
-gint cp_grid_get_scrollbar_pos(CPGrid * grid);
-
-
-/*
- * We are going to use gtk_container_add/remove, so these are internal.
- * If GridView is not visible, it won't update the view, so it should be
- * hidden when doing massive modifications.
- *
- * 
- * Use GtkContainer API:
- *
- * void gtk_container_add(GtkContainer *container,
- *                        GtkWidget *widget);
- *
- * void gtk_container_remove(GtkContainer *container,
- *                           GtkWidget *widget);
- */
-
-void cp_grid_activate_child(CPGrid * grid, CPGridItem * item);
-
-gboolean cp_grid_has_focus(CPGrid *grid);
-
-void cp_grid_focus_first_item(CPGrid *grid);
-
+void          hcp_grid_set_icon_size     (HCPGrid     *grid, 
+                                          HCPIconSize  icon_size);
 
 G_END_DECLS
-#endif /* ifndef CP_GRID_H_ */
+
+#endif
