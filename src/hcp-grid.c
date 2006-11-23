@@ -86,18 +86,6 @@ hcp_grid_update_icon (GtkTreeModel *model,
                                           0, 
                                           &error);
 
-  if (grid->priv->row_height == -1) 
-  {
-    if (grid->priv->icon_size == HCP_ICON_SIZE_SMALL) 
-    {
-      grid->priv->row_height = gdk_pixbuf_get_height (icon_pixbuf) + 10;
-    }
-    else if (grid->priv->icon_size == HCP_ICON_SIZE_LARGE) 
-    {
-      grid->priv->row_height = gdk_pixbuf_get_height (icon_pixbuf) + 2;
-    }
-  }
-
   if (icon_pixbuf == NULL) 
   {
     ULOG_WARN("Couldn't load icon \"%s\": %s", icon, error->message);
@@ -115,6 +103,18 @@ hcp_grid_update_icon (GtkTreeModel *model,
     {
       ULOG_WARN("Couldn't load default icon: %s!", error->message);
       g_error_free (error);
+    }
+  }
+
+  if (grid->priv->row_height == -1) 
+  {
+    if (grid->priv->icon_size == HCP_ICON_SIZE_SMALL) 
+    {
+      grid->priv->row_height = gdk_pixbuf_get_height (icon_pixbuf) + 10;
+    }
+    else if (grid->priv->icon_size == HCP_ICON_SIZE_LARGE) 
+    {
+      grid->priv->row_height = gdk_pixbuf_get_height (icon_pixbuf) + 2;
     }
   }
 
