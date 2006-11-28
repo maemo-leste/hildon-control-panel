@@ -37,14 +37,14 @@
 
 #define HCP_CODE_DIALOG_HELP_TOPIC "Features_restorefactorysettings_passwordquerydialog"
 
-#define HCP_RFS_INFOBANNER_OK     _("rfs_bd_ok")
-#define HCP_RFS_INFOBANNER_CANCEL _("rfs_bd_cancel")
-#define HCP_RFS_IB_WRONG_LOCKCODE dgettext("hildon-libs", "secu_info_incorrectcode")
+#define HCP_RFS_INFOBANNER_OK      _("rfs_bd_ok")
+#define HCP_RFS_INFOBANNER_CANCEL  _("rfs_bd_cancel")
+#define HCP_RFS_IB_WRONG_LOCKCODE  dgettext("hildon-libs", "secu_info_incorrectcode")
 
-#define HCP_MCE_DBUS_SERVICE "com.nokia.mce"
-#define HCP_MCE_DBUS_REQUEST_IF "com.nokia.mce.request"
-#define HCP_MCE_DBUS_REQUEST_PATH "/com/nokia/mce/request"
-#define HCP_MCE_PASSWORD_VALIDATE "validate_devicelock_code"
+#define HCP_MCE_DBUS_SERVICE       "com.nokia.mce"
+#define HCP_MCE_DBUS_REQUEST_IF    "com.nokia.mce.request"
+#define HCP_MCE_DBUS_REQUEST_PATH  "/com/nokia/mce/request"
+#define HCP_MCE_PASSWORD_VALIDATE  "validate_devicelock_code"
 
 #define HCP_DEFAULT_SALT "$1$JE5Gswee$"
 

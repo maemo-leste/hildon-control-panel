@@ -23,7 +23,6 @@
  */
 
 #include <libosso.h>
-#include <osso-log.h>
 #include <osso-helplib.h>
 #include <hildon-widgets/hildon-window.h>
 #include <hildon-widgets/hildon-program.h>
@@ -96,44 +95,52 @@ struct _HCPWindowPrivate
 static void 
 hcp_window_enforce_state (HCPWindow *window)
 {
-    /* Actually enforce the saved state */
-    if (window->priv->icon_size == 0)
-      hcp_app_view_set_icon_size (window->priv->view,
-                                  HCP_ICON_SIZE_SMALL);
-    else if (window->priv->icon_size == 1)
-      hcp_app_view_set_icon_size (window->priv->view,
-                                  HCP_ICON_SIZE_LARGE);
-    else 
-      ULOG_ERR("Unknown iconsize");
+  HCPWindowPrivate *priv;
 
-    /* If the saved focused item filename is defined, try to 
-     * focus on the item. */
-    if (window->priv->saved_focused_filename)
-    {
-      GHashTable *apps = NULL;
-      HCPApp *app = NULL;
+  g_return_if_fail (window);
+  g_return_if_fail (HCP_IS_WINDOW (window));
 
-      g_object_get (G_OBJECT (window->priv->al),
-                    "apps", &apps,
-                    NULL);
+  priv = HCP_WINDOW_GET_PRIVATE (window);
 
-      app = g_hash_table_lookup (apps,
-                                 window->priv->saved_focused_filename);
+  /* Actually enforce the saved state */
+  if (priv->icon_size == 0)
+    hcp_app_view_set_icon_size (priv->view,
+                                HCP_ICON_SIZE_SMALL);
+  else if (priv->icon_size == 1)
+    hcp_app_view_set_icon_size (priv->view,
+                                HCP_ICON_SIZE_LARGE);
+  else 
+    g_warning ("Unknown iconsize");
 
-      if (app)
-        hcp_app_focus (app);
+  /* If the saved focused item filename is defined, try to 
+   * focus on the item. */
+  if (priv->saved_focused_filename)
+  {
+    GHashTable *apps = NULL;
+    HCPApp *app = NULL;
 
-      g_free (window->priv->saved_focused_filename);
-      window->priv->saved_focused_filename = NULL;
-    }
+    g_object_get (G_OBJECT (priv->al),
+                  "apps", &apps,
+                  NULL);
 
-    /* HCPProgram will start the possible plugin in 
-     * program->execute */
+    app = g_hash_table_lookup (apps,
+                               priv->saved_focused_filename);
+
+    if (app)
+      hcp_app_focus (app);
+
+    g_free (priv->saved_focused_filename);
+    priv->saved_focused_filename = NULL;
+  }
+
+  /* HCPProgram will start the possible plugin in 
+   * program->execute */
 }
 
 static void 
 hcp_window_retrieve_state (HCPWindow *window)
 {
+  HCPWindowPrivate *priv;
   HCPProgram *program = hcp_program_get_instance ();
   osso_state_t state = { 0, };
   GKeyFile *keyfile = NULL;
@@ -143,11 +150,16 @@ hcp_window_retrieve_state (HCPWindow *window)
   gint scroll_value;
   gboolean execute;
 
+  g_return_if_fail (window);
+  g_return_if_fail (HCP_IS_WINDOW (window));
+
+  priv = HCP_WINDOW_GET_PRIVATE (window);
+
   ret = osso_state_read (program->osso, &state);
 
   if (ret != OSSO_OK)
   {
-    ULOG_ERR ("An error occured when reading application state");
+    g_warning ("An error occured when reading application state");
     return;
   }
 
@@ -167,8 +179,8 @@ hcp_window_retrieve_state (HCPWindow *window)
 
   if (error)
   {
-    ULOG_ERR ("An error occured when reading application state: %s",
-              error->message);
+    g_warning ("An error occured when reading application state: %s",
+               error->message);
     goto cleanup;
   }
 
@@ -179,12 +191,12 @@ hcp_window_retrieve_state (HCPWindow *window)
   
   if (error)
   {
-    ULOG_ERR ("An error occured when reading application state: %s",
-              error->message);
+    g_warning ("An error occured when reading application state: %s",
+               error->message);
     goto cleanup;
   }
 
-  window->priv->saved_focused_filename = focused;
+  priv->saved_focused_filename = focused;
 
   scroll_value = g_key_file_get_integer (keyfile,
                                          HCP_STATE_GROUP,
@@ -193,12 +205,12 @@ hcp_window_retrieve_state (HCPWindow *window)
 
   if (error)
   {
-    ULOG_ERR ("An error occured when reading application state: %s",
-              error->message);
+    g_warning ("An error occured when reading application state: %s",
+               error->message);
     goto cleanup;
   }
   
-  window->priv->scroll_value = scroll_value;
+  priv->scroll_value = scroll_value;
   
   execute = g_key_file_get_boolean (keyfile,
                                     HCP_STATE_GROUP,
@@ -207,8 +219,8 @@ hcp_window_retrieve_state (HCPWindow *window)
 
   if (error)
   {
-    ULOG_ERR ("An error occured when reading application state: %s",
-              error->message);
+    g_warning ("An error occured when reading application state: %s",
+               error->message);
     goto cleanup;
   }
   
@@ -227,23 +239,28 @@ cleanup:
 static void 
 hcp_window_save_state (HCPWindow *window, gboolean clear_state)
 {
-  HCPProgram *program = hcp_program_get_instance ();
   HCPWindowPrivate *priv;
+  HCPProgram *program = hcp_program_get_instance ();
   osso_state_t state = { 0, };
   GKeyFile *keyfile = NULL;
   osso_return_t ret;
   gchar *focused = NULL;
   GError *error = NULL;
 
-  priv = window->priv;
+  g_return_if_fail (window);
+  g_return_if_fail (HCP_IS_WINDOW (window));
+
+  priv = HCP_WINDOW_GET_PRIVATE (window);
 
   if (clear_state)
   {
     state.state_data = "";
     state.state_size = 1;
+
     ret = osso_state_write (program->osso, &state);
+
     if (ret != OSSO_OK)
-      ULOG_ERR ("An error occured when clearing application state");
+      g_warning ("An error occured when clearing application state");
 
     return;
   }
@@ -282,7 +299,7 @@ hcp_window_save_state (HCPWindow *window, gboolean clear_state)
 
   if (ret != OSSO_OK)
   {
-    ULOG_ERR ("An error occured when reading application state");
+    g_warning ("An error occured when reading application state");
   }
 
   /* If a plugin is running, save its state */
@@ -295,8 +312,8 @@ hcp_window_save_state (HCPWindow *window, gboolean clear_state)
 cleanup:
   if (error)
   {
-    ULOG_ERR ("An error occured when reading application state: %s",
-              error->message);
+    g_warning ("An error occured when reading application state: %s",
+               error->message);
     g_error_free (error);
   }
 
@@ -310,9 +327,15 @@ cleanup:
 static void 
 hcp_window_retrieve_configuration (HCPWindow *window)
 {
+  HCPWindowPrivate *priv;
   GConfClient *client = NULL;
   GError *error = NULL;
   gboolean icon_size;
+
+  g_return_if_fail (window);
+  g_return_if_fail (HCP_IS_WINDOW (window));
+
+  priv = HCP_WINDOW_GET_PRIVATE (window);
 
   client = gconf_client_get_default ();
 
@@ -324,12 +347,12 @@ hcp_window_retrieve_configuration (HCPWindow *window)
 
   if (error)
   {
-    ULOG_ERR (error->message);
+    g_warning ("Error reading window settings from GConf: %s", error->message);
     g_error_free (error);
   }
   else
   {
-    window->priv->icon_size = icon_size?1:0;
+    priv->icon_size = icon_size ? TRUE : FALSE;
   }
 
   g_object_unref (client);
@@ -339,15 +362,21 @@ hcp_window_retrieve_configuration (HCPWindow *window)
 static void 
 hcp_window_save_configuration (HCPWindow *window)
 {
+  HCPWindowPrivate *priv;
   GConfClient *client = NULL;
   GError *error = NULL;
   gboolean icon_size;
+
+  g_return_if_fail (window);
+  g_return_if_fail (HCP_IS_WINDOW (window));
+
+  priv = HCP_WINDOW_GET_PRIVATE (window);
 
   client = gconf_client_get_default ();
 
   g_return_if_fail (client);
 
-  icon_size = window->priv->icon_size?TRUE:FALSE;
+  icon_size = priv->icon_size ? TRUE : FALSE;
 
   gconf_client_set_bool (client,
                          HCP_GCONF_ICON_SIZE_KEY,
@@ -356,7 +385,7 @@ hcp_window_save_configuration (HCPWindow *window)
 
   if (error)
   {
-    ULOG_ERR (error->message);
+    g_warning ("Error saving window settings to GConf: %s", error->message);
     g_error_free (error);
   }
 
@@ -368,8 +397,14 @@ hcp_window_keyboard_listener (GtkWidget * widget,
                               GdkEventKey * keyevent, 
 		              gpointer data)
 {
-  HCPWindow *window = HCP_WINDOW (widget);
-  HCPWindowPrivate *priv = window->priv;
+  HCPWindow *window;
+  HCPWindowPrivate *priv;
+
+  g_return_val_if_fail (widget, FALSE);
+  g_return_val_if_fail (HCP_IS_WINDOW (widget), FALSE);
+
+  window = HCP_WINDOW (widget);
+  priv = HCP_WINDOW_GET_PRIVATE (window);
 
   if (keyevent->type == GDK_KEY_RELEASE) 
   {
@@ -379,10 +414,13 @@ hcp_window_keyboard_listener (GtkWidget * widget,
         if (priv->icon_size != 1) 
         {
           priv->icon_size = 1;
+
           gtk_check_menu_item_set_active (
                   GTK_CHECK_MENU_ITEM (priv->large_icons_menu_item),
                   TRUE);
+
           hcp_app_view_set_icon_size (priv->view, HCP_ICON_SIZE_LARGE);
+
           hcp_window_save_configuration (window);
   
           return TRUE;
@@ -393,10 +431,13 @@ hcp_window_keyboard_listener (GtkWidget * widget,
         if (priv->icon_size != 0)
         {
           priv->icon_size = 0;
+
           gtk_check_menu_item_set_active (
                   GTK_CHECK_MENU_ITEM (priv->small_icons_menu_item),
                   TRUE);
+
           hcp_app_view_set_icon_size (priv->view, HCP_ICON_SIZE_SMALL);
+
           hcp_window_save_configuration (window);
 
           return TRUE;
@@ -414,7 +455,7 @@ hcp_window_keyboard_listener (GtkWidget * widget,
           gtk_window_fullscreen (GTK_WINDOW (window));
           priv->fullscreen = TRUE;
         }
-
+        return TRUE;
         break;
     }
   }
@@ -437,19 +478,19 @@ hcp_window_launch_help (GtkWidget *widget, HCPWindow *window)
       break;
 
     case OSSO_ERROR:
-      ULOG_WARN ("HELP: ERROR (No help for such topic ID)\n");
+      g_warning ("HELP: ERROR (No help for such topic ID)\n");
       break;
 
     case OSSO_RPC_ERROR:
-      ULOG_WARN ("HELP: RPC ERROR (RPC failed for HelpApp/Browser)\n");
+      g_warning ("HELP: RPC ERROR (RPC failed for HelpApp/Browser)\n");
       break;
 
     case OSSO_INVALID:
-      ULOG_WARN ("HELP: INVALID (invalid argument)\n");
+      g_warning ("HELP: INVALID (invalid argument)\n");
       break;
 
     default:
-      ULOG_WARN ("HELP: Unknown error!\n");
+      g_warning ("HELP: Unknown error!\n");
       break;
   }
 }
@@ -495,7 +536,7 @@ hcp_window_run_operator_wizard (GtkWidget *widget, HCPWindow *window)
       break;
 
     case OSSO_INVALID:
-      ULOG_ERR("Invalid parameter in operator_wizard launch");
+      g_warning ("Invalid parameter in operator_wizard launch");
       break;
 
     case OSSO_RPC_ERROR:
@@ -505,37 +546,45 @@ hcp_window_run_operator_wizard (GtkWidget *widget, HCPWindow *window)
     case OSSO_ERROR_STATE_SIZE:
       if (returnvalues.type == DBUS_TYPE_STRING) 
       {    
-        ULOG_ERR("Operator wizard launch failed: %s\n",returnvalues.value.s);
+        g_warning ("Operator wizard launch failed: %s\n",returnvalues.value.s);
       }
       else
       {
-        ULOG_ERR("Operator wizard launch failed, unspecified");
+        g_warning ("Operator wizard launch failed, unspecified");
       }
       break;            
 
     default:
-      ULOG_ERR("Unknown error type %d", returnstatus);
+      g_warning ("Unknown error type %d", returnstatus);
   }
   
   osso_rpc_free_val (&returnvalues);
 }
 
-static void hcp_window_iconsize (GtkWidget *widget, HCPWindow *window)
+static void 
+hcp_window_iconsize (GtkWidget *widget, HCPWindow *window)
 {
+  HCPWindowPrivate *priv;
+
+  g_return_if_fail (window);
+  g_return_if_fail (HCP_IS_WINDOW (window));
+
+  priv = HCP_WINDOW_GET_PRIVATE (window);
+
   if (!gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget)))
     return;
   
-  if (widget == window->priv->large_icons_menu_item)
+  if (widget == priv->large_icons_menu_item)
   {
-    hcp_app_view_set_icon_size (window->priv->view,
+    hcp_app_view_set_icon_size (priv->view,
                                 HCP_ICON_SIZE_LARGE);
-    window->priv->icon_size = 1;
+    priv->icon_size = 1;
   }
-  else if (widget == window->priv->small_icons_menu_item)
+  else if (widget == priv->small_icons_menu_item)
   {
-    hcp_app_view_set_icon_size (window->priv->view,
+    hcp_app_view_set_icon_size (priv->view,
                                 HCP_ICON_SIZE_SMALL);
-    window->priv->icon_size = 0;
+    priv->icon_size = 0;
   }
   
   hcp_window_save_configuration (window);
@@ -544,7 +593,14 @@ static void hcp_window_iconsize (GtkWidget *widget, HCPWindow *window)
 static void 
 hcp_window_open (GtkWidget *widget, HCPWindow *window)
 {
-  hcp_app_launch (window->priv->focused_item, TRUE);
+  HCPWindowPrivate *priv;
+
+  g_return_if_fail (window);
+  g_return_if_fail (HCP_IS_WINDOW (window));
+
+  priv = HCP_WINDOW_GET_PRIVATE (window);
+
+  hcp_app_launch (priv->focused_item, TRUE);
 }
 
 static void 
@@ -552,8 +608,13 @@ hcp_window_topmost_status_change (GObject *gobject,
 		                  GParamSpec *arg1,
 			          HCPWindow *window)
 {
+  HCPWindowPrivate *priv;
   HildonProgram *program = HILDON_PROGRAM (gobject);
-  HCPWindowPrivate *priv = window->priv;
+
+  g_return_if_fail (window);
+  g_return_if_fail (HCP_IS_WINDOW (window));
+
+  priv = HCP_WINDOW_GET_PRIVATE (window);
 
   if (hildon_program_get_is_topmost (program)) {
     hildon_program_set_can_hibernate (program, FALSE);
@@ -575,35 +636,48 @@ hcp_window_app_view_focus_cb (HCPAppView *view,
                               HCPApp     *app, 
                               HCPWindow  *window)
 {
-  if (window->priv->focused_item != NULL)
-    g_object_unref (window->priv->focused_item);
+  HCPWindowPrivate *priv;
+
+  g_return_if_fail (window);
+  g_return_if_fail (HCP_IS_WINDOW (window));
+
+  priv = HCP_WINDOW_GET_PRIVATE (window);
+
+  if (priv->focused_item != NULL)
+    g_object_unref (priv->focused_item);
 
   /* Increment reference count to avoid object
    * destruction on HCPAppList update. */
-  window->priv->focused_item = g_object_ref (app);
+  priv->focused_item = g_object_ref (app);
 }
 
 static void 
 hcp_window_app_list_updated_cb (HCPAppList *al, HCPWindow *window)
 {
+  HCPWindowPrivate *priv;
   GHashTable *apps = NULL;
   HCPApp *app = NULL;
   gchar *focused = NULL;
 
-  g_object_get (G_OBJECT (window->priv->focused_item),
+  g_return_if_fail (window);
+  g_return_if_fail (HCP_IS_WINDOW (window));
+
+  priv = HCP_WINDOW_GET_PRIVATE (window);
+
+  g_object_get (G_OBJECT (priv->focused_item),
                 "plugin", &focused,
                 NULL);
 
-  g_object_unref (window->priv->focused_item);
+  g_object_unref (priv->focused_item);
   window->priv->focused_item = NULL;
 
-  g_object_get (G_OBJECT (window->priv->al),
+  g_object_get (G_OBJECT (priv->al),
                 "apps", &apps,
                 NULL);
 
   /* Update the view */
-  hcp_app_view_populate (HCP_APP_VIEW (window->priv->view), al);
-  gtk_widget_show_all (window->priv->view);
+  hcp_app_view_populate (HCP_APP_VIEW (priv->view), al);
+  gtk_widget_show_all (priv->view);
 
   app = g_hash_table_lookup (apps,
                              focused);
@@ -618,6 +692,9 @@ hcp_window_app_list_updated_cb (HCPAppList *al, HCPWindow *window)
 
 static void hcp_window_quit (GtkWidget *widget, HCPWindow *window)
 {
+  g_return_if_fail (window);
+  g_return_if_fail (HCP_IS_WINDOW (window));
+
   hcp_window_save_state (window, TRUE);
 
   gtk_widget_destroy (GTK_WIDGET (window));
@@ -639,10 +716,10 @@ hcp_window_construct_ui (HCPWindow *window)
   GtkWidget *scrolled_window = NULL;
   GSList *menugroup = NULL;
 
-  g_return_if_fail (window != NULL);
+  g_return_if_fail (window);
   g_return_if_fail (HCP_IS_WINDOW (window));
 
-  priv = window->priv;
+  priv = HCP_WINDOW_GET_PRIVATE (window);
 
   /* Why is this not read from the gtkrc?? -- Jobi */
   /* Control Panel Grid */
@@ -775,26 +852,6 @@ hcp_window_construct_ui (HCPWindow *window)
 
   gtk_widget_show_all (GTK_WIDGET (menu));
 
-  /* What is this for? -- Jobi */
-#if 0 
-  hcp->grids = hildon_cp_applist_get_grids();
-  grids = hcp->grids;
-  
-  while (grids != 0)
-  {
-      grid = grids->data;
-      {
-          GValue val = { 0, };
-          g_value_init(&val, G_TYPE_STRING);
-          g_value_set_string(&val, "");
-          g_object_set_property(G_OBJECT(grid), "empty_label", &val);
-          g_value_unset(&val);
-      }
-
-      grids = grids->next;
-  }
-#endif
-
   /* Set the keyboard listening callback */
   gtk_widget_add_events (GTK_WIDGET(window),
                          GDK_BUTTON_RELEASE_MASK);
@@ -874,14 +931,12 @@ hcp_window_init (HCPWindow *window)
 static void
 hcp_window_finalize (GObject *object)
 {
-  HCPWindow *window;
   HCPWindowPrivate *priv;
   
-  g_return_if_fail (object != NULL);
+  g_return_if_fail (object);
   g_return_if_fail (HCP_IS_WINDOW (object));
 
-  window = HCP_WINDOW (object);
-  priv = window->priv;
+  priv = HCP_WINDOW_GET_PRIVATE (object);
 
   if (priv->al != NULL) 
   {
@@ -925,5 +980,8 @@ hcp_window_new ()
 void
 hcp_window_close (HCPWindow *window)
 {
+  g_return_if_fail (window);
+  g_return_if_fail (HCP_IS_WINDOW (window));
+
   hcp_window_quit (NULL, window);
 }

@@ -23,7 +23,6 @@
 
 #include <math.h>
 
-#include <osso-log.h>
 #include <hildon-widgets/hildon-defines.h>
 
 #include <gtk/gtk.h>
@@ -44,12 +43,12 @@ struct _HCPGridPrivate
   gboolean     can_move_focus;
   gboolean     focused_in;
   HCPIconSize  icon_size;
-  HCPIconSize  row_height;
+  gint         row_height;
 };
 
 enum
 {
-  HCP_GRID_FOCUS_FROM_ABOVE = 0,
+  HCP_GRID_FOCUS_FROM_ABOVE,
   HCP_GRID_FOCUS_FROM_BELOW,
   HCP_GRID_FOCUS_FIRST,
   HCP_GRID_FOCUS_LAST
@@ -61,14 +60,17 @@ hcp_grid_update_icon (GtkTreeModel *model,
                       GtkTreeIter  *iter,
                       gpointer      user_data)
 {
-  HCPGrid *grid;
+  HCPGridPrivate *priv;
   HCPApp *app;
   GtkIconTheme *icon_theme;
   GdkPixbuf *icon_pixbuf;
   gchar *icon = NULL;
   GError *error = NULL;
 
-  grid = HCP_GRID (user_data);
+  g_return_val_if_fail (user_data, TRUE);
+  g_return_val_if_fail (HCP_IS_GRID (user_data), TRUE);
+
+  priv = HCP_GRID_GET_PRIVATE (user_data);
 
   gtk_tree_model_get (GTK_TREE_MODEL (model), iter, 
                       HCP_STORE_APP, &app,
@@ -82,39 +84,39 @@ hcp_grid_update_icon (GtkTreeModel *model,
 
   icon_pixbuf = gtk_icon_theme_load_icon (icon_theme,
                                           icon,
-                                          grid->priv->icon_size, 
+                                          priv->icon_size, 
                                           0, 
                                           &error);
 
   if (icon_pixbuf == NULL) 
   {
-    ULOG_WARN("Couldn't load icon \"%s\": %s", icon, error->message);
+    g_warning ("Couldn't load icon \"%s\": %s", icon, error->message);
     g_error_free (error);
 
     error = NULL;
 
     icon_pixbuf = gtk_icon_theme_load_icon (icon_theme,
                                             HCP_DEFAULT_ICON_BASENAME,
-                                            grid->priv->icon_size, 
+                                            priv->icon_size, 
                                             0, 
                                             &error);
 
     if (icon_pixbuf == NULL) 
     {
-      ULOG_WARN("Couldn't load default icon: %s!", error->message);
+      g_warning ("Couldn't load default icon: %s", error->message);
       g_error_free (error);
     }
   }
 
-  if (grid->priv->row_height == -1) 
+  if (priv->row_height == -1) 
   {
-    if (grid->priv->icon_size == HCP_ICON_SIZE_SMALL) 
+    if (priv->icon_size == HCP_ICON_SIZE_SMALL) 
     {
-      grid->priv->row_height = gdk_pixbuf_get_height (icon_pixbuf) + 10;
+      priv->row_height = gdk_pixbuf_get_height (icon_pixbuf) + 10;
     }
-    else if (grid->priv->icon_size == HCP_ICON_SIZE_LARGE) 
+    else if (priv->icon_size == HCP_ICON_SIZE_LARGE) 
     {
-      grid->priv->row_height = gdk_pixbuf_get_height (icon_pixbuf) + 2;
+      priv->row_height = gdk_pixbuf_get_height (icon_pixbuf) + 2;
     }
   }
 
@@ -174,11 +176,15 @@ hcp_grid_button_pressed (GtkWidget      *widget,
 static void 
 hcp_grid_selection_changed (GtkWidget *widget, gpointer user_data)
 {
+  HCPGridPrivate *priv;
   GtkTreeModel *model;
   GtkTreePath *path;
   gint n_items, item_pos, y, last_row;
 
-  g_return_if_fail (widget != NULL);
+  g_return_if_fail (widget);
+  g_return_if_fail (HCP_IS_GRID (widget));
+
+  priv = HCP_GRID_GET_PRIVATE (widget);
 
   model = gtk_icon_view_get_model (GTK_ICON_VIEW (widget));
   n_items = gtk_tree_model_iter_n_children (model, NULL);
@@ -191,13 +197,13 @@ hcp_grid_selection_changed (GtkWidget *widget, gpointer user_data)
   y = item_pos / HCP_GRID_NUM_COLUMNS;
   last_row = ceil ((double) n_items / HCP_GRID_NUM_COLUMNS) - 1;
 
-  if ((y == 0 || y == last_row) && !HCP_GRID (widget)->priv->focused_in)
+  if ((y == 0 || y == last_row) && !priv->focused_in)
   {
-    HCP_GRID (widget)->priv->can_move_focus = FALSE;
+    priv->can_move_focus = FALSE;
   } 
-  else if (HCP_GRID (widget)->priv->focused_in)
+  else if (priv->focused_in)
   {
-    HCP_GRID (widget)->priv->focused_in = FALSE;
+    priv->focused_in = FALSE;
   } 
 
   gtk_tree_path_free (path);
@@ -264,6 +270,8 @@ hcp_grid_select_from_outside (GtkWidget *widget,
   gint item_pos = HCP_GRID_NO_FOCUS;
 
   if (widget == NULL) return;
+
+  g_return_if_fail (HCP_IS_GRID (widget));
 
   model = gtk_icon_view_get_model (GTK_ICON_VIEW (widget));
   n_items = gtk_tree_model_iter_n_children (model, NULL);
@@ -340,12 +348,16 @@ static gint
 hcp_grid_keyboard_listener (GtkWidget   *widget,
                             GdkEventKey *keyevent)
 {
+  HCPGridPrivate *priv;
   GtkTreeModel *model;
   GtkTreePath *path;
   gint n_items, item_pos, last_row, x, y;
   gboolean result = FALSE;
 
-  g_return_val_if_fail (widget != NULL, FALSE);
+  g_return_val_if_fail (widget, FALSE);
+  g_return_val_if_fail (HCP_IS_GRID (widget), FALSE);
+
+  priv = HCP_GRID_GET_PRIVATE (widget);
 
   model = gtk_icon_view_get_model (GTK_ICON_VIEW (widget));
   n_items = gtk_tree_model_iter_n_children (model, NULL);
@@ -367,28 +379,28 @@ hcp_grid_keyboard_listener (GtkWidget   *widget,
       case HILDON_HARDKEY_UP:
         if (y == 0)
         {
-          if (HCP_GRID (widget)->priv->can_move_focus)
+          if (priv->can_move_focus)
           {
             hcp_grid_select_from_outside (hcp_grid_get_previous (widget),
                                           HCP_GRID_FOCUS_FROM_BELOW, x);
             result = TRUE;
           }
           else
-            HCP_GRID (widget)->priv->can_move_focus = TRUE;
+            priv->can_move_focus = TRUE;
         }
         break;
 
       case HILDON_HARDKEY_DOWN:
         if (y == last_row) 
         {
-          if (HCP_GRID (widget)->priv->can_move_focus)
+          if (priv->can_move_focus)
           {
             hcp_grid_select_from_outside (hcp_grid_get_next (widget),
                                           HCP_GRID_FOCUS_FROM_ABOVE, x);
             result = TRUE;
           }
           else
-            HCP_GRID (widget)->priv->can_move_focus = TRUE;
+            priv->can_move_focus = TRUE;
         } 
         break;
 
@@ -396,8 +408,8 @@ hcp_grid_keyboard_listener (GtkWidget   *widget,
       case HILDON_HARDKEY_RIGHT:
         if (y == 0 || y == last_row)
         {
-          if (!HCP_GRID (widget)->priv->can_move_focus)
-            HCP_GRID (widget)->priv->can_move_focus = TRUE;
+          if (!priv->can_move_focus)
+            priv->can_move_focus = TRUE;
         } 
         break;
     }
@@ -411,11 +423,14 @@ hcp_grid_keyboard_listener (GtkWidget   *widget,
 static void
 hcp_grid_size_request (GtkWidget *widget, GtkRequisition *req)
 {
-  HCPGrid *grid;
+  HCPGridPrivate *priv;
   GtkTreeModel *store;
   gint num_items;
 
-  grid = HCP_GRID (widget);
+  g_return_if_fail (widget);
+  g_return_if_fail (HCP_IS_GRID (widget));
+
+  priv = HCP_GRID_GET_PRIVATE (widget);
 
   store = gtk_icon_view_get_model (GTK_ICON_VIEW (widget));
 
@@ -423,7 +438,7 @@ hcp_grid_size_request (GtkWidget *widget, GtkRequisition *req)
 
   if (num_items > 0) 
   {
-    req->height = (ceil ((double) num_items / HCP_GRID_NUM_COLUMNS)) * grid->priv->row_height;
+    req->height = (ceil ((double) num_items / HCP_GRID_NUM_COLUMNS)) * priv->row_height;
   }
 }
 
@@ -464,6 +479,8 @@ hcp_grid_init (HCPGrid *grid)
   gtk_icon_view_set_columns (GTK_ICON_VIEW (grid),
                              HCP_GRID_NUM_COLUMNS);
 
+  /* FIXME: This should not be hardcoded. It should be defined 
+     based on HCPAppView width. */
   gtk_icon_view_set_item_width (GTK_ICON_VIEW (grid), 330);
 
   g_signal_connect (G_OBJECT (grid), "selection-changed",
@@ -486,7 +503,7 @@ hcp_grid_get_selected_item (HCPGrid *grid)
   GtkTreePath *path;
   GList *list;
 
-  g_return_val_if_fail (grid != NULL, NULL);
+  g_return_val_if_fail (grid, NULL);
   g_return_val_if_fail (HCP_IS_GRID (grid), NULL);
 
   list = gtk_icon_view_get_selected_items (GTK_ICON_VIEW (grid));
@@ -504,14 +521,17 @@ hcp_grid_get_selected_item (HCPGrid *grid)
 void 
 hcp_grid_set_icon_size (HCPGrid *grid, HCPIconSize icon_size)
 {
+  HCPGridPrivate *priv;
   GtkTreeModel *model;
 
-  g_return_if_fail (grid != NULL);
+  g_return_if_fail (grid);
   g_return_if_fail (HCP_IS_GRID (grid));
 
-  grid->priv->icon_size = icon_size;
+  priv = HCP_GRID_GET_PRIVATE (grid);
 
-  grid->priv->row_height = -1;
+  priv->icon_size = icon_size;
+
+  priv->row_height = -1;
 
   model = gtk_icon_view_get_model (GTK_ICON_VIEW (grid));
 

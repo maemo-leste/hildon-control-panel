@@ -36,29 +36,29 @@
 
 int main (int argc, char **argv)
 {
-    HCPProgram *program = NULL; 
+  HCPProgram *program = NULL; 
 
-    setlocale (LC_ALL, "");
+  setlocale (LC_ALL, "");
 
-    bindtextdomain (PACKAGE, LOCALEDIR);
+  bindtextdomain (PACKAGE, LOCALEDIR);
 
-    bind_textdomain_codeset (PACKAGE, "UTF-8");
+  bind_textdomain_codeset (PACKAGE, "UTF-8");
 
-    textdomain (PACKAGE);
+  textdomain (PACKAGE);
 
-    /* Set application name to "" as we only need 
-     * the window title in the title bar */
-    g_set_application_name ("");
-    
-    gtk_init (&argc, &argv);
+  /* Set application name to "" as we only need 
+   * the window title in the title bar */
+  g_set_application_name ("");
+  
+  gtk_init (&argc, &argv);
 
-    program = hcp_program_get_instance ();
+  program = hcp_program_get_instance ();
 
-    hcp_program_run (program);
+  hcp_program_run (program);
 
-    gtk_main();
+  gtk_main();
 
-    g_object_unref (program);
+  g_object_unref (program);
 
-    return 0;
+  return 0;
 }

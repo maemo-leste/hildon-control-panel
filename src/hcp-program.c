@@ -187,6 +187,9 @@ error:
 static void 
 hcp_program_init_rpc (HCPProgram *program)
 {
+  g_return_if_fail (program);
+  g_return_if_fail (HCP_IS_PROGRAM (program));
+
   program->osso = osso_initialize (HCP_APP_NAME, HCP_APP_VERSION, TRUE, NULL);
   
   if (!program->osso)
@@ -203,6 +206,9 @@ hcp_program_init_rpc (HCPProgram *program)
 static void 
 hcp_program_hw_signal_cb (osso_hw_state_t *state, HCPProgram *program)
 {
+  g_return_if_fail (program);
+  g_return_if_fail (HCP_IS_PROGRAM (program));
+
   if (state != NULL) 
   {
     if (state->shutdown_ind)
@@ -236,7 +242,7 @@ hcp_program_finalize (GObject *object)
 {
   HCPProgram *program;
   
-  g_return_if_fail (object != NULL);
+  g_return_if_fail (object);
   g_return_if_fail (HCP_IS_PROGRAM (object));
 
   program = HCP_PROGRAM (object);
@@ -280,6 +286,9 @@ void
 hcp_program_run (HCPProgram *program)
 {
   gboolean dbus_activated;
+
+  g_return_if_fail (program);
+  g_return_if_fail (HCP_IS_PROGRAM (program));
 
   dbus_activated = g_getenv ("DBUS_STARTER_BUS_TYPE")?TRUE:FALSE;
 

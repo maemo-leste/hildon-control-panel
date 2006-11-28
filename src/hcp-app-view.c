@@ -22,8 +22,6 @@
  *
  */
 
-#include <osso-log.h>
-
 #include <glib/gi18n.h>
 
 #include "hcp-app-view.h"
@@ -39,11 +37,11 @@ G_DEFINE_TYPE (HCPAppView, hcp_app_view, GTK_TYPE_VBOX);
 
 typedef enum
 {
-  HCP_APP_VIEW_SIGNAL_FOCUS_CHANGED,
-  HCP_APP_VIEW_SIGNALS
+  SIGNAL_FOCUS_CHANGED,
+  N_SIGNALS
 } HCPAppViewSignals;
 
-static gint hcp_app_view_signals[HCP_APP_VIEW_SIGNALS];
+static gint signals[N_SIGNALS];
 
 enum
 {
@@ -106,7 +104,8 @@ hcp_app_view_get_selected_app (GtkWidget *widget)
   GtkTreeIter iter;
   gint item_pos;
 
-  g_return_val_if_fail (widget != NULL, NULL);
+  g_return_val_if_fail (widget, NULL);
+  g_return_val_if_fail (GTK_IS_ICON_VIEW (widget), NULL);
 
   model = gtk_icon_view_get_model (GTK_ICON_VIEW (widget));
 
@@ -176,7 +175,7 @@ hcp_app_view_grid_selection_changed (GtkWidget *widget, gpointer user_data)
   }
 
   g_signal_emit (G_OBJECT (widget->parent), 
-                 hcp_app_view_signals[HCP_APP_VIEW_SIGNAL_FOCUS_CHANGED], 
+                 signals[SIGNAL_FOCUS_CHANGED], 
                  0, app);
 }
 
@@ -278,13 +277,14 @@ hcp_app_view_get_property (GObject    *gobject,
                            GValue     *value,
                            GParamSpec *pspec)
 {
+  HCPAppViewPrivate *priv;
 
-  HCPAppView *view = HCP_APP_VIEW (gobject);
+  priv = HCP_APP_VIEW_GET_PRIVATE (gobject);
 
   switch (prop_id)
   {
     case PROP_ICON_SIZE:
-      g_value_set_int (value, view->priv->icon_size);
+      g_value_set_int (value, priv->icon_size);
       break;
 
     default:
@@ -299,12 +299,14 @@ hcp_app_view_set_property (GObject      *gobject,
                            const GValue *value,
                            GParamSpec   *pspec)
 {
-  HCPAppView *view = HCP_APP_VIEW (gobject);
+  HCPAppViewPrivate *priv;
+
+  priv = HCP_APP_VIEW_GET_PRIVATE (gobject);
   
   switch (prop_id)
   {
     case PROP_ICON_SIZE:
-      view->priv->icon_size = g_value_get_int (value);
+      priv->icon_size = g_value_get_int (value);
       break;
 
     default:
@@ -321,6 +323,16 @@ hcp_app_view_class_init (HCPAppViewClass *class)
   g_object_class->get_property = hcp_app_view_get_property;
   g_object_class->set_property = hcp_app_view_set_property;
 
+  signals[SIGNAL_FOCUS_CHANGED] =
+        g_signal_new ("focus-changed",
+                      G_OBJECT_CLASS_TYPE (g_object_class),
+                      G_SIGNAL_RUN_FIRST,
+                      G_STRUCT_OFFSET (HCPAppViewClass, focus_changed),
+                      NULL, NULL,
+                      g_cclosure_marshal_VOID__OBJECT,
+                      G_TYPE_NONE, 1,
+                      HCP_TYPE_APP);
+
   g_object_class_install_property (g_object_class,
                                    PROP_ICON_SIZE,
                                    g_param_spec_int ("icon-size",
@@ -332,16 +344,6 @@ hcp_app_view_class_init (HCPAppViewClass *class)
                                                      (G_PARAM_READABLE | 
                                                       G_PARAM_WRITABLE | 
                                                       G_PARAM_CONSTRUCT)));
-
-  hcp_app_view_signals[HCP_APP_VIEW_SIGNAL_FOCUS_CHANGED] =
-        g_signal_new ("focus-changed",
-                      G_OBJECT_CLASS_TYPE (g_object_class),
-                      G_SIGNAL_RUN_FIRST,
-                      G_STRUCT_OFFSET (HCPAppViewClass, focus_changed),
-                      NULL, NULL,
-                      g_cclosure_marshal_VOID__OBJECT,
-                      G_TYPE_NONE, 1,
-                      HCP_TYPE_APP);
 
   g_type_class_add_private (g_object_class, sizeof (HCPAppViewPrivate));
 }
@@ -359,7 +361,15 @@ hcp_app_view_new (HCPIconSize icon_size)
 void
 hcp_app_view_populate (HCPAppView *view, HCPAppList *al)
 {
+  HCPAppViewPrivate *priv;
   GSList *categories = NULL;
+
+  g_return_if_fail (view);
+  g_return_if_fail (HCP_IS_APP_VIEW (view));
+  g_return_if_fail (al);
+  g_return_if_fail (HCP_IS_APP_LIST (al));
+
+  priv = HCP_APP_VIEW_GET_PRIVATE (view);
 
   g_object_get (G_OBJECT (al),
                 "categories", &categories,
@@ -369,7 +379,7 @@ hcp_app_view_populate (HCPAppView *view, HCPAppList *al)
                          (GtkCallback) gtk_widget_destroy,
                          NULL);
 
-  view->priv->first_grid = NULL;
+  priv->first_grid = NULL;
 
   gtk_container_set_focus_chain (GTK_CONTAINER (view), NULL);
 
@@ -377,13 +387,13 @@ hcp_app_view_populate (HCPAppView *view, HCPAppList *al)
                    (GFunc) hcp_app_view_add_category,
                    view);
 
-  hcp_app_view_set_icon_size (GTK_WIDGET (view), view->priv->icon_size);
+  hcp_app_view_set_icon_size (GTK_WIDGET (view), priv->icon_size);
 
   /* Put focus on the first item of the first grid */
   if (view->priv->first_grid) 
   {
-    gtk_widget_grab_focus (view->priv->first_grid);
-    gtk_icon_view_select_path (GTK_ICON_VIEW (view->priv->first_grid),
+    gtk_widget_grab_focus (priv->first_grid);
+    gtk_icon_view_select_path (GTK_ICON_VIEW (priv->first_grid),
                                gtk_tree_path_new_first ());
   }
 }
@@ -394,6 +404,9 @@ hcp_app_view_set_icon_size (GtkWidget *view, HCPIconSize size)
   GtkWidget *grid = NULL;
   GList *iter = NULL;
   GList *list = NULL;
+
+  g_return_if_fail (view);
+  g_return_if_fail (HCP_IS_APP_VIEW (view));
 
   list = iter = gtk_container_get_children (GTK_CONTAINER (view));
 

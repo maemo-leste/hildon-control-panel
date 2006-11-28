@@ -25,8 +25,6 @@
 #include <dlfcn.h>
 #include <string.h>
 
-#include <osso-log.h>
-
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
@@ -73,7 +71,7 @@ typedef struct _PluginLaunchData
 {
   HCPApp     *app;
   HCPPlugin  *plugin;
-  gboolean   user_activated;
+  gboolean    user_activated;
 } PluginLaunchData;
 
 #define HCP_PLUGIN_EXEC_SYMBOL        "execute"
@@ -98,17 +96,23 @@ static void
 hcp_app_load (HCPApp *app, HCPPlugin *plugin)
 {
   gchar *plugin_path = NULL;
+  HCPAppPrivate *priv;
 
-  g_return_if_fail (app && app->priv->plugin);
+  g_return_if_fail (app);
+  g_return_if_fail (HCP_IS_APP (app));
 
-  if (*app->priv->plugin == G_DIR_SEPARATOR)
+  priv = HCP_APP_GET_PRIVATE (app); 
+
+  g_return_if_fail (priv->plugin);
+
+  if (*priv->plugin == G_DIR_SEPARATOR)
   {
     /* .desktop provided fullpath, use that */
-    plugin_path = g_strdup (app->priv->plugin);
+    plugin_path = g_strdup (priv->plugin);
   }
   else
   {
-    plugin_path = g_build_filename (HCP_PLUGIN_DIR, app->priv->plugin, NULL);
+    plugin_path = g_build_filename (HCP_PLUGIN_DIR, priv->plugin, NULL);
   }
 
   plugin->handle = dlopen (plugin_path, RTLD_LAZY);
@@ -117,9 +121,9 @@ hcp_app_load (HCPApp *app, HCPPlugin *plugin)
 
   if (!plugin->handle)
   {
-    ULOG_ERR ("Could not load hildon-control-panel applet %s: %s",
-              app->priv->plugin,
-              dlerror());
+    g_warning ("Could not load hildon-control-panel applet %s: %s",
+               priv->plugin,
+               dlerror());
     return;
   }
 
@@ -127,52 +131,66 @@ hcp_app_load (HCPApp *app, HCPPlugin *plugin)
 
   if (!plugin->exec)
   {
-    ULOG_ERR ("Could not find "HCP_PLUGIN_SYMBOL" symbol in "
-              "hildon-control-panel applet %s: %s",
-              app->priv->plugin,
-              dlerror ());
+    g_warning ("Could not find "HCP_PLUGIN_EXEC_SYMBOL" symbol in "
+               "hildon-control-panel applet %s: %s",
+               priv->plugin,
+               dlerror ());
 
     dlclose (plugin->handle);
 
     plugin->handle = NULL;
   }
 
-  app->priv->save_state = dlsym (plugin->handle, HCP_PLUGIN_SAVE_STATE_SYMBOL);
+  priv->save_state = dlsym (plugin->handle, HCP_PLUGIN_SAVE_STATE_SYMBOL);
 }
 
 static void
-hcp_app_unload (HCPApp *item, HCPPlugin *plugin)
+hcp_app_unload (HCPApp *app, HCPPlugin *plugin)
 {
-    g_return_if_fail (plugin->handle);
+  HCPAppPrivate *priv;
 
-    if (dlclose (plugin->handle))
-    {
-        ULOG_ERR ("An error occurred when unloading hildon-control-panel "
-                  "applet %s: %s",
-                  app->priv->plugin,
-                  dlerror ());
-    }
+  g_return_if_fail (app);
+  g_return_if_fail (HCP_IS_APP (app));
+  g_return_if_fail (plugin->handle);
+
+  priv = HCP_APP_GET_PRIVATE (app); 
+
+  if (dlclose (plugin->handle))
+  {
+      g_warning ("An error occurred when unloading hildon-control-panel "
+                 "applet %s: %s",
+                 priv->plugin,
+                 dlerror ());
+  }
 }
 
 static gboolean
 hcp_app_idle_launch (PluginLaunchData *d)
 {
   HCPPlugin *p;
+  HCPAppPrivate *priv;
   HCPProgram *program = hcp_program_get_instance ();
+
+  g_return_val_if_fail (d, FALSE);
+  g_return_val_if_fail (d->app, FALSE);
+  g_return_val_if_fail (HCP_IS_APP (d->app), FALSE);
+
+  priv = HCP_APP_GET_PRIVATE (d->app);
   
   p = g_new0 (HCPPlugin, 1);
   
   hcp_app_load (d->app, p);
-  
+
   if (!p->handle)
     goto cleanup;
-  
-  d->app->priv->is_running = TRUE;
+
+  priv->is_running = TRUE;
 
   /* Always use hcp->window as parent. If CP is launched without
    * UI (run_applet RPC) the applet's dialog will be system modal */ 
   p->exec (program->osso, program->window, d->user_activated);
-  d->app->priv->is_running = FALSE;
+
+  priv->is_running = FALSE;
 
   program->execute = 0;
 
@@ -197,11 +215,11 @@ hcp_app_finalize (GObject *object)
   HCPApp *app;
   HCPAppPrivate *priv;
   
-  g_return_if_fail (object != NULL);
+  g_return_if_fail (object);
   g_return_if_fail (HCP_IS_APP (object));
 
   app = HCP_APP (object);
-  priv = app->priv;
+  priv = HCP_APP_GET_PRIVATE (app);
 
   if (priv->name != NULL) 
   {
@@ -242,37 +260,38 @@ hcp_app_get_property (GObject    *gobject,
                       GValue     *value,
                       GParamSpec *pspec)
 {
+  HCPAppPrivate *priv;
 
-  HCPApp *app = HCP_APP (gobject);
+  priv = HCP_APP_GET_PRIVATE (gobject);
 
   switch (prop_id)
   {
     case PROP_NAME:
-      g_value_set_string (value, app->priv->name);
+      g_value_set_string (value, priv->name);
       break;
 
     case PROP_PLUGIN:
-      g_value_set_string (value, app->priv->plugin);
+      g_value_set_string (value, priv->plugin);
       break;
 
     case PROP_ICON:
-      g_value_set_string (value, app->priv->icon);
+      g_value_set_string (value, priv->icon);
       break;
 
     case PROP_CATEGORY:
-      g_value_set_string (value, app->priv->category);
+      g_value_set_string (value, priv->category);
       break;
 
     case PROP_IS_RUNNING:
-      g_value_set_boolean (value, app->priv->is_running);
+      g_value_set_boolean (value, priv->is_running);
       break;
 
     case PROP_GRID:
-      g_value_set_object (value, app->priv->grid);
+      g_value_set_object (value, priv->grid);
       break;
 
     case PROP_ITEM_POS:
-      g_value_set_int (value, app->priv->item_pos);
+      g_value_set_int (value, priv->item_pos);
       break;
 
     default:
@@ -287,42 +306,44 @@ hcp_app_set_property (GObject      *gobject,
                       const GValue *value,
                       GParamSpec   *pspec)
 {
-  HCPApp *app = HCP_APP (gobject);
+  HCPAppPrivate *priv;
+
+  priv = HCP_APP_GET_PRIVATE (gobject);
   
   switch (prop_id)
   {
     case PROP_NAME:
-      g_free (app->priv->name);
-      app->priv->name = g_strdup (g_value_get_string (value));
+      g_free (priv->name);
+      priv->name = g_strdup (g_value_get_string (value));
       break;
 
     case PROP_PLUGIN:
-      g_free (app->priv->plugin);
-      app->priv->plugin = g_strdup (g_value_get_string (value));
+      g_free (priv->plugin);
+      priv->plugin = g_strdup (g_value_get_string (value));
       break;
 
     case PROP_ICON:
-      g_free (app->priv->icon);
-      app->priv->icon = g_strdup (g_value_get_string (value));
+      g_free (priv->icon);
+      priv->icon = g_strdup (g_value_get_string (value));
       break;
 
     case PROP_CATEGORY:
-      g_free (app->priv->category);
-      app->priv->category = g_strdup (g_value_get_string (value));
+      g_free (priv->category);
+      priv->category = g_strdup (g_value_get_string (value));
       break;
 
     case PROP_IS_RUNNING:
-      app->priv->is_running = g_value_get_boolean (value);
+      priv->is_running = g_value_get_boolean (value);
       break;
 
     case PROP_GRID:
-      if (app->priv->grid)
-        g_object_unref (app->priv->grid);
-      app->priv->grid = g_object_ref (g_value_get_object (value));
+      if (priv->grid)
+        g_object_unref (priv->grid);
+      priv->grid = g_object_ref (g_value_get_object (value));
       break;
 
     case PROP_ITEM_POS:
-      app->priv->item_pos = g_value_get_int (value);
+      priv->item_pos = g_value_get_int (value);
       break;
 
     default:
@@ -416,6 +437,9 @@ hcp_app_launch (HCPApp *app, gboolean user_activated)
   PluginLaunchData *d;
   HCPProgram *program = hcp_program_get_instance ();
 
+  g_return_if_fail (app);
+  g_return_if_fail (HCP_IS_APP (app));
+
   if (!program->execute)
   {
       program->execute = 1;
@@ -434,13 +458,20 @@ hcp_app_launch (HCPApp *app, gboolean user_activated)
 void
 hcp_app_focus (HCPApp *app)
 {
-  if (app->priv->grid) 
+  HCPAppPrivate *priv;
+
+  g_return_if_fail (app);
+  g_return_if_fail (HCP_IS_APP (app));
+
+  priv = HCP_APP_GET_PRIVATE (app);
+
+  if (priv->grid) 
   {
     GtkTreePath *path;
 
-    gtk_widget_grab_focus (app->priv->grid);
-    path = gtk_tree_path_new_from_indices (app->priv->item_pos, -1);
-    gtk_icon_view_select_path (GTK_ICON_VIEW (app->priv->grid), path);
+    gtk_widget_grab_focus (priv->grid);
+    path = gtk_tree_path_new_from_indices (priv->item_pos, -1);
+    gtk_icon_view_select_path (GTK_ICON_VIEW (priv->grid), path);
     gtk_tree_path_free (path);
   }
 }
@@ -448,22 +479,42 @@ hcp_app_focus (HCPApp *app)
 void
 hcp_app_save_state (HCPApp *app)
 {
+  HCPAppPrivate *priv;
   HCPProgram *program = hcp_program_get_instance ();
 
-  if (app->priv->save_state)
-    app->priv->save_state (program->osso, NULL /* What is expected here? -- Jobi */);
+  g_return_if_fail (app);
+  g_return_if_fail (HCP_IS_APP (app));
+
+  priv = HCP_APP_GET_PRIVATE (app);
+
+  if (priv->save_state)
+    priv->save_state (program->osso, NULL /* What is expected here? -- Jobi */);
 }
 
 gboolean
 hcp_app_is_running (HCPApp *app)
 {
-  return app->priv->is_running;
+  HCPAppPrivate *priv;
+
+  g_return_val_if_fail (app, FALSE);
+  g_return_val_if_fail (HCP_IS_APP (app), FALSE);
+
+  priv = HCP_APP_GET_PRIVATE (app);
+
+  return priv->is_running;
 }
 
 gboolean
 hcp_app_can_save_state (HCPApp *app)
 {
-  return (app->priv->save_state == NULL);
+  HCPAppPrivate *priv;
+
+  g_return_val_if_fail (app, FALSE);
+  g_return_val_if_fail (HCP_IS_APP (app), FALSE);
+
+  priv = HCP_APP_GET_PRIVATE (app);
+
+  return (priv->save_state == NULL);
 }
 
 gint

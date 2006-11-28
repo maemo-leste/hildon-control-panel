@@ -24,7 +24,6 @@
 
 #include <string.h>
 
-#include <osso-log.h>
 #include <libosso.h>
 #include <hildon-base-lib/hildon-base-dnotify.h>
 
@@ -43,16 +42,17 @@ G_DEFINE_TYPE (HCPAppList, hcp_app_list, G_TYPE_OBJECT);
 
 typedef enum
 {
-  HCP_APP_LIST_SIGNAL_UPDATED,
-  HCP_APP_LIST_SIGNALS
+  SIGNAL_UPDATED,
+  N_SIGNALS
 } HCPAppListSignals;
 
-static gint hcp_app_list_signals[HCP_APP_LIST_SIGNALS];
+static gint signals[N_SIGNALS];
 
 enum
 {
-  HCP_APP_LIST_PROP_APPS = 1,
-  HCP_APP_LIST_PROP_CATEGORIES,
+  PROP_0,
+  PROP_APPS,
+  PROP_CATEGORIES,
 };
 
 struct _HCPAppListPrivate 
@@ -80,7 +80,7 @@ hcp_dnotify_reread_desktop_entries (HCPAppList *al)
   hcp_app_list_update (al);
 
   g_signal_emit (G_OBJECT (al), 
-                 hcp_app_list_signals[HCP_APP_LIST_SIGNAL_UPDATED], 
+                 signals[SIGNAL_UPDATED], 
                  0, NULL);
 
   return FALSE; 
@@ -101,6 +101,10 @@ static int
 hcp_init_dnotify (HCPAppList *al, const gchar *path)
 {
   hildon_return_t ret;
+
+  g_return_val_if_fail (al, HILDON_ERR);
+  g_return_val_if_fail (HCP_IS_APP_LIST (al), HILDON_ERR);
+  g_return_val_if_fail (path, HILDON_ERR);
 
   ret = hildon_dnotify_handler_init ();
 
@@ -124,6 +128,7 @@ hcp_init_dnotify (HCPAppList *al, const gchar *path)
 static void
 hcp_app_list_get_configured_categories (HCPAppList *al)
 {
+  HCPAppListPrivate *priv;
   GConfClient *client = NULL;
   GSList *group_names = NULL;
   GSList *group_names_i = NULL;
@@ -131,18 +136,26 @@ hcp_app_list_get_configured_categories (HCPAppList *al)
   GSList *group_ids_i = NULL;
   GError *error = NULL;
 
+  g_return_if_fail (al);
+  g_return_if_fail (HCP_IS_APP_LIST (al));
+
+  priv = HCP_APP_LIST_GET_PRIVATE (al);
+
   client = gconf_client_get_default ();
   
   if (client)
   {
     /* Get the group names */
     group_names = gconf_client_get_list (client, 
-    		HCP_GCONF_GROUPS_KEY,
-    		GCONF_VALUE_STRING, &error);
+    		                         HCP_GCONF_GROUPS_KEY,
+    		                         GCONF_VALUE_STRING, 
+                                         &error);
 
     if (error)
     {
-      ULOG_ERR (error->message);
+      g_warning ("Error reading categories names from GConf: %s",
+                 error->message);
+
       g_error_free (error);
       g_object_unref (client);
 
@@ -151,12 +164,14 @@ hcp_app_list_get_configured_categories (HCPAppList *al)
 
     /* Get the group ids */
     group_ids = gconf_client_get_list (client, 
-    		HCP_GCONF_GROUP_IDS_KEY,
-    		GCONF_VALUE_STRING, &error);
+                                       HCP_GCONF_GROUP_IDS_KEY,
+                                       GCONF_VALUE_STRING, &error);
     
     if (error)
     {
-      ULOG_ERR (error->message);
+      g_warning ("Error reading categories ids from GConf: %s",
+                 error->message);
+
       g_error_free (error);
       g_object_unref (client);
 
@@ -177,7 +192,7 @@ hcp_app_list_get_configured_categories (HCPAppList *al)
     category->name = (gchar *) group_names_i->data;
     category->apps = NULL;
 
-    al->priv->categories = g_slist_append (al->priv->categories, category);
+    priv->categories = g_slist_append (priv->categories, category);
 
     group_ids_i = g_slist_next (group_ids_i);
     group_names_i = g_slist_next (group_names_i);
@@ -251,14 +266,12 @@ hcp_app_list_free_app (gchar *plugin, HCPApp *app)
 static void
 hcp_app_list_finalize (GObject *object)
 {
-  HCPAppList *al;
   HCPAppListPrivate *priv;
   
-  g_return_if_fail (object != NULL);
+  g_return_if_fail (object);
   g_return_if_fail (HCP_IS_APP_LIST (object));
 
-  al = HCP_APP_LIST (object);
-  priv = al->priv;
+  priv = HCP_APP_LIST_GET_PRIVATE (object);
 
   if (priv->apps != NULL) 
   {
@@ -271,6 +284,8 @@ hcp_app_list_finalize (GObject *object)
     g_slist_foreach (priv->categories, (GFunc) hcp_app_list_free_category, NULL);
     g_slist_free (priv->categories);
   }
+
+  G_OBJECT_CLASS (hcp_app_list_parent_class)->finalize (object);
 }
 
 static void
@@ -279,17 +294,18 @@ hcp_app_list_get_property (GObject    *gobject,
                            GValue     *value,
                            GParamSpec *pspec)
 {
+  HCPAppListPrivate *priv;
 
-  HCPAppList *al = HCP_APP_LIST (gobject);
+  priv = HCP_APP_LIST_GET_PRIVATE (gobject);
 
   switch (prop_id)
   {
-    case HCP_APP_LIST_PROP_APPS:
-      g_value_set_pointer (value, al->priv->apps);
+    case PROP_APPS:
+      g_value_set_pointer (value, priv->apps);
       break;
 
-    case HCP_APP_LIST_PROP_CATEGORIES:
-      g_value_set_pointer (value, al->priv->categories);
+    case PROP_CATEGORIES:
+      g_value_set_pointer (value, priv->categories);
       break;
 
     default:
@@ -307,7 +323,7 @@ hcp_app_list_class_init (HCPAppListClass *class)
 
   g_object_class->get_property = hcp_app_list_get_property;
 
-  hcp_app_list_signals[HCP_APP_LIST_SIGNAL_UPDATED] =
+  signals[SIGNAL_UPDATED] =
         g_signal_new ("updated",
                       G_OBJECT_CLASS_TYPE (g_object_class),
                       G_SIGNAL_RUN_FIRST,
@@ -317,17 +333,17 @@ hcp_app_list_class_init (HCPAppListClass *class)
                       G_TYPE_NONE, 0);
 
   g_object_class_install_property (g_object_class,
-                                   HCP_APP_LIST_PROP_APPS,
+                                   PROP_APPS,
                                    g_param_spec_pointer ("apps",
                                                          "Apps",
-                                                         "Set app list",
+                                                         "App List",
                                                          G_PARAM_READABLE));
 
   g_object_class_install_property (g_object_class,
-                                   HCP_APP_LIST_PROP_CATEGORIES,
+                                   PROP_CATEGORIES,
                                    g_param_spec_pointer ("categories",
                                                          "Categories",
-                                                         "Set categories list",
+                                                         "Categories List",
                                                          G_PARAM_READABLE));
 
   g_type_class_add_private (g_object_class, sizeof (HCPAppListPrivate));
@@ -336,20 +352,23 @@ hcp_app_list_class_init (HCPAppListClass *class)
 static void 
 hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
 {
+  HCPAppListPrivate *priv;
   GDir *dir;
   GError *error = NULL;
   const char *filename;
   GKeyFile *keyfile;
 
-  ULOG_DEBUG("hcp-app-list:read_desktop_entries");
+  g_return_if_fail (al);
+  g_return_if_fail (HCP_IS_APP_LIST (al));
+  g_return_if_fail (dir_path);
 
-  g_return_if_fail (dir_path && al->priv->apps);
+  priv = HCP_APP_LIST_GET_PRIVATE (al);
 
   dir = g_dir_open(dir_path, 0, &error);
 
   if (!dir)
   {
-    ULOG_ERR (error->message);
+    g_warning ("Error reading desktop files directory: %s", error->message);
     g_error_free (error);
     return;
   }
@@ -377,56 +396,56 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
 
     if (error)
     {
-      ULOG_ERR (error->message);
+      g_warning ("Error reading applet desktop file: %s", error->message);
       g_error_free (error);
       continue;
     }
 
     name = g_key_file_get_locale_string (keyfile,
-            HCP_DESKTOP_GROUP,
-            HCP_DESKTOP_KEY_NAME,
-            NULL /* current locale */,
-            &error);
+                                         HCP_DESKTOP_GROUP,
+                                         HCP_DESKTOP_KEY_NAME,
+                                         NULL /* current locale */,
+                                         &error);
 
     if (error)
     {
-      ULOG_ERR (error->message);
+      g_warning ("Error reading applet desktop file: %s", error->message);
       g_error_free (error);
       continue;
     }
 
     plugin = g_key_file_get_string (keyfile,
-            HCP_DESKTOP_GROUP,
-            HCP_DESKTOP_KEY_PLUGIN,
-            &error);
+                                    HCP_DESKTOP_GROUP,
+                                    HCP_DESKTOP_KEY_PLUGIN,
+                                    &error);
 
     if (error)
     {
-      ULOG_ERR (error->message);
+      g_warning ("Error reading applet desktop file: %s", error->message);
       g_error_free (error);
       continue;
     }
 
     icon = g_key_file_get_string (keyfile,
-            HCP_DESKTOP_GROUP,
-            HCP_DESKTOP_KEY_ICON,
-            &error);
+                                  HCP_DESKTOP_GROUP,
+                                  HCP_DESKTOP_KEY_ICON,
+                                  &error);
 
     if (error)
     {
-      ULOG_WARN (error->message);
+      g_warning ("Error reading applet desktop file: %s", error->message);
       g_error_free (error);
       error = NULL;
     }
     
     category = g_key_file_get_string (keyfile,
-            HCP_DESKTOP_GROUP,
-            HCP_DESKTOP_KEY_CATEGORY,
-            &error);
+                                      HCP_DESKTOP_GROUP,
+                                      HCP_DESKTOP_KEY_CATEGORY,
+                                      &error);
 
     if (error)
     {
-      ULOG_WARN (error->message);
+      g_warning ("Error reading applet desktop file: %s", error->message);
       g_error_free (error);
       error = NULL;
     }
@@ -440,7 +459,7 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
                   "category", category,
                   NULL); 
 
-    g_hash_table_insert (al->priv->apps, g_strdup (plugin), app);
+    g_hash_table_insert (priv->apps, g_strdup (plugin), app);
 
     g_free (name);
     g_free (plugin);
@@ -453,10 +472,10 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
 }
 
 static gint
-hcp_app_list_find_category (gpointer _category, gpointer _app)
+hcp_app_list_find_category (gpointer a, gpointer b)
 {
-  HCPCategory *category = (HCPCategory *) _category;
-  HCPApp *app = (HCPApp *) _app;
+  HCPCategory *category = (HCPCategory *) a;
+  HCPApp *app = (HCPApp *) b;
   gchar *category_id = NULL;
 
   g_object_get (G_OBJECT (app),
@@ -464,7 +483,7 @@ hcp_app_list_find_category (gpointer _category, gpointer _app)
                 NULL);
 
   if (category_id && category->id &&
-      !strcmp (category_id, category->id))
+      !g_ascii_strcasecmp (category_id, category->id))
   {
     g_free (category_id);
     return 0;
@@ -476,15 +495,23 @@ hcp_app_list_find_category (gpointer _category, gpointer _app)
 }
 
 static void
-hcp_app_list_sort_by_category (gpointer key, gpointer value, gpointer _al)
+hcp_app_list_sort_by_category (gpointer key, gpointer value, gpointer user_data)
 {
-  HCPAppList *al = (HCPAppList *) _al;
-  GSList *category_item = NULL;
+  HCPAppListPrivate *priv;
+  HCPAppList *al = (HCPAppList *) user_data;
   HCPApp *app = (HCPApp *) value;
   HCPCategory *category; 
+  GSList *category_item = NULL;
+
+  g_return_if_fail (al);
+  g_return_if_fail (HCP_IS_APP_LIST (al));
+  g_return_if_fail (app);
+  g_return_if_fail (HCP_IS_APP (app));
+
+  priv = HCP_APP_LIST_GET_PRIVATE (al);
 
   /* Find a category for this applet */
-  category_item = g_slist_find_custom (al->priv->categories,
+  category_item = g_slist_find_custom (priv->categories,
                                        app,
                                        (GCompareFunc) hcp_app_list_find_category);
 
@@ -496,30 +523,13 @@ hcp_app_list_sort_by_category (gpointer key, gpointer value, gpointer _al)
   {
     /* If category doesn't exist or wasn't matched,
      * add to the default one (Extra) */
-    category = g_slist_last (al->priv->categories)->data;
+    category = g_slist_last (priv->categories)->data;
   }
-      
+
   category->apps = g_slist_insert_sorted (
                                   category->apps,
                                   app,
                                   (GCompareFunc) hcp_app_sort_func);
-}
-
-void
-hcp_app_list_update (HCPAppList *al)
-{
-  /* Clean the previous list */
-  g_hash_table_foreach_remove (al->priv->apps, (GHRFunc) hcp_app_list_free_app, NULL);
-
-  /* Read all the entries */
-  hcp_app_list_read_desktop_entries (al, CONTROLPANEL_ENTRY_DIR);
-
-  /* Place them is the relevant category */
-  g_slist_foreach (al->priv->categories, (GFunc) hcp_app_list_empty_category, NULL);
-
-  g_hash_table_foreach (al->priv->apps,
-                        (GHFunc) hcp_app_list_sort_by_category,
-                        al);
 }
 
 GObject *
@@ -528,4 +538,28 @@ hcp_app_list_new ()
   GObject *al = g_object_new (HCP_TYPE_APP_LIST, NULL);
 
   return al;
+}
+
+void
+hcp_app_list_update (HCPAppList *al)
+{
+  HCPAppListPrivate *priv;
+
+  g_return_if_fail (al);
+  g_return_if_fail (HCP_IS_APP_LIST (al));
+
+  priv = HCP_APP_LIST_GET_PRIVATE (al);
+
+  /* Clean the previous list */
+  g_hash_table_foreach_remove (priv->apps, (GHRFunc) hcp_app_list_free_app, NULL);
+
+  /* Read all the entries */
+  hcp_app_list_read_desktop_entries (al, CONTROLPANEL_ENTRY_DIR);
+
+  /* Place them is the relevant category */
+  g_slist_foreach (priv->categories, (GFunc) hcp_app_list_empty_category, NULL);
+
+  g_hash_table_foreach (priv->apps,
+                        (GHFunc) hcp_app_list_sort_by_category,
+                        al);
 }
