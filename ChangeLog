@@ -1,7 +1,7 @@
 2006-11-28  Lucas Rocha  <lucas.rocha@nokia.com>
 
 	* src/*.[ch]: general code cleanups, improve code reliability, fix
-	some GObject leaks.
+	some GObject leaks, get rid of osso-log.
 
 2006-11-23  Lucas Rocha  <lucas.rocha@nokia.com>
 
