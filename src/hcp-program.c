@@ -24,8 +24,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <osso-log.h>
-
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
@@ -194,7 +192,7 @@ hcp_program_init_rpc (HCPProgram *program)
   
   if (!program->osso)
   {
-    ULOG_ERR("Error initializing osso -- check that D-BUS is running");
+    g_warning ("Error initializing osso -- check that D-BUS is running");
     exit(-1);
   }
 

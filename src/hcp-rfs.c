@@ -28,7 +28,6 @@
 #include <hildon-widgets/hildon-banner.h>
 #include <osso-helplib.h>
 #include <libosso.h>
-#include <osso-log.h>
 
 #include <glib/gi18n.h>
 
@@ -133,7 +132,7 @@ hcp_rfs_check_lock_code (HCPProgram *program, const gchar *code)
   switch (ret)
   {
     case OSSO_INVALID:
-      ULOG_ERR ("Lockcode query call failed: Invalid parameter");
+      g_warning ("Lockcode query call failed: Invalid parameter");
       osso_rpc_free_val (&returnvalue);
       return -1;
 
@@ -144,12 +143,11 @@ hcp_rfs_check_lock_code (HCPProgram *program, const gchar *code)
     case OSSO_ERROR_STATE_SIZE:
       if (returnvalue.type == DBUS_TYPE_STRING)
       {
-          ULOG_ERR ("Lockcode query call failed: %s", 
-  		              returnvalue.value.s);
+        g_warning ("Lockcode query call failed: %s", returnvalue.value.s);
       }
       else
       {
-          ULOG_ERR ("Lockcode query call failed: unspecified");
+        g_warning ("Lockcode query call failed: unspecified");
       }
       osso_rpc_free_val (&returnvalue);
       return -1;
@@ -158,16 +156,16 @@ hcp_rfs_check_lock_code (HCPProgram *program, const gchar *code)
         break;
 
     default:
-      ULOG_ERR ("Lockcode query call failed: unknown"
-  	              " error type %d", ret);
+      g_warning ("Lockcode query call failed: unknown"
+  	         " error type %d", ret);
       osso_rpc_free_val (&returnvalue);
       return -1;
   }
 
   if (returnvalue.type != DBUS_TYPE_BOOLEAN)
   {
-    ULOG_ERR ("Lockcode query call failed: unexpected return "
-              "value type %d", returnvalue.type);
+    g_warning ("Lockcode query call failed: unexpected return "
+               "value type %d", returnvalue.type);
 
     osso_rpc_free_val (&returnvalue);
     return -1;
@@ -250,11 +248,11 @@ hcp_rfs_launch_script (const gchar *script)
 
   if (!g_spawn_command_line_async (script, &error))
   {
-    ULOG_ERR ("Call to RFS or CUD script failed");
+    g_warning ("Call to RFS or CUD script failed");
 
     if (error)
     {
-      ULOG_ERR (error->message);
+      g_warning (error->message);
       g_error_free (error);
     }
   }

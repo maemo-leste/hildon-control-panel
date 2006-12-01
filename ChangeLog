@@ -1,3 +1,7 @@
+2006-12-01  Lucas Rocha  <lucas.rocha@nokia.com>
+
+	* src/hcp-rfs.c, src/hcp-program.c: get rid of osso-log.
+
 2006-11-28  Lucas Rocha  <lucas.rocha@nokia.com>
 
 	* src/*.[ch]: general code cleanups, improve code reliability, fix
