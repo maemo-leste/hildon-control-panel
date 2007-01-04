@@ -70,7 +70,7 @@ hcp_grid_update_icon (GtkTreeModel *model,
   g_return_val_if_fail (user_data, TRUE);
   g_return_val_if_fail (HCP_IS_GRID (user_data), TRUE);
 
-  priv = HCP_GRID_GET_PRIVATE (user_data);
+  priv = HCP_GRID (user_data)->priv;
 
   gtk_tree_model_get (GTK_TREE_MODEL (model), iter, 
                       HCP_STORE_APP, &app,
@@ -184,7 +184,7 @@ hcp_grid_selection_changed (GtkWidget *widget, gpointer user_data)
   g_return_if_fail (widget);
   g_return_if_fail (HCP_IS_GRID (widget));
 
-  priv = HCP_GRID_GET_PRIVATE (widget);
+  priv = HCP_GRID (widget)->priv;
 
   model = gtk_icon_view_get_model (GTK_ICON_VIEW (widget));
   n_items = gtk_tree_model_iter_n_children (model, NULL);
@@ -357,7 +357,7 @@ hcp_grid_keyboard_listener (GtkWidget   *widget,
   g_return_val_if_fail (widget, FALSE);
   g_return_val_if_fail (HCP_IS_GRID (widget), FALSE);
 
-  priv = HCP_GRID_GET_PRIVATE (widget);
+  priv = HCP_GRID (widget)->priv;
 
   model = gtk_icon_view_get_model (GTK_ICON_VIEW (widget));
   n_items = gtk_tree_model_iter_n_children (model, NULL);
@@ -430,7 +430,7 @@ hcp_grid_size_request (GtkWidget *widget, GtkRequisition *req)
   g_return_if_fail (widget);
   g_return_if_fail (HCP_IS_GRID (widget));
 
-  priv = HCP_GRID_GET_PRIVATE (widget);
+  priv = HCP_GRID (widget)->priv;
 
   store = gtk_icon_view_get_model (GTK_ICON_VIEW (widget));
 
@@ -527,7 +527,7 @@ hcp_grid_set_icon_size (HCPGrid *grid, HCPIconSize icon_size)
   g_return_if_fail (grid);
   g_return_if_fail (HCP_IS_GRID (grid));
 
-  priv = HCP_GRID_GET_PRIVATE (grid);
+  priv = grid->priv;
 
   priv->icon_size = icon_size;
 

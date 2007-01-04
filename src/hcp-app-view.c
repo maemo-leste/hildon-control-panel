@@ -279,7 +279,7 @@ hcp_app_view_get_property (GObject    *gobject,
 {
   HCPAppViewPrivate *priv;
 
-  priv = HCP_APP_VIEW_GET_PRIVATE (gobject);
+  priv = HCP_APP_VIEW (gobject)->priv;
 
   switch (prop_id)
   {
@@ -301,7 +301,7 @@ hcp_app_view_set_property (GObject      *gobject,
 {
   HCPAppViewPrivate *priv;
 
-  priv = HCP_APP_VIEW_GET_PRIVATE (gobject);
+  priv = HCP_APP_VIEW (gobject)->priv;
   
   switch (prop_id)
   {
@@ -369,7 +369,7 @@ hcp_app_view_populate (HCPAppView *view, HCPAppList *al)
   g_return_if_fail (al);
   g_return_if_fail (HCP_IS_APP_LIST (al));
 
-  priv = HCP_APP_VIEW_GET_PRIVATE (view);
+  priv = view->priv;
 
   g_object_get (G_OBJECT (al),
                 "categories", &categories,

@@ -101,7 +101,7 @@ hcp_app_load (HCPApp *app, HCPPlugin *plugin)
   g_return_if_fail (app);
   g_return_if_fail (HCP_IS_APP (app));
 
-  priv = HCP_APP_GET_PRIVATE (app); 
+  priv = app->priv; 
 
   g_return_if_fail (priv->plugin);
 
@@ -153,7 +153,7 @@ hcp_app_unload (HCPApp *app, HCPPlugin *plugin)
   g_return_if_fail (HCP_IS_APP (app));
   g_return_if_fail (plugin->handle);
 
-  priv = HCP_APP_GET_PRIVATE (app); 
+  priv = app->priv; 
 
   if (dlclose (plugin->handle))
   {
@@ -175,7 +175,7 @@ hcp_app_idle_launch (PluginLaunchData *d)
   g_return_val_if_fail (d->app, FALSE);
   g_return_val_if_fail (HCP_IS_APP (d->app), FALSE);
 
-  priv = HCP_APP_GET_PRIVATE (d->app);
+  priv = d->app->priv;
   
   p = g_new0 (HCPPlugin, 1);
   
@@ -219,7 +219,7 @@ hcp_app_finalize (GObject *object)
   g_return_if_fail (HCP_IS_APP (object));
 
   app = HCP_APP (object);
-  priv = HCP_APP_GET_PRIVATE (app);
+  priv = app->priv;
 
   if (priv->name != NULL) 
   {
@@ -262,7 +262,7 @@ hcp_app_get_property (GObject    *gobject,
 {
   HCPAppPrivate *priv;
 
-  priv = HCP_APP_GET_PRIVATE (gobject);
+  priv = HCP_APP (gobject)->priv;
 
   switch (prop_id)
   {
@@ -308,7 +308,7 @@ hcp_app_set_property (GObject      *gobject,
 {
   HCPAppPrivate *priv;
 
-  priv = HCP_APP_GET_PRIVATE (gobject);
+  priv = HCP_APP (gobject)->priv;
   
   switch (prop_id)
   {
@@ -463,7 +463,7 @@ hcp_app_focus (HCPApp *app)
   g_return_if_fail (app);
   g_return_if_fail (HCP_IS_APP (app));
 
-  priv = HCP_APP_GET_PRIVATE (app);
+  priv = app->priv;
 
   if (priv->grid) 
   {
@@ -485,7 +485,7 @@ hcp_app_save_state (HCPApp *app)
   g_return_if_fail (app);
   g_return_if_fail (HCP_IS_APP (app));
 
-  priv = HCP_APP_GET_PRIVATE (app);
+  priv = app->priv;
 
   if (priv->save_state)
     priv->save_state (program->osso, NULL /* What is expected here? -- Jobi */);
@@ -499,7 +499,7 @@ hcp_app_is_running (HCPApp *app)
   g_return_val_if_fail (app, FALSE);
   g_return_val_if_fail (HCP_IS_APP (app), FALSE);
 
-  priv = HCP_APP_GET_PRIVATE (app);
+  priv = app->priv;
 
   return priv->is_running;
 }
@@ -512,7 +512,7 @@ hcp_app_can_save_state (HCPApp *app)
   g_return_val_if_fail (app, FALSE);
   g_return_val_if_fail (HCP_IS_APP (app), FALSE);
 
-  priv = HCP_APP_GET_PRIVATE (app);
+  priv = app->priv;
 
   return (priv->save_state == NULL);
 }

@@ -100,7 +100,7 @@ hcp_window_enforce_state (HCPWindow *window)
   g_return_if_fail (window);
   g_return_if_fail (HCP_IS_WINDOW (window));
 
-  priv = HCP_WINDOW_GET_PRIVATE (window);
+  priv = window->priv;
 
   /* Actually enforce the saved state */
   if (priv->icon_size == 0)
@@ -153,7 +153,7 @@ hcp_window_retrieve_state (HCPWindow *window)
   g_return_if_fail (window);
   g_return_if_fail (HCP_IS_WINDOW (window));
 
-  priv = HCP_WINDOW_GET_PRIVATE (window);
+  priv = window->priv;
 
   ret = osso_state_read (program->osso, &state);
 
@@ -250,7 +250,7 @@ hcp_window_save_state (HCPWindow *window, gboolean clear_state)
   g_return_if_fail (window);
   g_return_if_fail (HCP_IS_WINDOW (window));
 
-  priv = HCP_WINDOW_GET_PRIVATE (window);
+  priv = window->priv;
 
   if (clear_state)
   {
@@ -335,7 +335,7 @@ hcp_window_retrieve_configuration (HCPWindow *window)
   g_return_if_fail (window);
   g_return_if_fail (HCP_IS_WINDOW (window));
 
-  priv = HCP_WINDOW_GET_PRIVATE (window);
+  priv = window->priv;
 
   client = gconf_client_get_default ();
 
@@ -370,7 +370,7 @@ hcp_window_save_configuration (HCPWindow *window)
   g_return_if_fail (window);
   g_return_if_fail (HCP_IS_WINDOW (window));
 
-  priv = HCP_WINDOW_GET_PRIVATE (window);
+  priv = window->priv;
 
   client = gconf_client_get_default ();
 
@@ -404,7 +404,7 @@ hcp_window_keyboard_listener (GtkWidget * widget,
   g_return_val_if_fail (HCP_IS_WINDOW (widget), FALSE);
 
   window = HCP_WINDOW (widget);
-  priv = HCP_WINDOW_GET_PRIVATE (window);
+  priv = window->priv;
 
   if (keyevent->type == GDK_KEY_RELEASE) 
   {
@@ -569,7 +569,7 @@ hcp_window_iconsize (GtkWidget *widget, HCPWindow *window)
   g_return_if_fail (window);
   g_return_if_fail (HCP_IS_WINDOW (window));
 
-  priv = HCP_WINDOW_GET_PRIVATE (window);
+  priv = window->priv;
 
   if (!gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget)))
     return;
@@ -598,7 +598,7 @@ hcp_window_open (GtkWidget *widget, HCPWindow *window)
   g_return_if_fail (window);
   g_return_if_fail (HCP_IS_WINDOW (window));
 
-  priv = HCP_WINDOW_GET_PRIVATE (window);
+  priv = window->priv;
 
   hcp_app_launch (priv->focused_item, TRUE);
 }
@@ -614,7 +614,7 @@ hcp_window_topmost_status_change (GObject *gobject,
   g_return_if_fail (window);
   g_return_if_fail (HCP_IS_WINDOW (window));
 
-  priv = HCP_WINDOW_GET_PRIVATE (window);
+  priv = window->priv;
 
   if (hildon_program_get_is_topmost (program)) {
     hildon_program_set_can_hibernate (program, FALSE);
@@ -641,7 +641,7 @@ hcp_window_app_view_focus_cb (HCPAppView *view,
   g_return_if_fail (window);
   g_return_if_fail (HCP_IS_WINDOW (window));
 
-  priv = HCP_WINDOW_GET_PRIVATE (window);
+  priv = window->priv;
 
   if (priv->focused_item != NULL)
     g_object_unref (priv->focused_item);
@@ -662,7 +662,7 @@ hcp_window_app_list_updated_cb (HCPAppList *al, HCPWindow *window)
   g_return_if_fail (window);
   g_return_if_fail (HCP_IS_WINDOW (window));
 
-  priv = HCP_WINDOW_GET_PRIVATE (window);
+  priv = window->priv;
 
   g_object_get (G_OBJECT (priv->focused_item),
                 "plugin", &focused,
@@ -719,7 +719,7 @@ hcp_window_construct_ui (HCPWindow *window)
   g_return_if_fail (window);
   g_return_if_fail (HCP_IS_WINDOW (window));
 
-  priv = HCP_WINDOW_GET_PRIVATE (window);
+  priv = window->priv;
 
   /* Why is this not read from the gtkrc?? -- Jobi */
   /* Control Panel Grid */
@@ -936,7 +936,7 @@ hcp_window_finalize (GObject *object)
   g_return_if_fail (object);
   g_return_if_fail (HCP_IS_WINDOW (object));
 
-  priv = HCP_WINDOW_GET_PRIVATE (object);
+  priv = HCP_WINDOW (object)->priv;
 
   if (priv->al != NULL) 
   {

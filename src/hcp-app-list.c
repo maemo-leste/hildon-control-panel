@@ -139,7 +139,7 @@ hcp_app_list_get_configured_categories (HCPAppList *al)
   g_return_if_fail (al);
   g_return_if_fail (HCP_IS_APP_LIST (al));
 
-  priv = HCP_APP_LIST_GET_PRIVATE (al);
+  priv = al->priv;
 
   client = gconf_client_get_default ();
   
@@ -271,7 +271,7 @@ hcp_app_list_finalize (GObject *object)
   g_return_if_fail (object);
   g_return_if_fail (HCP_IS_APP_LIST (object));
 
-  priv = HCP_APP_LIST_GET_PRIVATE (object);
+  priv = HCP_APP_LIST (object)->priv;
 
   if (priv->apps != NULL) 
   {
@@ -296,7 +296,7 @@ hcp_app_list_get_property (GObject    *gobject,
 {
   HCPAppListPrivate *priv;
 
-  priv = HCP_APP_LIST_GET_PRIVATE (gobject);
+  priv = HCP_APP_LIST (gobject)->priv;
 
   switch (prop_id)
   {
@@ -362,7 +362,7 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
   g_return_if_fail (HCP_IS_APP_LIST (al));
   g_return_if_fail (dir_path);
 
-  priv = HCP_APP_LIST_GET_PRIVATE (al);
+  priv = al->priv;
 
   dir = g_dir_open(dir_path, 0, &error);
 
@@ -508,7 +508,7 @@ hcp_app_list_sort_by_category (gpointer key, gpointer value, gpointer user_data)
   g_return_if_fail (app);
   g_return_if_fail (HCP_IS_APP (app));
 
-  priv = HCP_APP_LIST_GET_PRIVATE (al);
+  priv = al->priv;
 
   /* Find a category for this applet */
   category_item = g_slist_find_custom (priv->categories,
@@ -548,7 +548,7 @@ hcp_app_list_update (HCPAppList *al)
   g_return_if_fail (al);
   g_return_if_fail (HCP_IS_APP_LIST (al));
 
-  priv = HCP_APP_LIST_GET_PRIVATE (al);
+  priv = al->priv;
 
   /* Clean the previous list */
   g_hash_table_foreach_remove (priv->apps, (GHRFunc) hcp_app_list_free_app, NULL);
