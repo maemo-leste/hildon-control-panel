@@ -52,7 +52,6 @@ struct _HCPWindowPrivate
   GtkWidget      *view;
   GtkWidget      *large_icons_menu_item;
   GtkWidget      *small_icons_menu_item;
-  gboolean        fullscreen;
 
   /* For state save data */
   gint            icon_size;
@@ -442,20 +441,6 @@ hcp_window_keyboard_listener (GtkWidget * widget,
 
           return TRUE;
         }
-        break;
-
-      case HILDON_HARDKEY_FULLSCREEN:
-        if (priv->fullscreen)
-        {
-          gtk_window_unfullscreen (GTK_WINDOW (window));
-          priv->fullscreen = FALSE;
-        }
-        else
-        {
-          gtk_window_fullscreen (GTK_WINDOW (window));
-          priv->fullscreen = TRUE;
-        }
-        return TRUE;
         break;
     }
   }
@@ -881,7 +866,6 @@ hcp_window_init (HCPWindow *window)
 
   priv = window->priv;
 
-  priv->fullscreen = FALSE;
   priv->icon_size = 1;
   priv->focused_item = NULL;
   priv->saved_focused_filename = NULL;
