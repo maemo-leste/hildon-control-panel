@@ -21,6 +21,8 @@
 
 SUBDIRS = data src 
 
+CLEANFILES = *~
+
 EXTRA_DIST = debian/changelog debian/control debian/copyright debian/rules \
 	debian/hildon-control-panel.install \
 	debian/hildon-control-panel-dev.install 

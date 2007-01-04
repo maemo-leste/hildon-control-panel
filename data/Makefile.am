@@ -35,3 +35,5 @@ gconfschemas_DATA=hildon-control-panel.schemas
 hildondesktopentry_DATA = hildon-control-panel.desktop
 
 hildon_othersmenudir = $(sysconfdir)/others-menu
+
+CLEANFILES = *~

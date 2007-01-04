@@ -73,4 +73,4 @@ hildon_cp_pluginincludeinst_DATA = hildon-cp-plugin-interface.h
 
 EXTRA_DIST = hcp-marshalers.list
 
-CLEANFILES = $(BUILT_SOURCES)
+CLEANFILES = *~ $(BUILT_SOURCES)
