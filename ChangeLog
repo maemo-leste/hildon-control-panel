@@ -1,3 +1,8 @@
+2007-02-13  Lucas Rocha  <lucas.rocha@nokia.com>
+
+	* configure.ac: remove gtkhtml dependency and add gconf dependency
+	checks.
+
 2007-01-04  Lucas Rocha  <lucas.rocha@nokia.com>
 
 	* src/hcp-window.c: removed fullscreen support as it's not on UI spec.

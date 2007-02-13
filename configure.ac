@@ -21,22 +21,23 @@ AC_SUBST(X_CFLAGS)
 
 AC_HEADER_STDC
 
-ALL_LINGUAS="en_GB"
-AC_SUBST(ALL_LINGUAS)
-AM_GLIB_GNU_GETTEXT
-
-if test foobar${hildon_use_debug} = foobaryes 
+if test "x${hildon_use_debug}" = "xyes"
 then
     CFLAGS="$CFLAGS -ggdb -O0 -DDEBUG"
 else
     CFLAGS="$CFLAGS -O2"
 fi
 
-# D-BUS headers do not compile with -pedantic. Once they are fixed, 
-#return the flag
-#CFLAGS="$CFLAGS -Wall -ansi -pedantic -Wmissing-prototypes -Wmissing-declarations -Werror" 
 CFLAGS="$CFLAGS -Wall -ansi -Wmissing-prototypes -Wmissing-declarations -Werror -lcrypt" 
 AC_SUBST(CFLAGS)
+
+ALL_LINGUAS="en_GB"
+AC_SUBST(ALL_LINGUAS)
+AM_GLIB_GNU_GETTEXT
+
+PKG_CHECK_MODULES(OSSOSETTINGS, osso-af-settings >= 0.8.1)
+localedir=`pkg-config osso-af-settings --variable=localedir`
+AC_SUBST(localedir)
 
 PKG_CHECK_MODULES(HILDONFM, hildon-fm)
 AC_SUBST(HILDONFM_LIBS)
@@ -54,19 +55,16 @@ PKG_CHECK_MODULES(HILDONBASELIB, hildon-base-lib >= 0.7.1)
 AC_SUBST(HILDONBASELIB_LIBS)
 AC_SUBST(HILDONBASELIB_CFLAGS)
 
-PKG_CHECK_MODULES(HTML, libgtkhtml-3.8)
-AC_SUBST(HTML_LIBS)
-AC_SUBST(HTML_CFLAGS)
-
-PKG_CHECK_MODULES(OSSOSETTINGS, osso-af-settings >= 0.8.1)
-localedir=`pkg-config osso-af-settings --variable=localedir`
-AC_SUBST(localedir)
-hildondesktopentrydir=`pkg-config osso-af-settings --variable=desktopentrydir`
-AC_SUBST(hildondesktopentrydir)
-
 PKG_CHECK_MODULES(LIBOSSOHELP, libossohelp >= 0.0.4)
 AC_SUBST(LIBOSSOHELP)
 AC_SUBST(LIBOSSOHELP_CFLAGS)
+
+PKG_CHECK_MODULES(GCONF, gconf-2.0 >= 2.6.2)
+AC_SUBST(GCONF_LIBS)
+AC_SUBST(GCONF_CFLAGS)
+
+hildondesktopentrydir=`pkg-config osso-af-settings --variable=desktopentrydir`
+AC_SUBST(hildondesktopentrydir)
 
 desktopentrydir=${datadir}/applications
 hildoncpdesktopentrydir=${desktopentrydir}/hildon-control-panel
