@@ -1,5 +1,10 @@
 2007-02-13  Lucas Rocha  <lucas.rocha@nokia.com>
 
+	* debian/control, configure.ac: remove hildon-libs dependency and add hildon-1 dependency
+	checks.
+
+2007-02-13  Lucas Rocha  <lucas.rocha@nokia.com>
+
 	* configure.ac: remove gtkhtml dependency and add gconf dependency
 	checks.
 
