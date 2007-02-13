@@ -1,5 +1,9 @@
 2007-02-13  Lucas Rocha  <lucas.rocha@nokia.com>
 
+	* configure.ac: release 3.0.0
+
+2007-02-13  Lucas Rocha  <lucas.rocha@nokia.com>
+
 	* debian/control, configure.ac: remove hildon-libs dependency and add hildon-1 dependency
 	checks.
 

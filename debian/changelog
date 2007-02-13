@@ -1,3 +1,9 @@
+hildon-control-panel (2.9.9-1) unstable; urgency=low
+
+  * First *unstable* release on fully refactored Hildon Control Panel.
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Mon, 13 Feb 2007 14:33:04 +0300
+
 hildon-control-panel (2.2.10-1) unstable; urgency=low
 
   * hcp-rfs.c: Make all infonotes transient to the dialog
