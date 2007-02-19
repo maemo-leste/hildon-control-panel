@@ -77,6 +77,13 @@ endif
 
 	dh_clean 
 
+configure: configure-stamp
+
+configure-stamp:
+	dh_testdir
+	./autogen.sh
+	touch configure-stamp
+
 install: build
 	dh_testdir
 	dh_testroot

@@ -1,3 +1,10 @@
+hildon-control-panel (2.9.10-1) unstable; urgency=low
+
+  * src/*.c: replaced include <hildon-widgets/*> with <hildon/*>
+  * debian/rules: run the autotools
+
+ -- Johan Bilien <johan.bilien@nokia.com>  Mon, 19 Feb 2007 17:36:08 +0200
+
 hildon-control-panel (2.9.9-1) unstable; urgency=low
 
   * First *unstable* release on fully refactored Hildon Control Panel.
