@@ -23,7 +23,7 @@
 
 #include <math.h>
 
-#include <hildon-widgets/hildon-defines.h>
+#include <hildon/hildon-defines.h>
 
 #include <gtk/gtk.h>
 

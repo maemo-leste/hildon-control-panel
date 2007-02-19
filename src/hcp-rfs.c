@@ -24,8 +24,8 @@
 #include <crypt.h>
 #include <strings.h>
 
-#include <hildon-widgets/hildon-code-dialog.h>
-#include <hildon-widgets/hildon-banner.h>
+#include <hildon/hildon-code-dialog.h>
+#include <hildon/hildon-banner.h>
 #include <osso-helplib.h>
 #include <libosso.h>
 

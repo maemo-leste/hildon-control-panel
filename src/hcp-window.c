@@ -24,8 +24,8 @@
 
 #include <libosso.h>
 #include <osso-helplib.h>
-#include <hildon-widgets/hildon-window.h>
-#include <hildon-widgets/hildon-program.h>
+#include <hildon/hildon-window.h>
+#include <hildon/hildon-program.h>
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>

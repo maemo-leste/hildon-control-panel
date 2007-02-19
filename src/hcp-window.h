@@ -25,7 +25,7 @@
 #ifndef HCP_WINDOW_H
 #define HCP_WINDOW_H
 
-#include <hildon-widgets/hildon-window.h>
+#include <hildon/hildon-window.h>
 
 #include <glib-object.h>
 

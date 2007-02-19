@@ -1,3 +1,7 @@
+2007-02-19  Johan Bilie  <johan.bilien@nokia.com>
+
+	* src/*.c: replaced include <hildon-widgets/*> with <hildon/*>
+
 2007-02-13  Lucas Rocha  <lucas.rocha@nokia.com>
 
 	* configure.ac: release 3.0.0
