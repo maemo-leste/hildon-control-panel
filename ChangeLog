@@ -1,3 +1,8 @@
+2007-02-20  Lucas Rocha  <lucas.rocha@nokia.com>
+
+	* src/hcp-grid.c: cursor should follow selection. Small fix on column
+	width.
+
 2007-02-19  Johan Bilie  <johan.bilien@nokia.com>
 
 	* src/*.c: replaced include <hildon-widgets/*> with <hildon/*>

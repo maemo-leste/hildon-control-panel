@@ -197,6 +197,8 @@ hcp_grid_selection_changed (GtkWidget *widget, gpointer user_data)
   y = item_pos / HCP_GRID_NUM_COLUMNS;
   last_row = ceil ((double) n_items / HCP_GRID_NUM_COLUMNS) - 1;
 
+  gtk_icon_view_set_cursor (GTK_ICON_VIEW (widget), path, NULL, FALSE);
+  
   if ((y == 0 || y == last_row) && !priv->focused_in)
   {
     priv->can_move_focus = FALSE;
@@ -481,7 +483,7 @@ hcp_grid_init (HCPGrid *grid)
 
   /* FIXME: This should not be hardcoded. It should be defined 
      based on HCPAppView width. */
-  gtk_icon_view_set_item_width (GTK_ICON_VIEW (grid), 330);
+  gtk_icon_view_set_item_width (GTK_ICON_VIEW (grid), 320);
 
   g_signal_connect (G_OBJECT (grid), "selection-changed",
                     G_CALLBACK (hcp_grid_selection_changed),
