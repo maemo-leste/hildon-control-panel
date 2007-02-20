@@ -1,3 +1,12 @@
+hildon-control-panel (2.9.11-1) unstable; urgency=low
+
+  * data/hildon-control-panel.pc.in: requires hildon-1
+
+  * src/hcp-grid.c: cursor should follow selection. Small fix on column
+  width.
+
+ -- Johan Bilien <johan.bilien@nokia.com>  Tue, 20 Feb 2007 16:43:33 +0200
+
 hildon-control-panel (2.9.10-2) unstable; urgency=low
 
   * Removed build-dep on hildon-fm-dev, not used 
