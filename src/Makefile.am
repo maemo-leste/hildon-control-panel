@@ -20,7 +20,7 @@
 #
 
 INCLUDES = \
-	$(HILDON_CFLAGS) $(HILDONBASELIB_CFLAGS) $(HILDONFM_CFLAGS)\
+	$(HILDON_CFLAGS) $(HILDONBASELIB_CFLAGS)\
 	$(MAEMO_LAUNCHER_CFLAGS) \
 	$(OSSO_CFLAGS)\
 	$(LIBOSSOHELP_CFLAGS) \
@@ -66,7 +66,7 @@ controlpanel_LDFLAGS = $(MAEMO_LAUNCHER_LDFLAGS)
 
 controlpanel_LDADD = \
 	$(HILDON_LIBS) $(HILDONBASELIB_LIBS) $(OSSO_LIBS)\
-	$(LIBOSSOHELP_LIBS)  $(GCONF_LIBS) $(HILDONFM_LIBS)
+	$(LIBOSSOHELP_LIBS)  $(GCONF_LIBS)
 
 hildon_cp_pluginincludeinstdir=$(includedir)/hildon-cp-plugin
 hildon_cp_pluginincludeinst_DATA = hildon-cp-plugin-interface.h

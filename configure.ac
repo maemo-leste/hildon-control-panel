@@ -39,10 +39,6 @@ PKG_CHECK_MODULES(OSSOSETTINGS, osso-af-settings >= 0.8.1)
 localedir=`pkg-config osso-af-settings --variable=localedir`
 AC_SUBST(localedir)
 
-PKG_CHECK_MODULES(HILDONFM, hildon-fm)
-AC_SUBST(HILDONFM_LIBS)
-AC_SUBST(HILDONFM_CFLAGS)
-
 PKG_CHECK_MODULES(OSSO,libosso >= 0.10.0)
 AC_SUBST(OSSO_LIBS)
 AC_SUBST(OSSO_CFLAGS)

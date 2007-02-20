@@ -1,3 +1,9 @@
+hildon-control-panel (2.9.10-2) unstable; urgency=low
+
+  * Removed build-dep on hildon-fm-dev, not used 
+
+ -- Johan Bilien <johan.bilien@nokia.com>  Tue, 20 Feb 2007 14:37:28 +0200
+
 hildon-control-panel (2.9.10-1) unstable; urgency=low
 
   * src/*.c: replaced include <hildon-widgets/*> with <hildon/*>
