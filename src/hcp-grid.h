@@ -44,7 +44,7 @@ typedef struct _HCPGridPrivate HCPGridPrivate;
 typedef enum 
 {
   HCP_ICON_SIZE_SMALL = 27,
-  HCP_ICON_SIZE_LARGE = 128
+  HCP_ICON_SIZE_LARGE = 66 
 } HCPIconSize;
 
 typedef enum {
