@@ -483,7 +483,7 @@ hcp_grid_init (HCPGrid *grid)
 
   /* FIXME: This should not be hardcoded. It should be defined 
      based on HCPAppView width. */
-  gtk_icon_view_set_item_width (GTK_ICON_VIEW (grid), 317);
+  gtk_icon_view_set_item_width (GTK_ICON_VIEW (grid), 320);
 
   g_signal_connect (G_OBJECT (grid), "selection-changed",
                     G_CALLBACK (hcp_grid_selection_changed),

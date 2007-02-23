@@ -1,8 +1,3 @@
-2007-02-23  Lucas Rocha  <lucas.rocha@nokia.com>
-
-	* src/hcp-grid.c: fix zooming by reduzing the column width so that it
-	doesn't get beyond scrolled window boundaries.
-
 2007-02-21  Lucas Rocha  <lucas.rocha@nokia.com>
 
 	* src/hcp-grid.c: fix the large icons size.
