@@ -25,11 +25,11 @@
 #include <string.h>
 
 #include <libosso.h>
-#include <hildon-base-lib/hildon-base-dnotify.h>
 
 #include <gtk/gtk.h>
 #include <gconf/gconf-client.h>
 #include <glib/gi18n.h>
+#include <libgnomevfs/gnome-vfs.h>
 
 #include "hcp-app-list.h"
 #include "hcp-app.h"
@@ -57,8 +57,9 @@ enum
 
 struct _HCPAppListPrivate 
 {
-  GHashTable *apps;
-  GSList     *categories;
+  GHashTable             *apps;
+  GSList                 *categories;
+  GnomeVFSMonitorHandle  *monitor;
 };
 
 #define HCP_SEPARATOR_DEFAULT _("copa_ia_extras")
@@ -69,10 +70,8 @@ struct _HCPAppListPrivate
 
 static int callback_pending = 0;
 
-/* Called by dnotify_callback_f after a timeout (to prevent exessive
-   callbacks. */
 static gboolean 
-hcp_dnotify_reread_desktop_entries (HCPAppList *al)
+hcp_monitor_reread_desktop_entries (HCPAppList *al)
 {
   callback_pending = 0;
 
@@ -87,42 +86,41 @@ hcp_dnotify_reread_desktop_entries (HCPAppList *al)
 }
 
 static void 
-hcp_dnotify_callback_f (char *path, HCPAppList *al)
+hcp_monitor_callback_f (GnomeVFSMonitorHandle *handle,
+                        const gchar *monitor_uri,
+                        const gchar *info_uri,
+                        GnomeVFSMonitorEventType event_type,
+                        HCPAppList *al)
 {
   if (!callback_pending) 
   {
     callback_pending = 1;
     g_timeout_add (HCP_DIR_READ_DELAY,
-                  (GSourceFunc) hcp_dnotify_reread_desktop_entries, al);
+                  (GSourceFunc) hcp_monitor_reread_desktop_entries, al);
   }
 }
 
 static int 
-hcp_init_dnotify (HCPAppList *al, const gchar *path)
+hcp_init_monitor (HCPAppList *al, const gchar *path)
 {
-  hildon_return_t ret;
+  GnomeVFSResult ret;
 
-  g_return_val_if_fail (al, HILDON_ERR);
-  g_return_val_if_fail (HCP_IS_APP_LIST (al), HILDON_ERR);
-  g_return_val_if_fail (path, HILDON_ERR);
+  g_return_val_if_fail (al, GNOME_VFS_ERROR_GENERIC);
+  g_return_val_if_fail (HCP_IS_APP_LIST (al), GNOME_VFS_ERROR_GENERIC);
+  g_return_val_if_fail (path, GNOME_VFS_ERROR_GENERIC);
 
-  ret = hildon_dnotify_handler_init ();
+  ret = gnome_vfs_monitor_add  (&al->priv->monitor, 
+                                path,
+                                GNOME_VFS_MONITOR_DIRECTORY,
+                                (GnomeVFSMonitorCallback) hcp_monitor_callback_f,
+                                al);
 
-  if (ret != HILDON_OK)
-  {
-    return ret;
-  }
-  
-  ret = hildon_dnotify_set_cb ((hildon_dnotify_cb_f *) hcp_dnotify_callback_f,
-                               (gchar *) path,
-                               al);
-
-  if (ret != HILDON_OK)
+  if (ret != GNOME_VFS_OK)
   {
       return ret;
   }
 
-  return HILDON_OK;
+  return GNOME_VFS_OK;
 }
 
 static void
@@ -224,7 +222,9 @@ hcp_app_list_init (HCPAppList *al)
 
   al->priv->categories = g_slist_append (al->priv->categories, extras_category);
 
-  hcp_init_dnotify (al, CONTROLPANEL_ENTRY_DIR);
+  al->priv->monitor = NULL;
+  
+  hcp_init_monitor (al, CONTROLPANEL_ENTRY_DIR);
 }
 
 static void
@@ -285,6 +285,11 @@ hcp_app_list_finalize (GObject *object)
     g_slist_free (priv->categories);
   }
 
+  if (priv->monitor)
+  {
+    gnome_vfs_monitor_cancel (priv->monitor);
+  }
+    
   G_OBJECT_CLASS (hcp_app_list_parent_class)->finalize (object);
 }
 

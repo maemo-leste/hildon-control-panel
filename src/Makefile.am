@@ -20,11 +20,12 @@
 #
 
 INCLUDES = \
-	$(HILDON_CFLAGS) $(HILDONBASELIB_CFLAGS)\
+	$(HILDON_CFLAGS) \
 	$(MAEMO_LAUNCHER_CFLAGS) \
 	$(OSSO_CFLAGS)\
 	$(LIBOSSOHELP_CFLAGS) \
 	$(GCONF_CFLAGS) \
+	$(GNOME_VFS_CFLAGS) \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DPREFIXDIR=\"$(prefix)\" \
 	-DCONTROLPANEL_ENTRY_DIR=\"$(hildoncpdesktopentrydir)\" \
@@ -65,8 +66,11 @@ BUILT_SOURCES = hcp-marshalers.c \
 controlpanel_LDFLAGS = $(MAEMO_LAUNCHER_LDFLAGS)
 
 controlpanel_LDADD = \
-	$(HILDON_LIBS) $(HILDONBASELIB_LIBS) $(OSSO_LIBS)\
-	$(LIBOSSOHELP_LIBS)  $(GCONF_LIBS)
+	$(HILDON_LIBS) \
+	$(OSSO_LIBS) \
+	$(LIBOSSOHELP_LIBS) \
+	$(GCONF_LIBS) \
+	$(GNOME_VFS_LIBS)
 
 hildon_cp_pluginincludeinstdir=$(includedir)/hildon-cp-plugin
 hildon_cp_pluginincludeinst_DATA = hildon-cp-plugin-interface.h

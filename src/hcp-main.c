@@ -31,6 +31,7 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <glib/gi18n.h>
+#include <libgnomevfs/gnome-vfs.h>
 
 #include "hcp-program.h"
 
@@ -51,6 +52,8 @@ int main (int argc, char **argv)
   g_set_application_name ("");
   
   gtk_init (&argc, &argv);
+
+  gnome_vfs_init ();
 
   program = hcp_program_get_instance ();
 
