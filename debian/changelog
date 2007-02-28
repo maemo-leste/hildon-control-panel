@@ -1,3 +1,9 @@
+hildon-control-panel (2.9.12-1) unstable; urgency=low
+
+  * Removed dependency from hildon-base-libs, not used
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Wed, 28 Feb 2007 10:12:04 +0300
+
 hildon-control-panel (2.9.11-1) unstable; urgency=low
 
   * data/hildon-control-panel.pc.in: requires hildon-1
