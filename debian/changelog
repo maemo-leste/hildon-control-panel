@@ -1,3 +1,9 @@
+hildon-control-panel (2.9.12-2) unstable; urgency=low
+
+  * Removed remaining bits of hildon-base-lib dependency.
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Mon, 05 Mar 2007 10:07:04 +0300
+
 hildon-control-panel (2.9.12-1) unstable; urgency=low
 
   * Removed dependency from hildon-base-libs, not used

@@ -1,3 +1,7 @@
+2007-03-05  Lucas Rocha  <lucas.rocha@nokia.com>
+
+	* debian/control: remove remaining bits of hildon-base-lib dependency.
+
 2007-02-28  Lucas Rocha  <lucas.rocha@nokia.com>
 
 	* configure.ac, src/Makefile.am, src/hcp-app-list.c, debian/control:
