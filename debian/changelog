@@ -1,6 +1,6 @@
-hildon-control-panel (2.2.11-1) unstable; urgency=low
+hildon-control-panel (1:1.9.0-1) unstable; urgency=low
 
-  * Fixing package version to 2.2.x.
+  * Fixing package version to 1.9.0 
 
  -- Lucas Rocha <lucas.rocha@nokia.com>  Fri, 09 Mar 2007 14:55:04 +0300
 

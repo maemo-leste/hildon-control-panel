@@ -1,3 +1,8 @@
+2007-03-09  Lucas Rocha  <lucas.rocha@nokia.com>
+
+	* configure.ac: Reverted to 1.9.0 for consistency with the rest
+	of the Hildon framework
+
 2007-03-05  Lucas Rocha  <lucas.rocha@nokia.com>
 
 	* debian/control: remove remaining bits of hildon-base-lib dependency.
