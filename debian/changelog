@@ -1,8 +1,8 @@
-hildon-control-panel (1:1.9.0-1) unstable; urgency=low
+hildon-control-panel (1:1.9.0-2) unstable; urgency=low
 
-  * Fixing package version to 1.9.0 
+  * Removed hildon-control-panel dependency from hildon-control-panel-dev for now.
 
- -- Lucas Rocha <lucas.rocha@nokia.com>  Fri, 09 Mar 2007 14:55:04 +0300
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Fri, 9 Mar 2007 17:27:23 +0200
 
 hildon-control-panel (2.9.12-2) unstable; urgency=low
 
