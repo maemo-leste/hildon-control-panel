@@ -23,7 +23,7 @@
  */
 
 #include <libosso.h>
-#include <osso-helplib.h>
+#include <hildon/hildon-help.h>
 #include <hildon/hildon-window.h>
 #include <hildon/hildon-program.h>
 
@@ -454,8 +454,8 @@ hcp_window_launch_help (GtkWidget *widget, HCPWindow *window)
   HCPProgram *program = hcp_program_get_instance (); 
   osso_return_t help_ret;
   
-  help_ret = ossohelp_show (program->osso, 
-                            HCP_OSSO_HELP_ID, 0);
+  help_ret = hildon_help_show (program->osso, 
+                               HCP_OSSO_HELP_ID, 0);
 
   switch (help_ret)
   {

@@ -26,7 +26,7 @@
 
 #include <hildon/hildon-code-dialog.h>
 #include <hildon/hildon-banner.h>
-#include <osso-helplib.h>
+#include <hildon/hildon-help.h>
 #include <libosso.h>
 
 #include <glib/gi18n.h>
@@ -73,9 +73,9 @@ static gboolean hcp_rfs_display_warning (HCPProgram  *program,
   gtk_window_set_position (GTK_WINDOW (confirm_dialog),
                            GTK_WIN_POS_NONE);
 
-  ossohelp_dialog_help_enable  (GTK_DIALOG (confirm_dialog),
-                                help_topic,
-                                program->osso);
+  hildon_help_dialog_help_enable (GTK_DIALOG (confirm_dialog),
+                                  help_topic,
+                                  program->osso);
 
   gtk_dialog_set_has_separator (GTK_DIALOG (confirm_dialog), FALSE);
 
@@ -190,9 +190,9 @@ hcp_rfs_check_lock_code_dialog (HCPProgram *program)
 
   dialog = hildon_code_dialog_new ();
   
-  ossohelp_dialog_help_enable (GTK_DIALOG (dialog),
-                               HCP_CODE_DIALOG_HELP_TOPIC,
-                               program->osso);
+  hildon_help_dialog_help_enable (GTK_DIALOG (dialog),
+                                  HCP_CODE_DIALOG_HELP_TOPIC,
+                                  program->osso);
 
   gtk_widget_show_all (dialog);
 
