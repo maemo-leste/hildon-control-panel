@@ -1,3 +1,9 @@
+hildon-control-panel (1:1.9.0-3) unstable; urgency=low
+
+  * Move from libosso-help to hildon-help.
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Wed, 14 Mar 2007 12:51:35 +0200
+
 hildon-control-panel (1:1.9.0-2) unstable; urgency=low
 
   * Removed hildon-control-panel dependency from hildon-control-panel-dev for now.
