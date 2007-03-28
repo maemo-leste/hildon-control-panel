@@ -1,3 +1,9 @@
+2007-03-28  Lucas Rocha  <lucas.rocha@nokia.com>
+
+	* src/hcp-app.c: don't do dlclose on plugins and cache the opened
+	modules to avoid GType related problems when running applets more than
+	once.
+
 2007-03-14  Lucas Rocha  <lucas.rocha@nokia.com>
 
 	* debian/control, configure.ac, rc/hcp-rfs.c, src/hcp-window.c,

@@ -50,27 +50,21 @@ enum
 
 struct _HCPAppPrivate 
 {
-    gchar      *name;
-    gchar      *plugin;
-    gchar      *icon;
-    gchar      *category;
-    gboolean    is_running;
-    GtkWidget  *grid;
-    gint        item_pos;
-
+    gchar                   *name;
+    gchar                   *plugin;
+    gchar                   *icon;
+    gchar                   *category;
+    gboolean                 is_running;
+    GtkWidget               *grid;
+    gint                     item_pos;
+    void                    *handle;
+    hcp_plugin_exec_f       *exec;
     hcp_plugin_save_state_f *save_state;
 };
-
-typedef struct _HCPPlugin
-{
-  void               *handle;
-  hcp_plugin_exec_f  *exec;
-} HCPPlugin;
 
 typedef struct _PluginLaunchData
 {
   HCPApp     *app;
-  HCPPlugin  *plugin;
   gboolean    user_activated;
 } PluginLaunchData;
 
@@ -93,7 +87,7 @@ hcp_app_init (HCPApp *app)
 }
 
 static void
-hcp_app_load (HCPApp *app, HCPPlugin *plugin)
+hcp_app_load (HCPApp *app)
 {
   gchar *plugin_path = NULL;
   HCPAppPrivate *priv;
@@ -115,11 +109,15 @@ hcp_app_load (HCPApp *app, HCPPlugin *plugin)
     plugin_path = g_build_filename (HCP_PLUGIN_DIR, priv->plugin, NULL);
   }
 
-  plugin->handle = dlopen (plugin_path, RTLD_LAZY);
-
+  if (!priv->handle)
+  {
+    g_debug ("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ LOADING APPLET");
+    priv->handle = dlopen (plugin_path, RTLD_LAZY);
+  }
+ 
   g_free (plugin_path);
 
-  if (!plugin->handle)
+  if (!priv->handle)
   {
     g_warning ("Could not load hildon-control-panel applet %s: %s",
                priv->plugin,
@@ -127,25 +125,32 @@ hcp_app_load (HCPApp *app, HCPPlugin *plugin)
     return;
   }
 
-  plugin->exec = dlsym (plugin->handle, HCP_PLUGIN_EXEC_SYMBOL);
-
-  if (!plugin->exec)
+  if (!priv->exec)
+  {
+    priv->exec = dlsym (priv->handle, HCP_PLUGIN_EXEC_SYMBOL);
+  }
+    
+  if (!priv->exec)
   {
     g_warning ("Could not find "HCP_PLUGIN_EXEC_SYMBOL" symbol in "
                "hildon-control-panel applet %s: %s",
                priv->plugin,
                dlerror ());
 
-    dlclose (plugin->handle);
+    dlclose (priv->handle);
 
-    plugin->handle = NULL;
+    priv->handle = NULL;
   }
 
-  priv->save_state = dlsym (plugin->handle, HCP_PLUGIN_SAVE_STATE_SYMBOL);
+  if (!priv->save_state)
+  {
+    priv->save_state = dlsym (priv->handle, HCP_PLUGIN_SAVE_STATE_SYMBOL);
+  }
 }
 
+#if 0
 static void
-hcp_app_unload (HCPApp *app, HCPPlugin *plugin)
+hcp_app_unload (HCPApp *app)
 {
   HCPAppPrivate *priv;
 
@@ -155,7 +160,7 @@ hcp_app_unload (HCPApp *app, HCPPlugin *plugin)
 
   priv = app->priv; 
 
-  if (dlclose (plugin->handle))
+  if (dlclose (priv->handle))
   {
       g_warning ("An error occurred when unloading hildon-control-panel "
                  "applet %s: %s",
@@ -163,11 +168,11 @@ hcp_app_unload (HCPApp *app, HCPPlugin *plugin)
                  dlerror ());
   }
 }
+#endif
 
 static gboolean
 hcp_app_idle_launch (PluginLaunchData *d)
 {
-  HCPPlugin *p;
   HCPAppPrivate *priv;
   HCPProgram *program = hcp_program_get_instance ();
 
@@ -177,32 +182,33 @@ hcp_app_idle_launch (PluginLaunchData *d)
 
   priv = d->app->priv;
   
-  p = g_new0 (HCPPlugin, 1);
-  
-  hcp_app_load (d->app, p);
+  hcp_app_load (d->app);
 
-  if (!p->handle)
+  if (!priv->handle)
     goto cleanup;
 
   priv->is_running = TRUE;
 
   /* Always use hcp->window as parent. If CP is launched without
    * UI (run_applet RPC) the applet's dialog will be system modal */ 
-  p->exec (program->osso, program->window, d->user_activated);
+  priv->exec (program->osso, program->window, d->user_activated);
 
   priv->is_running = FALSE;
 
   program->execute = 0;
 
+#if 0
+  /* Do not close the module and reuse it to avoid GType related
+   * errors. */
   hcp_app_unload (d->app, p);
-
+#endif
+  
   /* HCP was launched window less, so we can exit once we are done
    * with this applet */
   if (!program->window)
      gtk_main_quit ();
 
 cleanup:
-  g_free (p);
   g_object_unref (d->app);
   g_free (d);
 
