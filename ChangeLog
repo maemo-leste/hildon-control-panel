@@ -1,6 +1,6 @@
 2007-05-18  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* COPYING: added license text.
+	* COPYING: added license text. Fixes bug NB#56773.
 
 2007-03-28  Lucas Rocha  <lucas.rocha@nokia.com>
 
