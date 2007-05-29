@@ -3,6 +3,7 @@ hildon-control-panel (1:1.9.0-4) unstable; urgency=low
   * Added license text. Fixes bug NB#56773.
   * Don't do dlclose on plugins and cache the opened modules to 
   avoid GType related problems when running applets more than once.
+  Fixes bug NB#56533.
 
  -- Lucas Rocha <lucas.rocha@nokia.com>  Fri, 25 May 2007 13:39:41 +0300
 
