@@ -36,14 +36,19 @@
 G_DEFINE_TYPE (HCPGrid, hcp_grid, GTK_TYPE_ICON_VIEW);
 
 #define HCP_GRID_NUM_COLUMNS 2
+#define HCP_GRID_ITEM_WIDTH  328 
+#define HCP_GRID_X_PADDING   4
+#define HCP_GRID_Y_PADDING   2
 #define HCP_GRID_NO_FOCUS   -1
 
 struct _HCPGridPrivate 
 {
-  gboolean     can_move_focus;
-  gboolean     focused_in;
-  HCPIconSize  icon_size;
-  gint         row_height;
+  GtkCellRenderer *text_cell;
+  GtkCellRenderer *pixbuf_cell;
+  gboolean         can_move_focus;
+  gboolean         focused_in;
+  HCPIconSize      icon_size;
+  gint             row_height;
 };
 
 enum
@@ -112,11 +117,11 @@ hcp_grid_update_icon (GtkTreeModel *model,
   {
     if (priv->icon_size == HCP_ICON_SIZE_SMALL) 
     {
-      priv->row_height = gdk_pixbuf_get_height (icon_pixbuf) + 10;
+      priv->row_height = gdk_pixbuf_get_height (icon_pixbuf);
     }
     else if (priv->icon_size == HCP_ICON_SIZE_LARGE) 
     {
-      priv->row_height = gdk_pixbuf_get_height (icon_pixbuf) + 2;
+      priv->row_height = gdk_pixbuf_get_height (icon_pixbuf);
     }
   }
 
@@ -427,8 +432,8 @@ hcp_grid_size_request (GtkWidget *widget, GtkRequisition *req)
 {
   HCPGridPrivate *priv;
   GtkTreeModel *store;
-  gint num_items;
-
+  gint num_items, num_rows;
+  
   g_return_if_fail (widget);
   g_return_if_fail (HCP_IS_GRID (widget));
 
@@ -438,10 +443,14 @@ hcp_grid_size_request (GtkWidget *widget, GtkRequisition *req)
 
   num_items = gtk_tree_model_iter_n_children (GTK_TREE_MODEL (store), NULL);
 
+  num_rows = ceil ((double) num_items / HCP_GRID_NUM_COLUMNS);
+  
   if (num_items > 0) 
   {
-    req->height = (ceil ((double) num_items / HCP_GRID_NUM_COLUMNS)) * priv->row_height;
+    req->height = num_rows * priv->row_height;
   }
+
+  req->height += HCP_GRID_Y_PADDING * 4;
 }
 
 static void
@@ -467,13 +476,43 @@ hcp_grid_init (HCPGrid *grid)
   grid->priv->focused_in = FALSE;
   grid->priv->icon_size = 0;
 
+  grid->priv->pixbuf_cell = gtk_cell_renderer_pixbuf_new ();
+
+  gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (grid), 
+		  	      grid->priv->pixbuf_cell, 
+			      FALSE);
+
+  g_object_set (grid->priv->pixbuf_cell, 
+                "follow-state", TRUE, 
+		"xpad", HCP_GRID_X_PADDING, 
+		"ypad", HCP_GRID_Y_PADDING, 
+                NULL);
+
+  gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (grid),
+                                  grid->priv->pixbuf_cell, 
+			          "pixbuf", 0,
+                                  NULL);
+
+  grid->priv->text_cell = gtk_cell_renderer_text_new ();
+
+  gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (grid), 
+		  	      grid->priv->text_cell, 
+			      FALSE);
+
+  g_object_set (grid->priv->text_cell, 
+                "yalign", 0.5,
+                NULL);
+
+  gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (grid),
+                                  grid->priv->text_cell, 
+				  "text", 1, 
+				  NULL);  
+
   gtk_icon_view_set_margin (GTK_ICON_VIEW (grid), 0);
 
-  gtk_icon_view_set_column_spacing (GTK_ICON_VIEW (grid), 0);
+  gtk_icon_view_set_column_spacing (GTK_ICON_VIEW (grid), 8);
   gtk_icon_view_set_row_spacing (GTK_ICON_VIEW (grid), 0);
-
-  gtk_icon_view_set_pixbuf_column (GTK_ICON_VIEW (grid), 0);
-  gtk_icon_view_set_text_column (GTK_ICON_VIEW (grid), 1);
+  gtk_icon_view_set_spacing (GTK_ICON_VIEW (grid), 6);
 
   gtk_icon_view_set_orientation (GTK_ICON_VIEW (grid), 
                                  GTK_ORIENTATION_HORIZONTAL);
@@ -483,12 +522,12 @@ hcp_grid_init (HCPGrid *grid)
 
   /* FIXME: This should not be hardcoded. It should be defined 
      based on HCPAppView width. */
-  gtk_icon_view_set_item_width (GTK_ICON_VIEW (grid), 320);
+  gtk_icon_view_set_item_width (GTK_ICON_VIEW (grid), 
+		  		HCP_GRID_ITEM_WIDTH);
 
   g_signal_connect (G_OBJECT (grid), "selection-changed",
                     G_CALLBACK (hcp_grid_selection_changed),
                     NULL);
-
 }
 
 GtkWidget *

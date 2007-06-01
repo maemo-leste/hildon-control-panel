@@ -88,9 +88,9 @@ hcp_app_view_create_separator (const gchar *label)
 
   gtk_widget_set_name (separator_1, "hildon-control-panel-separator");
   gtk_widget_set_name (separator_2, "hildon-control-panel-separator");
-  gtk_box_pack_start (GTK_BOX(hbox), separator_1, TRUE, TRUE, 5);
+  gtk_box_pack_start (GTK_BOX(hbox), separator_1, TRUE, TRUE, 0);
   gtk_box_pack_start (GTK_BOX(hbox), label_1, FALSE, FALSE, 5);
-  gtk_box_pack_start (GTK_BOX(hbox), separator_2, TRUE, TRUE, 5);
+  gtk_box_pack_start (GTK_BOX(hbox), separator_2, TRUE, TRUE, 0);
 
   return hbox;
 }
@@ -238,8 +238,8 @@ hcp_app_view_add_category (HCPCategory *category, HCPAppView *view)
     separator = hcp_app_view_create_separator (_(category->name));
 
     /* Pack the separator and the corresponding grid to the vbox */
-    gtk_box_pack_start (GTK_BOX (view), separator, FALSE, FALSE, 5);
-    gtk_box_pack_start (GTK_BOX (view), grid, FALSE, TRUE, 5);
+    gtk_box_pack_start (GTK_BOX (view), separator, FALSE, FALSE, 0);
+    gtk_box_pack_start (GTK_BOX (view), grid, FALSE, TRUE, 0);
 
     gtk_container_get_focus_chain (GTK_CONTAINER (view), &focus_chain);
     focus_chain = g_list_append (focus_chain, grid);
