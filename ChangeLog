@@ -1,5 +1,9 @@
 2007-06-01  Lucas Rocha  <lucas.rocha@nokia.com>
 
+	* configure.ac: release 1.9.1
+
+2007-06-01  Lucas Rocha  <lucas.rocha@nokia.com>
+
 	* src/hcp-grid.c, src/hcp-app-view.c: several layout small
 	improvements.
 

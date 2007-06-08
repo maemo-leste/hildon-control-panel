@@ -1,3 +1,9 @@
+hildon-control-panel (1:1.9.1-1) unstable; urgency=low
+
+  * Several grid layout improvements. Fixes bug NB#59409.
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Fri,  8 Jun 2007 16:00:00 +0300
+
 hildon-control-panel (1:1.9.0-4) unstable; urgency=low
 
   * Added license text. Fixes bug NB#56773.
