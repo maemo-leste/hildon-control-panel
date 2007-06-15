@@ -123,6 +123,8 @@ hcp_grid_update_icon (GtkTreeModel *model,
     {
       priv->row_height = gdk_pixbuf_get_height (icon_pixbuf);
     }
+
+    priv->row_height += 2 * HCP_GRID_Y_PADDING;
   }
 
   gtk_list_store_set (GTK_LIST_STORE (model), iter, 
@@ -449,8 +451,6 @@ hcp_grid_size_request (GtkWidget *widget, GtkRequisition *req)
   {
     req->height = num_rows * priv->row_height;
   }
-
-  req->height += HCP_GRID_Y_PADDING * 4;
 }
 
 static void
