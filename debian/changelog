@@ -1,3 +1,9 @@
+hildon-control-panel (1:1.9.2-1) unstable; urgency=low
+
+  * Correctly set row height in grid widget. 
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Fri, 15 Jun 2007 18:01:50 +0300
+
 hildon-control-panel (1:1.9.1-1) unstable; urgency=low
 
   * Several grid layout improvements. Fixes bug NB#59409.

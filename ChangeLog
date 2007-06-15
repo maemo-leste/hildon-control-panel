@@ -1,5 +1,9 @@
 2007-06-15  Lucas Rocha  <lucas.rocha@nokia.com>
 
+	* configure.ac: release 1.9.2
+
+2007-06-15  Lucas Rocha  <lucas.rocha@nokia.com>
+
 	* src/hcp-grid.c: correctly set the row height by taking in to account
 	the pixbuf cell padding.
 
