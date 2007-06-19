@@ -25,3 +25,4 @@
 #define HCP_GCONF_GROUPS_KEY     "/apps/osso/apps/controlpanel/groups"
 #define HCP_GCONF_GROUP_IDS_KEY  "/apps/osso/apps/controlpanel/group_ids"
 #define HCP_GCONF_ICON_SIZE_KEY  "/apps/osso/apps/controlpanel/icon_size"
+#define HCP_GCONF_LOCK_STATE_KEY "/system/osso/dsm/locks/devicelock_failed"

@@ -461,8 +461,6 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
                                          HCP_DESKTOP_KEY_TEXT_DOMAIN,
                                          &error);
 
-    g_debug ("TEM DOMAIN!!! %s", text_domain); 
-
     if (error)
     {
       g_warning ("Error reading applet desktop file: %s", error->message);
