@@ -186,17 +186,22 @@ hcp_app_view_add_app (HCPApp *app, HCPGrid *grid)
   GtkTreePath *path;
   GtkTreeIter iter;
   gchar *name = NULL;
+  gchar *text_domain = NULL;
 
   store = gtk_icon_view_get_model (GTK_ICON_VIEW (grid));
 
   g_object_get (G_OBJECT (app),
                 "name", &name,
+                "text-domain", &text_domain,
                 NULL); 
 
   gtk_list_store_append (GTK_LIST_STORE (store), &iter);
 
+  g_debug ("ADDING APP: %s (%s)", name, text_domain);
+  
   gtk_list_store_set (GTK_LIST_STORE (store), &iter, 
-                      HCP_STORE_LABEL, _(name),
+                      HCP_STORE_LABEL, ((text_domain && *text_domain) ? 
+			                dgettext(text_domain, name) : _(name)),
                       HCP_STORE_APP, app,
                       -1);
 

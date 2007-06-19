@@ -45,7 +45,8 @@ enum
   PROP_CATEGORY,
   PROP_IS_RUNNING,
   PROP_GRID,
-  PROP_ITEM_POS
+  PROP_ITEM_POS,
+  PROP_TEXT_DOMAIN
 };
 
 struct _HCPAppPrivate 
@@ -57,6 +58,7 @@ struct _HCPAppPrivate
     gboolean                 is_running;
     GtkWidget               *grid;
     gint                     item_pos;
+    gchar                   *text_domain;
     void                    *handle;
     hcp_plugin_exec_f       *exec;
     hcp_plugin_save_state_f *save_state;
@@ -83,6 +85,7 @@ hcp_app_init (HCPApp *app)
   app->priv->is_running = FALSE;
   app->priv->grid = NULL;
   app->priv->item_pos = -1;
+  app->priv->text_domain = NULL;
   app->priv->save_state = NULL;
 }
 
@@ -111,7 +114,6 @@ hcp_app_load (HCPApp *app)
 
   if (!priv->handle)
   {
-    g_debug ("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ LOADING APPLET");
     priv->handle = dlopen (plugin_path, RTLD_LAZY);
   }
  
@@ -257,6 +259,12 @@ hcp_app_finalize (GObject *object)
     priv->grid = NULL;
   }
 
+  if (priv->text_domain != NULL) 
+  {
+    g_free (priv->text_domain);
+    priv->text_domain = NULL;
+  }
+
   G_OBJECT_CLASS (hcp_app_parent_class)->finalize (object);
 }
 
@@ -298,6 +306,10 @@ hcp_app_get_property (GObject    *gobject,
 
     case PROP_ITEM_POS:
       g_value_set_int (value, priv->item_pos);
+      break;
+
+    case PROP_TEXT_DOMAIN:
+      g_value_set_string (value, priv->text_domain);
       break;
 
     default:
@@ -350,6 +362,11 @@ hcp_app_set_property (GObject      *gobject,
 
     case PROP_ITEM_POS:
       priv->item_pos = g_value_get_int (value);
+      break;
+
+    case PROP_TEXT_DOMAIN:
+      g_free (priv->text_domain);
+      priv->text_domain = g_strdup (g_value_get_string (value));
       break;
 
     default:
@@ -426,6 +443,14 @@ hcp_app_class_init (HCPAppClass *class)
                                                      -1,
                                                       (G_PARAM_READABLE | G_PARAM_WRITABLE)));
 
+  g_object_class_install_property (g_object_class,
+                                   PROP_TEXT_DOMAIN,
+                                   g_param_spec_string ("text-domain",
+                                                        "Text Domain",
+                                                        "Set app's text domain",
+                                                        NULL,
+                                                        (G_PARAM_READABLE | G_PARAM_WRITABLE)));
+ 
   g_type_class_add_private (g_object_class, sizeof (HCPAppPrivate));
 }
 

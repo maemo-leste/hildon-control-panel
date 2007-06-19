@@ -61,6 +61,7 @@ struct _HCPAppListClass
 #define HCP_DESKTOP_KEY_ICON            "Icon"
 #define HCP_DESKTOP_KEY_CATEGORY        "Categories"
 #define HCP_DESKTOP_KEY_PLUGIN          "X-control-panel-plugin"
+#define HCP_DESKTOP_KEY_TEXT_DOMAIN     "X-Text-Domain"
 
 typedef struct _HCPCategory {
   gchar   *id;

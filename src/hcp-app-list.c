@@ -389,6 +389,7 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
     gchar *plugin = NULL;
     gchar *icon = NULL;
     gchar *category = NULL;
+    gchar *text_domain = NULL;
 
     desktop_path = g_build_filename (dir_path, filename, NULL);
 
@@ -455,21 +456,47 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
       error = NULL;
     }
 
+    text_domain = g_key_file_get_string (keyfile,
+                                         HCP_DESKTOP_GROUP,
+                                         HCP_DESKTOP_KEY_TEXT_DOMAIN,
+                                         &error);
+
+    g_debug ("TEM DOMAIN!!! %s", text_domain); 
+
+    if (error)
+    {
+      g_warning ("Error reading applet desktop file: %s", error->message);
+      g_error_free (error);
+      error = NULL;
+    }
+
     app = hcp_app_new ();
 
     g_object_set (G_OBJECT (app), 
                   "name", name,
                   "plugin", plugin,
                   "icon", icon,
-                  "category", category,
                   NULL); 
 
+    if (category != NULL)
+      g_object_set (G_OBJECT (app), 
+                    "category", category,
+                    NULL); 
+    
+    if (text_domain != NULL)
+    {
+      g_object_set (G_OBJECT (app), 
+                    "text-domain", text_domain,
+                    NULL);
+    }
+   
     g_hash_table_insert (priv->apps, g_strdup (plugin), app);
 
     g_free (name);
     g_free (plugin);
     g_free (icon);
     g_free (category);
+    g_free (text_domain);
   }
 
   g_key_file_free (keyfile);
