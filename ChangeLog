@@ -1,5 +1,9 @@
 2007-06-19  Lucas Rocha  <lucas.rocha@nokia.com>
 
+	* configure.ac: release 1.9.4
+
+2007-06-19  Lucas Rocha  <lucas.rocha@nokia.com>
+
 	* src/hcp-rfs.[ch], src/hcp-config-keys.h, src/hcp-window.c: only ask 
 	for lock code for clearing and restoring user data when the device 
 	is locked.

@@ -1,3 +1,10 @@
+hildon-control-panel (1:1.9.4-1) unstable; urgency=low
+
+  * Only check lock code on clearing/restoring user data when the device is
+    locked. 
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Tue, 19 Jun 2007 14:41:39 +0300
+
 hildon-control-panel (1:1.9.3-1) unstable; urgency=low
 
   * Added support for defining translation domain per applet.
