@@ -362,7 +362,10 @@ hcp_window_retrieve_configuration (HCPWindow *window)
                                      &error);
 
   priv->device_locked = (lock_state > 0);
- 
+
+  /* Revert to always check lock code for now */
+  priv->device_locked = TRUE;
+  
   g_object_unref (client);
 }
 
