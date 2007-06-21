@@ -363,7 +363,7 @@ hcp_window_retrieve_configuration (HCPWindow *window)
 
   priv->device_locked = (lock_state > 0);
 
-  /* Revert to always check lock code for now */
+  /* FIXME: Revert to always check lock code for now */
   priv->device_locked = TRUE;
   
   g_object_unref (client);
@@ -709,6 +709,7 @@ hcp_window_construct_ui (HCPWindow *window)
   HildonProgram *program;
   
   GtkMenu *menu = NULL;
+  GtkAccelGroup *accel_group;
   GtkWidget *sub_view = NULL;
   GtkWidget *sub_tools = NULL;
   GtkWidget *mi = NULL;
@@ -842,11 +843,21 @@ hcp_window_construct_ui (HCPWindow *window)
                    G_CALLBACK (hcp_window_launch_help), window);
 
   /* Close */
+  accel_group = gtk_accel_group_new ();
+  gtk_window_add_accel_group (GTK_WINDOW (window), accel_group);
+  
   mi = gtk_menu_item_new_with_label (HCP_MENU_CLOSE);
 
   g_signal_connect (GTK_OBJECT(mi), "activate",
                     G_CALLBACK(hcp_window_quit), window);
 
+  gtk_widget_add_accelerator (mi, 
+		              "activate", 
+			      accel_group, 
+			      GDK_Q, 
+			      GDK_CONTROL_MASK, 
+			      GTK_ACCEL_VISIBLE);
+  
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), mi);
 
   gtk_widget_show_all (GTK_WIDGET (menu));
