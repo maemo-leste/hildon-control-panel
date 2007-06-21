@@ -1,5 +1,9 @@
 2007-06-21  Lucas Rocha  <lucas.rocha@nokia.com>
 
+	* configure.ac: release 1.9.5
+
+2007-06-21  Lucas Rocha  <lucas.rocha@nokia.com>
+
 	* src/hcp-window.c: always ask lock code until finding the correct
 	gconf key for locking.
 
