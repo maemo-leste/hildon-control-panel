@@ -40,8 +40,7 @@ hcp-marshalers.c: hcp-marshalers.list
 bin_PROGRAMS = controlpanel
 
 controlpanel_SOURCES = \
-	hcp-marshalers.h \
-	hcp-marshalers.c \
+	$(BUILT_SOURCES) \
 	hcp-main.c \
 	hcp-main.h \
 	hcp-program.c \
@@ -56,9 +55,13 @@ controlpanel_SOURCES = \
 	hcp-app-view.h \
 	hcp-grid.h \
 	hcp-grid.c \
-	hcp-rfs.c \
-	hcp-rfs.h \
 	hildon-cp-plugin-interface.h
+
+if USE_MAEMO_TOOLS
+controlpanel_SOURCES += \
+	hcp-rfs.c \
+	hcp-rfs.h
+endif
 
 BUILT_SOURCES = hcp-marshalers.c \
                 hcp-marshalers.h

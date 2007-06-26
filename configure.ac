@@ -35,8 +35,28 @@ ALL_LINGUAS="en_GB"
 AC_SUBST(ALL_LINGUAS)
 AM_GLIB_GNU_GETTEXT
 
-PKG_CHECK_MODULES(OSSOSETTINGS, osso-af-settings >= 0.8.1)
-localedir=`pkg-config osso-af-settings --variable=localedir`
+AC_ARG_ENABLE(maemo-tools,
+	      AS_HELP_STRING([--enable-maemo-tools],[Enable mobile operator, clear and restore user data tools (default=yes)]),
+	      [enable_maemo_tools=$enableval], 
+              [enable_maemo_tools=yes])
+
+AM_CONDITIONAL(USE_MAEMO_TOOLS, test "x$enable_maemo_tools" = "xyes")
+
+if test "x$enable_maemo_tools" = "xyes"; then
+    AC_DEFINE([MAEMO_TOOLS],[1],[Define to enable mobile operator, clear and restore user data tools])
+fi
+
+PKG_CHECK_MODULES(OSSOSETTINGS, 
+		  [osso-af-settings >= 0.9.0],
+		  [
+		  localedir=`pkg-config osso-af-settings --variable=localedir`
+                  hildondesktopentrydir=`pkg-config osso-af-settings --variable=desktopentrydir`
+		  ],[
+		  localedir="${datadir}/locale"
+                  hildondesktopentrydir="${datadir}/applications"
+		  ])
+
+AC_SUBST(hildondesktopentrydir)
 AC_SUBST(localedir)
 
 PKG_CHECK_MODULES(OSSO,libosso >= 0.10.0)
@@ -59,11 +79,7 @@ PKG_CHECK_MODULES(GCONF, gconf-2.0 >= 2.6.2)
 AC_SUBST(GCONF_LIBS)
 AC_SUBST(GCONF_CFLAGS)
 
-hildondesktopentrydir=`pkg-config osso-af-settings --variable=desktopentrydir`
-AC_SUBST(hildondesktopentrydir)
-
-desktopentrydir=${datadir}/applications
-hildoncpdesktopentrydir=${desktopentrydir}/hildon-control-panel
+hildoncpdesktopentrydir=${datadir}/applications/hildon-control-panel
 hildoncplibdir=${libdir}/hildon-control-panel
 
 AC_SUBST(hildondesktopentrydir)

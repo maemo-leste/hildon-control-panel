@@ -1,3 +1,11 @@
+2007-06-26  Lucas Rocha  <lucas.rocha@nokia.com>
+
+	* configure.ac: added --enable-maemo-tools option to enable/disable
+	the "Mobile operator setup wizard", "Restore original settings" and
+	"Clear user data" menu items. It's enabled by default.
+	* src/hcp-window.c: made the "Tools" menu optional.
+	* src/*.c: include config.h on all source files.
+
 2007-06-21  Lucas Rocha  <lucas.rocha@nokia.com>
 
 	* src/hcp-window.c: added Ctrl-Q accelerator to Close menu item. Fixes

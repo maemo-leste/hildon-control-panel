@@ -22,6 +22,10 @@
  *
  */
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <libosso.h>
 #include <hildon/hildon-help.h>
 #include <hildon/hildon-window.h>
@@ -37,8 +41,11 @@
 #include "hcp-app-view.h"
 #include "hcp-app.h"
 #include "hcp-grid.h"
-#include "hcp-rfs.h"
 #include "hcp-config-keys.h"
+
+#ifdef MAEMO_TOOLS
+#include "hcp-rfs.h"
+#endif
 
 #define HCP_WINDOW_GET_PRIVATE(object) \
         (G_TYPE_INSTANCE_GET_PRIVATE ((object), HCP_TYPE_WINDOW, HCPWindowPrivate))
@@ -492,6 +499,7 @@ hcp_window_launch_help (GtkWidget *widget, HCPWindow *window)
   }
 }
 
+#ifdef MAEMO_TOOLS
 static gboolean 
 hcp_window_clear_user_data (GtkWidget *widget, HCPWindow *window)
 {
@@ -559,6 +567,7 @@ hcp_window_run_operator_wizard (GtkWidget *widget, HCPWindow *window)
   
   osso_rpc_free_val (&returnvalues);
 }
+#endif
 
 static void 
 hcp_window_iconsize (GtkWidget *widget, HCPWindow *window)
@@ -711,7 +720,9 @@ hcp_window_construct_ui (HCPWindow *window)
   GtkMenu *menu = NULL;
   GtkAccelGroup *accel_group;
   GtkWidget *sub_view = NULL;
+#ifdef MAEMO_TOOLS
   GtkWidget *sub_tools = NULL;
+#endif
   GtkWidget *mi = NULL;
   GtkWidget *scrolled_window = NULL;
   GSList *menugroup = NULL;
@@ -800,6 +811,7 @@ hcp_window_construct_ui (HCPWindow *window)
   g_signal_connect (G_OBJECT (mi), "activate", 
                     G_CALLBACK (hcp_window_iconsize), window);
 
+#ifdef MAEMO_TOOLS
   /* Tools submenu */
   sub_tools = gtk_menu_new ();
 
@@ -833,11 +845,16 @@ hcp_window_construct_ui (HCPWindow *window)
 
   g_signal_connect (G_OBJECT (mi), "activate",
                     G_CALLBACK (hcp_window_clear_user_data), window);
-
+#endif
+  
   /* Help! */
   mi = gtk_menu_item_new_with_label (HCP_MENU_HELP);
 
+#ifdef MAEMO_TOOLS
   gtk_menu_shell_append (GTK_MENU_SHELL (sub_tools), mi);
+#else
+  gtk_menu_shell_append (GTK_MENU_SHELL (menu), mi);
+#endif
 
   g_signal_connect(G_OBJECT (mi), "activate",
                    G_CALLBACK (hcp_window_launch_help), window);
