@@ -201,8 +201,6 @@ hcp_app_view_add_app (HCPApp *app, HCPGrid *grid)
 
   gtk_list_store_append (GTK_LIST_STORE (store), &iter);
 
-  g_debug ("ADDING APP: %s (%s)", name, text_domain);
-  
   gtk_list_store_set (GTK_LIST_STORE (store), &iter, 
                       HCP_STORE_LABEL, ((text_domain && *text_domain) ? 
 			                dgettext(text_domain, name) : _(name)),

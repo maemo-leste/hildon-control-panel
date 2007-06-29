@@ -339,7 +339,6 @@ hcp_window_retrieve_configuration (HCPWindow *window)
   GConfClient *client = NULL;
   GError *error = NULL;
   gboolean icon_size;
-  gint lock_state;
   
   g_return_if_fail (window);
   g_return_if_fail (HCP_IS_WINDOW (window));
@@ -364,15 +363,11 @@ hcp_window_retrieve_configuration (HCPWindow *window)
     priv->icon_size = icon_size ? TRUE : FALSE;
   }
 
-  lock_state = gconf_client_get_int (client,
-                                     HCP_GCONF_LOCK_STATE_KEY,
-                                     &error);
+  priv->device_locked = 
+          gconf_client_get_bool (client,
+                                 HCP_GCONF_LOCK_STATE_KEY,
+                                 &error);
 
-  priv->device_locked = (lock_state > 0);
-
-  /* FIXME: Revert to always check lock code for now */
-  priv->device_locked = TRUE;
-  
   g_object_unref (client);
 }
 
@@ -685,6 +680,7 @@ hcp_window_app_list_updated_cb (HCPAppList *al, HCPWindow *window)
 
   /* Update the view */
   hcp_app_view_populate (HCP_APP_VIEW (priv->view), al);
+
   gtk_widget_show_all (priv->view);
 
   app = g_hash_table_lookup (apps,

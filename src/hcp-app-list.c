@@ -443,7 +443,6 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
 
     if (error)
     {
-      g_warning ("Error reading applet desktop file: %s", error->message);
       g_error_free (error);
       error = NULL;
     }
@@ -455,7 +454,6 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
 
     if (error)
     {
-      g_warning ("Error reading applet desktop file: %s", error->message);
       g_error_free (error);
       error = NULL;
     }
@@ -467,7 +465,6 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
 
     if (error)
     {
-      g_warning ("Error reading applet desktop file: %s", error->message);
       g_error_free (error);
       error = NULL;
     }

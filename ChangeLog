@@ -1,3 +1,11 @@
+2007-06-29  Lucas Rocha  <lucas.rocha@nokia.com>
+
+	* src/hcp-config-keys.h, src/hcp-window.c
+	(hcp_window_retrieve_configuration): changed the key to query if
+	the device lock was activated or not.
+	* src/hcp-app-list.c (hcp_app_list_read_desktop_entries): removed
+	warnings (when applicable) when reading desktop entries.
+
 2007-06-26  Lucas Rocha  <lucas.rocha@nokia.com>
 
 	* configure.ac: added --enable-maemo-tools option to enable/disable
