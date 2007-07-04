@@ -1,3 +1,8 @@
+2007-07-04  Lucas Rocha  <lucas.rocha@nokia.com>
+
+	* src/hcp-main.c: call g_thread_init if the thread system wasn't
+	initiated before.
+
 2007-06-29  Lucas Rocha  <lucas.rocha@nokia.com>
 
 	* src/hcp-config-keys.h, src/hcp-window.c

@@ -55,6 +55,8 @@ int main (int argc, char **argv)
 
   gnome_vfs_init ();
 
+  if (!g_thread_supported ()) g_thread_init (NULL);
+  
   program = hcp_program_get_instance ();
 
   hcp_program_run (program);
