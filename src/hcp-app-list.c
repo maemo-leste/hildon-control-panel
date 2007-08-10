@@ -395,6 +395,10 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
     gchar *category = NULL;
     gchar *text_domain = NULL;
 
+    /* Only consider .desktop files */
+    if (!g_str_has_suffix (filename, ".desktop"))
+      continue;   
+    
     desktop_path = g_build_filename (dir_path, filename, NULL);
 
     g_key_file_load_from_file (keyfile,
