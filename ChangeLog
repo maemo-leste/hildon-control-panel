@@ -1,5 +1,10 @@
 2007-08-10  Lucas Rocha  <lucas.rocha@nokia.com>
 
+	* src/hcp-grid.c (hcp_grid_init): do not set "follow-state" to true in
+	the pixbuf renderer. Fixes NB#61741.
+
+2007-08-10  Lucas Rocha  <lucas.rocha@nokia.com>
+
 	* src/hcp-app-list.c (hcp_app_list_read_desktop_entries): only consider 
 	.desktop files in applets directory.
 

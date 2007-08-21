@@ -487,7 +487,6 @@ hcp_grid_init (HCPGrid *grid)
 			      FALSE);
 
   g_object_set (grid->priv->pixbuf_cell, 
-                "follow-state", TRUE, 
 		"xpad", HCP_GRID_X_PADDING, 
 		"ypad", HCP_GRID_Y_PADDING, 
                 NULL);
