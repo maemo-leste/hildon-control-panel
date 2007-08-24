@@ -1,4 +1,4 @@
-2007-08-10  Lucas Rocha  <lucas.rocha@nokia.com>
+2007-08-24  Lucas Rocha  <lucas.rocha@nokia.com>
 
 	* src/hcp-window.c (hcp_window_quit): save state before closing
 	control panel in order to restore the last focused applet.

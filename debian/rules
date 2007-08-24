@@ -15,14 +15,11 @@ DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
 CFLAGS = -Wall -g
 
-ifneq (,$(findstring maemo-launcher,$(DEB_BUILD_OPTIONS)))
-    LAUNCHER = yes
-endif
-
-ifeq "$(strip $(LAUNCHER))" "yes"
-    LAUNCHER_DEPENDS = -Vlauncher:Depends="maemo-launcher"
-    LAUNCHER_CFLAGS = -shared
-    LAUNCHER_LDFLAGS = -shared -export-dynamic
+ifeq (,$(findstring nolauncher,$(DEB_BUILD_OPTIONS)))
+	LAUNCHER = yes
+	LAUNCHER_DEPENDS = -Vlauncher:Depends="maemo-launcher"
+	LAUNCHER_CFLAGS = $(shell pkg-config --cflags maemo-launcher-app)
+	LAUNCHER_LDFLAGS = $(shell pkg-config --libs maemo-launcher-app)
 endif 
 
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
