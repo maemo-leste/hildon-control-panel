@@ -492,7 +492,7 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
                     "text-domain", text_domain,
                     NULL);
     }
-   
+  
     g_hash_table_insert (priv->apps, g_strdup (plugin), app);
 
     g_free (name);

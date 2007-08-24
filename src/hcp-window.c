@@ -133,7 +133,7 @@ hcp_window_enforce_state (HCPWindow *window)
 
     app = g_hash_table_lookup (apps,
                                priv->saved_focused_filename);
-
+    
     if (app)
       hcp_app_focus (app);
 
@@ -307,7 +307,7 @@ hcp_window_save_state (HCPWindow *window, gboolean clear_state)
 
   if (ret != OSSO_OK)
   {
-    g_warning ("An error occured when reading application state");
+    g_warning ("An error occured when writing application state");
   }
 
   /* If a plugin is running, save its state */
@@ -699,7 +699,7 @@ static void hcp_window_quit (GtkWidget *widget, HCPWindow *window)
   g_return_if_fail (window);
   g_return_if_fail (HCP_IS_WINDOW (window));
 
-  hcp_window_save_state (window, TRUE);
+  hcp_window_save_state (window, FALSE);
 
   gtk_widget_destroy (GTK_WIDGET (window));
 
