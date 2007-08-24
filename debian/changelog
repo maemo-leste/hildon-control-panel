@@ -1,3 +1,35 @@
+hildon-control-panel (1:1.9.6-1) unstable; urgency=low
+
+  * src/hcp-window.c (hcp_window_quit): save state before closing
+  control panel in order to restore the last focused applet.
+  Fixes NB#66542.
+  
+  * src/hcp-grid.c (hcp_grid_init): do not set "follow-state" to true in
+  the pixbuf renderer. Fixes NB#61741.
+  
+  * src/hcp-app-list.c (hcp_app_list_read_desktop_entries): only consider 
+  .desktop files in applets directory.
+  
+  * src/hcp-main.c: call g_thread_init if the thread system wasn't
+  initiated before.
+  
+  * src/hcp-config-keys.h, src/hcp-window.c
+  (hcp_window_retrieve_configuration): changed the key to query if
+  the device lock was activated or not.
+  * src/hcp-app-list.c (hcp_app_list_read_desktop_entries): removed
+  warnings (when applicable) when reading desktop entries.
+  
+  * configure.ac: added --enable-maemo-tools option to enable/disable
+  the "Mobile operator setup wizard", "Restore original settings" and
+  "Clear user data" menu items. It's enabled by default.
+  * src/hcp-window.c: made the "Tools" menu optional.
+  * src/*.c: include config.h on all source files.
+  
+  * src/hcp-window.c: added Ctrl-Q accelerator to Close menu item. Fixes
+  bug NB#61112.
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Fri, 24 Aug 2007 14:32:41 +0300
+
 hildon-control-panel (1:1.9.5-1) unstable; urgency=low
 
   * Revert lock code check behavior.

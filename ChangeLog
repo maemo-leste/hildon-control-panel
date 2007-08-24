@@ -1,5 +1,9 @@
 2007-08-24  Lucas Rocha  <lucas.rocha@nokia.com>
 
+	* configure.ac: release 1.9.6
+
+2007-08-24  Lucas Rocha  <lucas.rocha@nokia.com>
+
 	* src/hcp-window.c (hcp_window_quit): save state before closing
 	control panel in order to restore the last focused applet.
 	Fixes NB#66542.
