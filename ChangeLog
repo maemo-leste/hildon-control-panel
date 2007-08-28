@@ -1,3 +1,8 @@
+2007-08-28  Lucas Rocha  <lucas.rocha@nokia.com>
+
+	* src/hcp-window.c: add accel group to menu in order to make it be
+	handled accordingly depending on GTK+ settings. Fixes NB#61112.
+
 2007-08-24  Lucas Rocha  <lucas.rocha@nokia.com>
 
 	* configure.ac: release 1.9.6
