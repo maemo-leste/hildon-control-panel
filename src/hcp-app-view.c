@@ -418,7 +418,6 @@ hcp_app_view_populate (HCPAppView *view, HCPAppList *al)
   if (view->priv->first_grid) 
   {
     gtk_widget_grab_focus (priv->first_grid);
-    g_debug ("LALALAL JOJOJO");
     gtk_icon_view_select_path (GTK_ICON_VIEW (priv->first_grid),
                                gtk_tree_path_new_first ());
   }

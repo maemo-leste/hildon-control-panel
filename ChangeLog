@@ -1,5 +1,9 @@
 2007-09-04  Lucas Rocha  <lucas.rocha@nokia.com>
 
+	* src/hcp-app-view.c: remove useless debugging message.
+
+2007-09-04  Lucas Rocha  <lucas.rocha@nokia.com>
+
 	* src/hcp-app-view.c (hcp_app_view_selection_changed_cb): scroll to
 	exact grid item instead of considering the whole widget height.
 	Fixes: NB#65971.
