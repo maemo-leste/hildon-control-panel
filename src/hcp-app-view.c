@@ -148,13 +148,23 @@ hcp_app_view_grid_selection_changed (GtkWidget *widget, gpointer user_data)
   GtkWidget *view = GTK_WIDGET (user_data);
   GtkWidget *scrolled_window = view->parent->parent;
   HCPApp *app = hcp_app_view_get_selected_app (widget);
+  GtkTreePath *path;
+  GtkAllocation allocation;
   GtkAdjustment *adj;
-  gint visible_y;
+  guint row, row_height, position, visible_y;
 
   if (app == NULL) return;
-
+  
   g_return_if_fail (GTK_IS_SCROLLED_WINDOW (scrolled_window));
 
+  path = hcp_grid_get_selected_item (HCP_GRID (widget)); 
+  position = gtk_tree_path_get_indices (path) [0]; 
+
+  row = position / HCP_GRID_NUM_COLUMNS;
+  row_height = hcp_grid_get_row_height (HCP_GRID (widget));
+  
+  gtk_tree_path_free (path);
+ 
   adj = gtk_scrolled_window_get_vadjustment (
                                 GTK_SCROLLED_WINDOW (scrolled_window));
 
@@ -163,18 +173,26 @@ hcp_app_view_grid_selection_changed (GtkWidget *widget, gpointer user_data)
   visible_y = view->allocation.y +
      (gint)(view->allocation.height * adj->value / (adj->upper - adj->lower));
 
-  if (widget->allocation.y < visible_y)
+  allocation.y = widget->allocation.y + (row * row_height);
+  allocation.height = row_height;
+
+  if (allocation.y < 0)
+    return;
+  
+  if (allocation.y < visible_y)
   {
-    adj->value = widget->allocation.y * (adj->upper - adj->lower)
-                                        / view->allocation.height;
+    adj->value = allocation.y * (adj->upper - adj->lower)
+                                 / view->allocation.height;
+
     gtk_adjustment_value_changed (adj);
   }
-  else if (widget->allocation.y + widget->allocation.height > 
+  else if (allocation.y + allocation.height > 
            visible_y + scrolled_window->allocation.height)
   {
-    adj->value = (widget->allocation.y + widget->allocation.height
+    adj->value = (allocation.y + allocation.height
            - scrolled_window->allocation.height) * (adj->upper - adj->lower)
            / view->allocation.height;
+    
     gtk_adjustment_value_changed (adj);
   }
 
@@ -400,6 +418,7 @@ hcp_app_view_populate (HCPAppView *view, HCPAppList *al)
   if (view->priv->first_grid) 
   {
     gtk_widget_grab_focus (priv->first_grid);
+    g_debug ("LALALAL JOJOJO");
     gtk_icon_view_select_path (GTK_ICON_VIEW (priv->first_grid),
                                gtk_tree_path_new_first ());
   }

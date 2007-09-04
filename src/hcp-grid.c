@@ -39,7 +39,6 @@
 
 G_DEFINE_TYPE (HCPGrid, hcp_grid, GTK_TYPE_ICON_VIEW);
 
-#define HCP_GRID_NUM_COLUMNS 2
 #define HCP_GRID_ITEM_WIDTH  328 
 #define HCP_GRID_X_PADDING   4
 #define HCP_GRID_Y_PADDING   2
@@ -560,6 +559,14 @@ hcp_grid_get_selected_item (HCPGrid *grid)
   g_list_free (list);
 
   return path;
+}
+
+guint
+hcp_grid_get_row_height (HCPGrid *grid)
+{
+  g_return_val_if_fail (HCP_IS_GRID (grid), 0);
+
+  return grid->priv->row_height;
 }
 
 void 

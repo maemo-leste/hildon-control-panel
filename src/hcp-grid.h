@@ -41,6 +41,9 @@ typedef struct _HCPGridPrivate HCPGridPrivate;
 
 #define HCP_DEFAULT_ICON_BASENAME  "qgn_list_gene_unknown_file"
 
+#define HCP_GRID_NUM_COLUMNS       2
+
+
 typedef enum 
 {
   HCP_ICON_SIZE_SMALL = 27,
@@ -71,6 +74,8 @@ GType         hcp_grid_get_type          (void);
 GtkWidget    *hcp_grid_new               (void);
 
 GtkTreePath  *hcp_grid_get_selected_item (HCPGrid     *grid);
+
+guint         hcp_grid_get_row_height    (HCPGrid     *grid);
 
 void          hcp_grid_set_icon_size     (HCPGrid     *grid, 
                                           HCPIconSize  icon_size);

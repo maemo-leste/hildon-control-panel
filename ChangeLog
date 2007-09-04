@@ -1,3 +1,13 @@
+2007-09-04  Lucas Rocha  <lucas.rocha@nokia.com>
+
+	* src/hcp-app-view.c (hcp_app_view_selection_changed_cb): scroll to
+	exact grid item instead of considering the whole widget height.
+	Fixes: NB#65971.
+	* src/hcp-grid.[ch] (hcp_grid_get_row_height): add API to get current
+	row height from the grid widget.
+	* src/hcp-window.c (hcp_window_init): correctly set accel group in
+	main menu. 
+
 2007-08-28  Lucas Rocha  <lucas.rocha@nokia.com>
 
 	* src/hcp-window.c: add accel group to menu in order to make it be

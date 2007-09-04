@@ -858,7 +858,7 @@ hcp_window_construct_ui (HCPWindow *window)
   /* Close */
   accel_group = gtk_accel_group_new ();
   gtk_window_add_accel_group (GTK_WINDOW (window), accel_group);
-  gtk_window_add_accel_group (GTK_WINDOW (menu), accel_group);
+  gtk_menu_set_accel_group (GTK_MENU (menu), accel_group);
   
   mi = gtk_menu_item_new_with_label (HCP_MENU_CLOSE);
 
