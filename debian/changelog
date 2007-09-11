@@ -1,3 +1,20 @@
+hildon-control-panel (1:1.9.7-1) unstable; urgency=low
+
+  * src/hcp-app-view.c: remove useless debugging message.
+  
+  * src/hcp-app-view.c (hcp_app_view_selection_changed_cb): scroll to
+  exact grid item instead of considering the whole widget height.
+  Fixes: NB#65971.
+  * src/hcp-grid.[ch] (hcp_grid_get_row_height): add API to get current
+  row height from the grid widget.
+  * src/hcp-window.c (hcp_window_init): correctly set accel group in
+  main menu. 
+  
+  * src/hcp-window.c: add accel group to menu in order to make it be
+  handled accordingly depending on GTK+ settings. Fixes NB#61112.
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Tue, 11 Sep 2007 10:11:45 +0300
+
 hildon-control-panel (1:1.9.6-1) unstable; urgency=low
 
   * src/hcp-window.c (hcp_window_quit): save state before closing
