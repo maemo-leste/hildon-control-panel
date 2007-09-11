@@ -11,7 +11,7 @@ hildon-control-panel (1:1.9.7-1) unstable; urgency=low
   main menu. 
   
   * src/hcp-window.c: add accel group to menu in order to make it be
-  handled accordingly depending on GTK+ settings. Fixes NB#61112.
+  handled accordingly depending on GTK+ settings. Fixes: NB#61112.
 
  -- Lucas Rocha <lucas.rocha@nokia.com>  Tue, 11 Sep 2007 10:11:45 +0300
 
