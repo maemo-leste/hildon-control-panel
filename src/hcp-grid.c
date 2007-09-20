@@ -152,8 +152,6 @@ hcp_grid_button_pressed (GtkWidget      *widget,
  
   if (event->button == 1 && event->type == GDK_BUTTON_PRESS)
   {
-    gtk_widget_grab_focus (widget);
-
     selected_path = hcp_grid_get_selected_item (HCP_GRID (widget));
 
     clicked_path = gtk_icon_view_get_path_at_pos (GTK_ICON_VIEW (widget), 
@@ -171,6 +169,7 @@ hcp_grid_button_pressed (GtkWidget      *widget,
 
     if (clicked_path != NULL) 
     {
+      gtk_widget_grab_focus (widget);
       gtk_icon_view_select_path (GTK_ICON_VIEW (widget), clicked_path);
     } 
 

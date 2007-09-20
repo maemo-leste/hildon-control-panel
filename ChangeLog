@@ -1,3 +1,9 @@
+2007-09-20  Lucas Rocha  <lucas.rocha@nokia.com>
+
+	* src/hcp-grid.c (hcp_grid_button_pressed): don't move focus from one
+	grid to another if there's no selectable item under the pointer.
+	Fixes: NB#70345.
+
 2007-09-11  Lucas Rocha  <lucas.rocha@nokia.com>
 
 	* configure.ac: release 1.9.7
