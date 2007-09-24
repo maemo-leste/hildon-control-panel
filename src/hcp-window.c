@@ -60,8 +60,6 @@ struct _HCPWindowPrivate
   GtkWidget      *large_icons_menu_item;
   GtkWidget      *small_icons_menu_item;
 
-  gboolean        device_locked;
-
   /* For state save data */
   gint            icon_size;
   gchar          *saved_focused_filename;
@@ -363,11 +361,6 @@ hcp_window_retrieve_configuration (HCPWindow *window)
     priv->icon_size = icon_size ? TRUE : FALSE;
   }
 
-  priv->device_locked = 
-          gconf_client_get_bool (client,
-                                 HCP_GCONF_LOCK_STATE_KEY,
-                                 &error);
-
   g_object_unref (client);
 }
 
@@ -501,8 +494,7 @@ hcp_window_clear_user_data (GtkWidget *widget, HCPWindow *window)
   hcp_rfs (HCP_CUD_WARNING,
            HCP_CUD_WARNING_TITLE,
            HCP_CUD_SCRIPT,
-           HCP_CUD_HELP_TOPIC,
-	   window->priv->device_locked);
+           HCP_CUD_HELP_TOPIC);
 
   return TRUE;
 }
@@ -513,8 +505,7 @@ hcp_window_reset_factory_settings (GtkWidget *widget, HCPWindow *window)
   hcp_rfs (HCP_RFS_WARNING,
            HCP_RFS_WARNING_TITLE,
            HCP_RFS_SCRIPT,
-           HCP_RFS_HELP_TOPIC,
-	   window->priv->device_locked);
+           HCP_RFS_HELP_TOPIC);
 
   return TRUE;
 }

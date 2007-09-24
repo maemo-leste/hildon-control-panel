@@ -265,8 +265,7 @@ hcp_rfs_launch_script (const gchar *script)
 
 gboolean 
 hcp_rfs (const gchar *warning, const gchar *title,
-         const gchar *script, const gchar *help_topic,
-	 gboolean check_lock_code)
+         const gchar *script, const gchar *help_topic)
 {
   if (warning)
   {
@@ -278,8 +277,7 @@ hcp_rfs (const gchar *warning, const gchar *title,
     }
   }
           
-  if (!check_lock_code ||
-      hcp_rfs_check_lock_code_dialog (hcp_program_get_instance ()))
+  if (hcp_rfs_check_lock_code_dialog (hcp_program_get_instance ()))
   {
     /* Password is correct, proceed */
     hcp_rfs_launch_script (script);

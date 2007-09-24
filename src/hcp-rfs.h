@@ -27,7 +27,6 @@
 gboolean hcp_rfs (const char *warning, 
                   const char *title, 
                   const char *script, 
-                  const char *help_topic,
-		  gboolean    check_lock_code);
+                  const char *help_topic);
 
 #endif
