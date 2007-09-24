@@ -1,3 +1,15 @@
+hildon-control-panel (1:1.9.8-1) unstable; urgency=low
+
+  * src/hcp-window.c, src/hcp-config-keys.h, src/hcp-rfs.[ch]: revert
+  previous behavior and always request lock code from user despite the
+  device autolock state. Fixes: NB#68866.
+  
+  * src/hcp-grid.c (hcp_grid_button_pressed): don't move focus from one
+  grid to another if there's no selectable item under the pointer.
+  Fixes: NB#70345.
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Mon, 24 Sep 2007 17:19:47 +0300
+
 hildon-control-panel (1:1.9.7-1) unstable; urgency=low
 
   * src/hcp-app-view.c: remove useless debugging message.
