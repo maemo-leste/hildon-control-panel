@@ -1,3 +1,8 @@
+2007-09-27  Lucas Rocha  <lucas.rocha@nokia.com>
+
+	* src/hcp-rfs.c (hcp_rfs_display_warning): set label size request in
+	order to avoid incorrect line wrapping. Fixes: NB#71082.
+
 2007-09-24  Lucas Rocha  <lucas.rocha@nokia.com>
 
 	* configure.ac: release 1.9.8

@@ -84,7 +84,12 @@ static gboolean hcp_rfs_display_warning (HCPProgram  *program,
   gtk_dialog_set_has_separator (GTK_DIALOG (confirm_dialog), FALSE);
 
   label = gtk_label_new (warning);
+  
   gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
+
+  gtk_widget_set_size_request (label,
+                               380,
+                               -1);
 
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG (confirm_dialog)->vbox), 
                      label);
