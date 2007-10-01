@@ -1,5 +1,9 @@
 2007-10-01  Lucas Rocha  <lucas.rocha@nokia.com>
 
+	* configure.ac: release 2.0.0
+
+2007-10-01  Lucas Rocha  <lucas.rocha@nokia.com>
+
 	* src/hcp-window.c (hcp_window_init, hcp_window_size_allocate):
 	enforce state on window size allocate to ensure all internal widgets
 	have their size already allocate for initial scrolling.

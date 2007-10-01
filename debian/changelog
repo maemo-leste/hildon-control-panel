@@ -1,3 +1,14 @@
+hildon-control-panel (1:2.0.0) unstable; urgency=low
+
+  * src/hcp-window.c (hcp_window_init, hcp_window_size_allocate):
+  enforce state on window size allocate to ensure all internal widgets
+  have their size already allocate for initial scrolling.
+  
+  * src/hcp-rfs.c (hcp_rfs_display_warning): set label size request in
+  order to avoid incorrect line wrapping. Fixes: NB#71082.
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Mon,  1 Oct 2007 14:47:53 +0300
+
 hildon-control-panel (1:1.9.8-1) unstable; urgency=low
 
   * src/hcp-window.c, src/hcp-config-keys.h, src/hcp-rfs.[ch]: revert
