@@ -1,4 +1,4 @@
-hildon-control-panel (1:2.0.0) unstable; urgency=low
+hildon-control-panel (1:2.0.0-1) unstable; urgency=low
 
   * src/hcp-window.c (hcp_window_init, hcp_window_size_allocate):
   enforce state on window size allocate to ensure all internal widgets
