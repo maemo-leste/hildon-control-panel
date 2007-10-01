@@ -933,13 +933,6 @@ hcp_window_init (HCPWindow *window)
   hcp_window_construct_ui (window);
 
   hcp_app_view_populate (HCP_APP_VIEW (priv->view), priv->al);
-
-  hcp_window_enforce_state (window);
-  
-  if (program->execute == 1 && priv->focused_item) {
-    program->execute = 0;
-    hcp_app_launch (priv->focused_item, FALSE);
-  }
 }
 
 static void
@@ -974,11 +967,38 @@ hcp_window_finalize (GObject *object)
 }
 
 static void
+hcp_window_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
+{
+  static gboolean enforce_state = TRUE;
+	
+  GTK_WIDGET_CLASS (hcp_window_parent_class)->size_allocate (widget, allocation);
+
+  if (enforce_state)
+  {
+    HCPProgram *program = hcp_program_get_instance ();
+    HCPWindow *window = HCP_WINDOW (widget);
+    
+    hcp_window_enforce_state (HCP_WINDOW (widget));
+
+    if (program->execute == 1 && window->priv->focused_item) 
+    {
+      program->execute = 0;
+      hcp_app_launch (window->priv->focused_item, FALSE);
+    }
+
+    enforce_state = FALSE;
+  }
+}
+
+static void
 hcp_window_class_init (HCPWindowClass *class)
 {
   GObjectClass *g_object_class = (GObjectClass *) class;
+  GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
   g_object_class->finalize = hcp_window_finalize;
+
+  widget_class->size_allocate = hcp_window_size_allocate;
 
   g_type_class_add_private (g_object_class, sizeof (HCPWindowPrivate));
 }
