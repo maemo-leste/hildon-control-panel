@@ -176,24 +176,24 @@ hcp_app_view_grid_selection_changed (GtkWidget *widget, gpointer user_data)
   allocation.y = widget->allocation.y + (row * row_height);
   allocation.height = row_height;
 
-  if (allocation.y < 0)
-    return;
-  
-  if (allocation.y < visible_y)
+  if (allocation.y >= 0)
   {
-    adj->value = allocation.y * (adj->upper - adj->lower)
-                                 / view->allocation.height;
+    if (allocation.y < visible_y)
+    {
+      adj->value = allocation.y * (adj->upper - adj->lower)
+                                   / view->allocation.height;
 
-    gtk_adjustment_value_changed (adj);
-  }
-  else if (allocation.y + allocation.height > 
-           visible_y + scrolled_window->allocation.height)
-  {
-    adj->value = (allocation.y + allocation.height
-           - scrolled_window->allocation.height) * (adj->upper - adj->lower)
-           / view->allocation.height;
-    
-    gtk_adjustment_value_changed (adj);
+      gtk_adjustment_value_changed (adj);
+    }
+    else if (allocation.y + allocation.height > 
+             visible_y + scrolled_window->allocation.height)
+    {
+      adj->value = (allocation.y + allocation.height
+             - scrolled_window->allocation.height) * (adj->upper - adj->lower)
+             / view->allocation.height;
+      
+      gtk_adjustment_value_changed (adj);
+    }
   }
 
   g_signal_emit (G_OBJECT (widget->parent), 

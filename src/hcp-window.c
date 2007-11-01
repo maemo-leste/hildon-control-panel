@@ -194,7 +194,7 @@ hcp_window_retrieve_state (HCPWindow *window)
                                    HCP_STATE_GROUP,
                                    HCP_STATE_FOCUSED,
                                    &error);
-  
+
   if (error)
   {
     g_warning ("An error occured when reading application state: %s",
@@ -202,8 +202,16 @@ hcp_window_retrieve_state (HCPWindow *window)
     goto cleanup;
   }
 
-  priv->saved_focused_filename = focused;
-
+  if (g_str_has_suffix (focused, ".so"))
+  {
+    priv->saved_focused_filename = focused;
+  }
+  else
+  {
+    priv->saved_focused_filename = NULL;
+    g_free (focused);
+  }
+	  
   scroll_value = g_key_file_get_integer (keyfile,
                                          HCP_STATE_GROUP,
                                          HCP_STATE_SCROLL_VALUE,
@@ -918,18 +926,6 @@ hcp_window_init (HCPWindow *window)
 
   hcp_window_retrieve_state (window);
 
-  if (priv->saved_focused_filename)
-  {
-    GHashTable *apps = NULL;
-
-    g_object_get (G_OBJECT (priv->al),
-                  "apps", &apps,
-                  NULL);
-
-    priv->focused_item = g_object_ref (g_hash_table_lookup (apps,
-                                              priv->saved_focused_filename));
-  }
-
   hcp_window_construct_ui (window);
 
   hcp_app_view_populate (HCP_APP_VIEW (priv->view), priv->al);
@@ -977,7 +973,7 @@ hcp_window_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
   {
     HCPProgram *program = hcp_program_get_instance ();
     HCPWindow *window = HCP_WINDOW (widget);
-    
+
     hcp_window_enforce_state (HCP_WINDOW (widget));
 
     if (program->execute == 1 && window->priv->focused_item) 
