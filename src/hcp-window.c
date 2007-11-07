@@ -666,6 +666,14 @@ hcp_window_app_list_updated_cb (HCPAppList *al, HCPWindow *window)
 
   priv = window->priv;
 
+  /* Update the view */
+  hcp_app_view_populate (HCP_APP_VIEW (priv->view), al);
+
+  gtk_widget_show_all (priv->view);
+
+  if (priv->focused_item == NULL)
+    return;
+	  
   g_object_get (G_OBJECT (priv->focused_item),
                 "plugin", &focused,
                 NULL);
@@ -676,11 +684,6 @@ hcp_window_app_list_updated_cb (HCPAppList *al, HCPWindow *window)
   g_object_get (G_OBJECT (priv->al),
                 "apps", &apps,
                 NULL);
-
-  /* Update the view */
-  hcp_app_view_populate (HCP_APP_VIEW (priv->view), al);
-
-  gtk_widget_show_all (priv->view);
 
   app = g_hash_table_lookup (apps,
                              focused);
