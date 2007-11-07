@@ -8,5 +8,5 @@ plugindesktopentrydir=@hildoncpdesktopentrydir@
 
 Name: hildon-control-panel
 Description: Hildon Control Panel
-Requires: hildon-libs >= 0.7.1
+Requires: hildon-1
 Version: @VERSION@

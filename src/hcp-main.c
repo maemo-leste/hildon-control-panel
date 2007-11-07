@@ -21,36 +21,49 @@
  *
  */
 
-/*
- * @file cp-marshalers.h
- *
- * This file is a header file for cp-marshalers.c.
- */
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
-#ifndef ___cp_marshal_MARSHAL_H__
-#define ___cp_marshal_MARSHAL_H__
+#include <libosso.h>
 
+#include <gtk/gtk.h>
+#include <glib.h>
 #include <glib-object.h>
+#include <glib/gi18n.h>
+#include <libgnomevfs/gnome-vfs.h>
 
-G_BEGIN_DECLS
+#include "hcp-program.h"
 
-/* BOOLEAN:INT (cp-marshalers.list:26) */
-extern void _cp_marshal_BOOLEAN__INT (GClosure     *closure,
-				      GValue       *return_value,
-				      guint         n_param_values,
-				      const GValue *param_values,
-				      gpointer      invocation_hint,
-				      gpointer      marshal_data);
+int main (int argc, char **argv)
+{
+  HCPProgram *program = NULL; 
 
-/* BOOLEAN:INT,INT,INT (cp-marshalers.list:27) */
-extern void _cp_marshal_BOOLEAN__INT_INT_INT (GClosure     *closure,
-					      GValue       *return_value,
-					      guint         n_param_values,
-					      const GValue *param_values,
-					      gpointer      invocation_hint,
-					      gpointer      marshal_data);
+  setlocale (LC_ALL, "");
 
-G_END_DECLS
+  bindtextdomain (PACKAGE, LOCALEDIR);
 
-#endif /* ___cp_marshal_MARSHAL_H__ */
+  bind_textdomain_codeset (PACKAGE, "UTF-8");
 
+  textdomain (PACKAGE);
+
+  /* Set application name to "" as we only need 
+   * the window title in the title bar */
+  g_set_application_name ("");
+  
+  gtk_init (&argc, &argv);
+
+  gnome_vfs_init ();
+
+  if (!g_thread_supported ()) g_thread_init (NULL);
+  
+  program = hcp_program_get_instance ();
+
+  hcp_program_run (program);
+
+  gtk_main();
+
+  g_object_unref (program);
+
+  return 0;
+}

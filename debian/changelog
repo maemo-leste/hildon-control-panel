@@ -1,3 +1,181 @@
+hildon-control-panel (1:2.0.1-1) unstable; urgency=low
+
+  * src/hcp-window.c (hcp_window_app_list_updated_cb): do not try to
+  focus previously selected item in case this is undefined. 
+  Fixes: NB#74138.
+
+  * src/hcp-app-view.c (hcp_app_view_selection_changed_cb): emit
+  focus-changed signal even if the widget is not properly allocated yet.
+  * src/hcp-window.c (hcp_window_init, hcp_window_retrieve_state):
+  correctly handle the case when there's no saved state yet to define
+  the initial focused applet. Fixes: NB#72771.
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Wed,  7 Nov 2007 13:03:45 +0200
+
+hildon-control-panel (1:2.0.0-1) unstable; urgency=low
+
+  * src/hcp-window.c (hcp_window_init, hcp_window_size_allocate):
+  enforce state on window size allocate to ensure all internal widgets
+  have their size already allocate for initial scrolling.
+  
+  * src/hcp-rfs.c (hcp_rfs_display_warning): set label size request in
+  order to avoid incorrect line wrapping. Fixes: NB#71082.
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Mon,  1 Oct 2007 14:47:53 +0300
+
+hildon-control-panel (1:1.9.8-1) unstable; urgency=low
+
+  * src/hcp-window.c, src/hcp-config-keys.h, src/hcp-rfs.[ch]: revert
+  previous behavior and always request lock code from user despite the
+  device autolock state. Fixes: NB#68866.
+  
+  * src/hcp-grid.c (hcp_grid_button_pressed): don't move focus from one
+  grid to another if there's no selectable item under the pointer.
+  Fixes: NB#70345.
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Mon, 24 Sep 2007 17:19:47 +0300
+
+hildon-control-panel (1:1.9.7-1) unstable; urgency=low
+
+  * src/hcp-app-view.c: remove useless debugging message.
+  
+  * src/hcp-app-view.c (hcp_app_view_selection_changed_cb): scroll to
+  exact grid item instead of considering the whole widget height.
+  Fixes: NB#65971.
+  * src/hcp-grid.[ch] (hcp_grid_get_row_height): add API to get current
+  row height from the grid widget.
+  * src/hcp-window.c (hcp_window_init): correctly set accel group in
+  main menu. 
+  
+  * src/hcp-window.c: add accel group to menu in order to make it be
+  handled accordingly depending on GTK+ settings. Fixes: NB#61112.
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Tue, 11 Sep 2007 10:11:45 +0300
+
+hildon-control-panel (1:1.9.6-1) unstable; urgency=low
+
+  * src/hcp-window.c (hcp_window_quit): save state before closing
+  control panel in order to restore the last focused applet.
+  Fixes NB#66542.
+  
+  * src/hcp-grid.c (hcp_grid_init): do not set "follow-state" to true in
+  the pixbuf renderer. Fixes NB#61741.
+  
+  * src/hcp-app-list.c (hcp_app_list_read_desktop_entries): only consider 
+  .desktop files in applets directory.
+  
+  * src/hcp-main.c: call g_thread_init if the thread system wasn't
+  initiated before.
+  
+  * src/hcp-config-keys.h, src/hcp-window.c
+  (hcp_window_retrieve_configuration): changed the key to query if
+  the device lock was activated or not.
+  * src/hcp-app-list.c (hcp_app_list_read_desktop_entries): removed
+  warnings (when applicable) when reading desktop entries.
+  
+  * configure.ac: added --enable-maemo-tools option to enable/disable
+  the "Mobile operator setup wizard", "Restore original settings" and
+  "Clear user data" menu items. It's enabled by default.
+  * src/hcp-window.c: made the "Tools" menu optional.
+  * src/*.c: include config.h on all source files.
+  
+  * src/hcp-window.c: added Ctrl-Q accelerator to Close menu item. Fixes
+  bug NB#61112.
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Fri, 24 Aug 2007 14:32:41 +0300
+
+hildon-control-panel (1:1.9.5-1) unstable; urgency=low
+
+  * Revert lock code check behavior.
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Thu, 21 Jun 2007 16:01:27 +0300
+
+hildon-control-panel (1:1.9.4-1) unstable; urgency=low
+
+  * Only check lock code on clearing/restoring user data when the device is
+    locked. 
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Tue, 19 Jun 2007 14:41:39 +0300
+
+hildon-control-panel (1:1.9.3-1) unstable; urgency=low
+
+  * Added support for defining translation domain per applet.
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Tue, 19 Jun 2007 14:02:03 +0300
+
+hildon-control-panel (1:1.9.2-1) unstable; urgency=low
+
+  * Correctly set row height in grid widget. 
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Fri, 15 Jun 2007 18:01:50 +0300
+
+hildon-control-panel (1:1.9.1-1) unstable; urgency=low
+
+  * Several grid layout improvements. Fixes bug NB#59409.
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Fri,  8 Jun 2007 16:00:00 +0300
+
+hildon-control-panel (1:1.9.0-4) unstable; urgency=low
+
+  * Added license text. Fixes bug NB#56773.
+  * Don't do dlclose on plugins and cache the opened modules to 
+  avoid GType related problems when running applets more than once.
+  Fixes bug NB#56533.
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Fri, 25 May 2007 13:39:41 +0300
+
+hildon-control-panel (1:1.9.0-3) unstable; urgency=low
+
+  * Move from libosso-help to hildon-help.
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Wed, 14 Mar 2007 12:51:35 +0200
+
+hildon-control-panel (1:1.9.0-2) unstable; urgency=low
+
+  * Removed hildon-control-panel dependency from hildon-control-panel-dev for now.
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Fri, 9 Mar 2007 17:27:23 +0200
+
+hildon-control-panel (2.9.12-2) unstable; urgency=low
+
+  * Removed remaining bits of hildon-base-lib dependency.
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Mon, 05 Mar 2007 10:07:04 +0300
+
+hildon-control-panel (2.9.12-1) unstable; urgency=low
+
+  * Removed dependency from hildon-base-libs, not used
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Wed, 28 Feb 2007 10:12:04 +0300
+
+hildon-control-panel (2.9.11-1) unstable; urgency=low
+
+  * data/hildon-control-panel.pc.in: requires hildon-1
+
+  * src/hcp-grid.c: cursor should follow selection. Small fix on column
+  width.
+
+ -- Johan Bilien <johan.bilien@nokia.com>  Tue, 20 Feb 2007 16:43:33 +0200
+
+hildon-control-panel (2.9.10-2) unstable; urgency=low
+
+  * Removed build-dep on hildon-fm-dev, not used 
+
+ -- Johan Bilien <johan.bilien@nokia.com>  Tue, 20 Feb 2007 14:37:28 +0200
+
+hildon-control-panel (2.9.10-1) unstable; urgency=low
+
+  * src/*.c: replaced include <hildon-widgets/*> with <hildon/*>
+  * debian/rules: run the autotools
+
+ -- Johan Bilien <johan.bilien@nokia.com>  Mon, 19 Feb 2007 17:36:08 +0200
+
+hildon-control-panel (2.9.9-1) unstable; urgency=low
+
+  * First *unstable* release on fully refactored Hildon Control Panel.
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Mon, 13 Feb 2007 14:33:04 +0300
+
 hildon-control-panel (2.2.10-1) unstable; urgency=low
 
   * hcp-rfs.c: Make all infonotes transient to the dialog

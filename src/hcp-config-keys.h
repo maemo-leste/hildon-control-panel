@@ -3,6 +3,7 @@
  *
  * Copyright (C) 2006 Nokia Corporation.
  *
+ * Author: Lucas Rocha <lucas.rocha@nokia.com>
  * Contact: Karoliina Salminen <karoliina.t.salminen@nokia.com>
  *
  * This library is free software; you can redistribute it and/or
@@ -21,15 +22,6 @@
  *
  */
 
-#ifndef __HILDON_CP_VIEW_H__
-#define __HILDON_CP_VIEW_H__
-
-#include "hildon-cp-applist.h"
-#include "cp-grid.h"
-
-
-GtkWidget *                 hcp_view_new (void);
-void                        hcp_view_populate (GtkWidget *view,
-                                               HCPAppList *al);
-
-#endif
+#define HCP_GCONF_GROUPS_KEY     "/apps/osso/apps/controlpanel/groups"
+#define HCP_GCONF_GROUP_IDS_KEY  "/apps/osso/apps/controlpanel/group_ids"
+#define HCP_GCONF_ICON_SIZE_KEY  "/apps/osso/apps/controlpanel/icon_size"

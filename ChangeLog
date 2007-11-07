@@ -1,419 +1,340 @@
-2006-10-16  Johan Bilien <johan.bilien@nokia.com>
+2007-11-07  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* configure.ac: 2.2.10
+	* configure.ac: post release version bump.
 
-2006-10-16  Johan Bilien <johan.bilien@nokia.com>
+2007-11-07  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hcp-rfs.c: Make all infonotes transient to the dialog
-	Fixes: NB#37551
+	* configure.ac: release 2.0.1
 
-2006-10-11  Johan Bilien <johan.bilien@nokia.com>
+2007-11-07  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* configure.ac: 2.2.9
+	* src/hcp-window.c (hcp_window_app_list_updated_cb): do not try to
+	focus previously selected item in case this is undefined. 
+	Fixes: NB#74138.
 
-2006-10-06  Moises Martinez <moises.martinzes@nokia.com>
+2007-11-01  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-control-panel-main.c: Force to set the
-	saved size before showing anything. Fixes: NB#42297
+	* src/hcp-app-view.c (hcp_app_view_selection_changed_cb): emit
+	focus-changed signal even if the widget is not properly allocated yet.
+	* src/hcp-window.c (hcp_window_init, hcp_window_retrieve_state):
+	correctly handle the case when there's no saved state yet to define
+	the initial focused applet. Fixes: NB#72771.
 
-2006-10-02  Johan Bilien <johan.bilien@nokia.com>
+2007-10-01  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* configure.ac: 2.2.8
+	* configure.ac: release 2.0.0
 
-2006-09-29  Moises Martinez <moises.martinzes@nokia.com>
+2007-10-01  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* cp-grid.c: Added a constant padding to fit the margin
-	* cp-grid-item.c: Added a constant padding to fit the margin 
-	and set proper style. Fixes: NB#38554
+	* src/hcp-window.c (hcp_window_init, hcp_window_size_allocate):
+	enforce state on window size allocate to ensure all internal widgets
+	have their size already allocate for initial scrolling.
 
-2006-09-29  Jakub Pavelek <jakub.pavelek@nokia.com>
+2007-09-27  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-cp-applist.h: added prototype for hcp_al_free()
-	* hildon-cp-applist.c: implemented hcp_al_free() that frees the list
-	and hash table
-	* hildon-control-panel-main.c: now calls hcp_al_free() and frees the
-	applet list too
+	* src/hcp-rfs.c (hcp_rfs_display_warning): set label size request in
+	order to avoid incorrect line wrapping. Fixes: NB#71082.
 
-2006-09-28  Jakub Pavelek <jakub.pavelek@nokia.com>
+2007-09-24  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-control-panel-main.c: hcp_save_state(): fixed a SEGFAULT when
-	  freeing non-allocated data
+	* configure.ac: release 1.9.8
 
-2006-09-27  Johan Bilien <johan.bilien@nokia.com>
+2007-09-20  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-control-panel-main.c: Fixed a crash if no applet focussed
-	  and we go to background
+	* src/hcp-window.c, src/hcp-config-keys.h, src/hcp-rfs.[ch]: revert
+	previous behavior and always request lock code from user despite the
+	device autolock state. Fixes: NB#68866.
 
-2006-09-25  Johan Bilien <johan.bilien@nokia.com>
+2007-09-20  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* configure.ac: 2.2.7
+	* src/hcp-grid.c (hcp_grid_button_pressed): don't move focus from one
+	grid to another if there's no selectable item under the pointer.
+	Fixes: NB#70345.
 
-2006-09-21  Johan Bilien <johan.bilien@nokia.com>
+2007-09-11  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-cp-view.c: Adjust the scrollbar if necessary when focussing
-	  on an item. Fixes: NB# 34439
+	* configure.ac: release 1.9.7
 
-2006-09-21  Johan Bilien <johan.bilien@nokia.com>
+2007-09-04  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* cp-grid.c: Fixed a crash freshly introduced
+	* src/hcp-app-view.c: remove useless debugging message.
 
-2006-09-20  Johan Bilien <johan.bilien@nokia.com>
+2007-09-04  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-control-panel-main.c: Removed unnecessary assignment
-	* hildon-control-panel.scheme: default size is small. Fixes: NB#31084
+	* src/hcp-app-view.c (hcp_app_view_selection_changed_cb): scroll to
+	exact grid item instead of considering the whole widget height.
+	Fixes: NB#65971.
+	* src/hcp-grid.[ch] (hcp_grid_get_row_height): add API to get current
+	row height from the grid widget.
+	* src/hcp-window.c (hcp_window_init): correctly set accel group in
+	main menu. 
 
-2006-09-20  Johan Bilien <johan.bilien@nokia.com>
+2007-08-28  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* cp-grid.c: Fixed various leaks of GList. Fixes: NB#40616
+	* src/hcp-window.c: add accel group to menu in order to make it be
+	handled accordingly depending on GTK+ settings. Fixes NB#61112.
 
-2006-09-20  Johan Bilien <johan.bilien@nokia.com>
+2007-08-24  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* cp-grid.c:
-	  - try to fix utterly broken size request
-	  - do not hide/show widgets which are "out of view" (we don't
-	    use a scrollbar any longer). Fixes: NB#40768
-	* hildon-control-panel-main.c: Removed unnecessary hard-coded size request
+	* configure.ac: release 1.9.6
 
-2006-09-04 Moises Martinez <moises.martinzes@nokia.com>
+2007-08-24  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-control-panel-main.c: Fixed building problem on
- 	not declaring ourselves as background killable if we are 
-	running an applet and it does not support state-saving
+	* src/hcp-window.c (hcp_window_quit): save state before closing
+	control panel in order to restore the last focused applet.
+	Fixes NB#66542.
 
-2006-09-04 Karoliina Salminen <karoliina.t.salminen@nokia.com>
+2007-08-10  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* All files: modification to license headers
-    	Fixes: NB#39397.
-	* configure.ac -> 2.2.6
+	* src/hcp-grid.c (hcp_grid_init): do not set "follow-state" to true in
+	the pixbuf renderer. Fixes NB#61741.
 
-2006-08-24 Johan Bilien <johan.bilien@nokia.com>
+2007-08-10  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-control-panel-main.c: do not declare ourselves as background
-	  killable if we are running an applet and it does not support
-	  state-saving
+	* src/hcp-app-list.c (hcp_app_list_read_desktop_entries): only consider 
+	.desktop files in applets directory.
 
-2006-08-23 Johan Bilien <johan.bilien@nokia.com>
+2007-07-04  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-cp-rfs.c: replace gtk_info_print with hildon_banner_info
-	  (Closes NB#37551)
+	* src/hcp-main.c: call g_thread_init if the thread system wasn't
+	initiated before.
 
-2006-08-18 Johan Bilien <johan.bilien@nokia.com>
+2007-06-29  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-cp-applist.c: Really free the lists return by gconf
-	   (Closes NB#36887)
-	* configure.ac: 2.2.5
+	* src/hcp-config-keys.h, src/hcp-window.c
+	(hcp_window_retrieve_configuration): changed the key to query if
+	the device lock was activated or not.
+	* src/hcp-app-list.c (hcp_app_list_read_desktop_entries): removed
+	warnings (when applicable) when reading desktop entries.
 
-2006-08-18 Johan Bilien <johan.bilien@nokia.com>
+2007-06-26  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-cp-rfs.c:
-	  - Make the dialogs transient to the main window (Closes NB#36937)
-	  - slight code cleaning
-	* configure.ac: 2.2.4
+	* configure.ac: added --enable-maemo-tools option to enable/disable
+	the "Mobile operator setup wizard", "Restore original settings" and
+	"Clear user data" menu items. It's enabled by default.
+	* src/hcp-window.c: made the "Tools" menu optional.
+	* src/*.c: include config.h on all source files.
 
-2006-08-07 Johan Bilien <johan.bilien@nokia.com>
+2007-06-21  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* configure.ac: 2.2.3
+	* src/hcp-window.c: added Ctrl-Q accelerator to Close menu item. Fixes
+	bug NB#61112.
 
-2006-08-07 Johan Bilien <johan.bilien@nokia.com>
+2007-06-21  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-cp-item.[ch]: Added sort function
-	* hildon-cp-applist.c: Sort the applets in each category
-	  (Closes NB#32005)
+	* configure.ac: release 1.9.5
 
-2006-08-07 Johan Bilien <johan.bilien@nokia.com>
+2007-06-21  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-cp-applist.c: Free the lists return by gconf (Closes NB#36887)
+	* src/hcp-window.c: always ask lock code until finding the correct
+	gconf key for locking.
 
-2006-08-04 Johan Bilien <johan.bilien@nokia.com>
+2007-06-19  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-cp-item.[ch]: Added hcp_item_save_state()
-	* hildon-control-panel-main.c: 
-	  - save the applet's state when saving cp state (Closes NB#36233)
-	  - implement the save_state RPC call
+	* configure.ac: release 1.9.4
 
-2006-08-03 Johan Bilien <johan.bilien@nokia.com>
+2007-06-19  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-cp-rfs.c: try with crypt.h instead
-	* configure.ac: 2.2.2.2
+	* src/hcp-rfs.[ch], src/hcp-config-keys.h, src/hcp-window.c: only ask 
+	for lock code for clearing and restoring user data when the device 
+	is locked.
 
-2006-08-03 Johan Bilien <johan.bilien@nokia.com>
+2007-06-19  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-cp-rfs.c: include unistd.h which seems to be required for crypt
-	* configure.ac: 2.2.2.1
+	* configure.ac: release 1.9.3
 
-2006-08-02 Moises Martinez <moises.martinzes@nokia.com>
+2007-06-19  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-control-panel-main.c: Remove dnotify
-	  for old user's plugin folder
+	* src/hcp-app-list.[ch], src/hcp-app.c: added support for defining the
+	translation domain in the applet's desktop file with the
+	"X-Text-Domain" key.
 
-2006-07-31 Johan Bilien <johan.bilien@nokia.com>
+2007-06-15  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* configure.ac: 2.2.2
+	* configure.ac: release 1.9.2
 
-2006-07-31 Johan Bilien <johan.bilien@nokia.com>
+2007-06-15  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-cp-rfc.c: Make the warning dialog artificially wider
-	  (Closes NB#36312)
+	* src/hcp-grid.c: correctly set the row height by taking in to account
+	the pixbuf cell padding.
 
-2006-07-26 Johan Bilien <johan.bilien@nokia.com>
+2007-06-01  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-cp-item.c: Block the execution of applets once the loading
- 	  of one has been programmed (Closes NB#34981)
+	* configure.ac: release 1.9.1
 
-2006-07-26 Johan Bilien <johan.bilien@nokia.com>
+2007-06-01  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-control-panel.desktop.in: Add Comment field
-	* configure.ac: 2.2.1
+	* src/hcp-grid.c, src/hcp-app-view.c: several layout small
+	improvements.
 
-2006-07-25 Johan Bilien <johan.bilien@nokia.com>
+2007-05-18  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-control-panel-main.c: Added D-Bus RPC handler to query
-	  if an applet is running
+	* COPYING: added license text. Fixes bug NB#56773.
 
-2006-07-25 Johan Bilien <johan.bilien@nokia.com>
+2007-03-28  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-control-panel-main.c: Restart the proper applet after coming
-	  back from bg-killing (Closes NB#35677)
+	* src/hcp-app.c: don't do dlclose on plugins and cache the opened
+	modules to avoid GType related problems when running applets more than
+	once.
 
-2006-07-14 Johan Bilien <johan.bilien@nokia.com>
+2007-03-14  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-cp-applist.c: Use g_key_file_get_locale_string to fetch the
-	  name from the desktop file to allow "in .desktop" l10n
+	* debian/control, configure.ac, rc/hcp-rfs.c, src/hcp-window.c,
+	src/Makefile.am: move from libosso-help to hildon-help.  
 
-2006-07-14 Johan Bilien <johan.bilien@nokia.com>
+2007-03-09  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* configure.ac: 2.2.0
+	* configure.ac: Reverted to 1.9.0 for consistency with the rest
+	of the Hildon framework
 
-2006-07-14 Johan Bilien <johan.bilien@nokia.com>
+2007-03-05  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-control-panel-main.c: Always load the UI interface for now
+	* debian/control: remove remaining bits of hildon-base-lib dependency.
 
-2006-07-12 Johan Bilien <johan.bilien@nokia.com>
+2007-02-28  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-cp-item.[ch]: 
-	  - load amd run plugins inside an idle loop
-	     so we can keep receiving DBus messages
-	  - load plugins without RTLD_GLOBAL, because we are likely to
-	    load 2 plugins at the same time, and they all use the same
-	    shared symbol names ...
-	* hildon-control-panel-main.[ch]:
-	  - Added RPC handler, with run_application method to launch
-	    applets remotely (Closes NB#25238 partially)
+	* configure.ac, src/Makefile.am, src/hcp-app-list.c, debian/control:
+	get rid of hildon-base-lib dependency. Using gnome-vfs file monitoring
+	API now.
 
-2006-07-11 Johan Bilien <johan.bilien@nokia.com>
+2007-02-21  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	Major refactoring:
-	* hildon-cp-item.[ch]: Added to represent a CP item (.desktop)
-	* hildon-cp-view.[ch]: Added to represent grid container widget
-	* hildon-control-panel-main.[ch], hildon-cp-applist.[ch]:
-	  - replaced global variables with objectified code
-	  - use gconf to store settings instead of configuration file
-	  - use osso_state_read/write and g_key_file_ to save state
-	  - replaced libmb with g_key_file_ for .desktop parsing
-	  - do not use osso_cp_plugin_ but implement loading of plugin
-	    from the application
+	* src/hcp-grid.c: fix the large icons size.
 
-2006-07-07 Johan Bilien <johan.bilien@nokia.com>
+2007-02-20  Johan Bilie  <johan.bilien@nokia.com>
 
-	* hildon-control-panel-main.c: Fixed height of the items in small icon
-	  mode
-	* hildon-cp-applist.c: Add applets to Extras if they don't have
-	  Category=
-	* configure.ac: 2.0.1
+	* data/hildon-control-panel.pc.in: requires hildon-1
 
-2006-07-06 Johan Bilien <johan.bilien@nokia.com>
+2007-02-20  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* configure.ac: 2.0.0
+	* src/hcp-grid.c: cursor should follow selection. Small fix on column
+	width.
 
-2006-07-06 Johan Bilien <johan.bilien@nokia.com>
+2007-02-19  Johan Bilie  <johan.bilien@nokia.com>
 
-	* hildon-cp-applist.c: Have 2 lists of ids for category, one for
-	  .desktop ids, one for localised titles
-	* cp-grid-item.c: Fixed typo which resulted in some Critical warnings
-	* hildon-control-panel.schemas: Added gconf schemas file with the default
-	  category
-	* hildon-control-panel.desktop: added Comment= field
+	* src/*.c: replaced include <hildon-widgets/*> with <hildon/*>
 
-2006-07-05 Moises Martinez <moises.martinzes@nokia.com>
+2007-02-13  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-cp-applist.c: Loading of user applets in old
-	  "/var/lib/install..." removed
+	* configure.ac: release 3.0.0
 
-2006-06-06 Karoliina Salminen <karoliina.t.salminen@nokia.com>
+2007-02-13  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* Added missing file hildon-control-panel-main-utils.h to version control.
-	* Tagged a new minor version for integration.
-	* configure.ac: 1.9.1
+	* debian/control, configure.ac: remove hildon-libs dependency and add hildon-1 dependency
+	checks.
 
-2006-06-01 Karoliina Salminen <karoliina.t.salminen@nokia.com>
+2007-02-13  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* configure.ac: 1.9.0. Changed version 
-	  so that it does not collide with IT2006.
-	* Merged implementation from branch cp-grid-fixes:
-	* up to r16945 
-	* New file:
-	* hildon-control-panel-main-utils.h
-	* contains a function needed by cp grid.
+	* configure.ac: remove gtkhtml dependency and add gconf dependency
+	checks.
 
-	* Makefile.am
-	* added the new file to list of files.
+2007-01-04  Lucas Rocha  <lucas.rocha@nokia.com>
 
-	* hildon-control-panel-main.c
-	* added accessor function for re-setting grid pointer after dnotify
+	* src/hcp-window.c: removed fullscreen support as it's not on UI spec.
 
-	* hildon-cp-applist.c
-	* after recreating grids, inform the main control panel of the change.
+2007-01-04  Lucas Rocha  <lucas.rocha@nokia.com>
 
-2006-05-29 Karoliina Salminen <karoliina.t.salminen@nokia.com>
+	* src/hcp-window.c, src/hcp-app.c, src/hcp-app-list.c,
+	src/hcp-grid.c, src/hcp-app-view.c: several code cleanups.
 
-	* Merged implementation branch up to r16763
+2007-01-04  Lucas Rocha  <lucas.rocha@nokia.com>
 
-2006-05-24 Karoliina Salminen <karoliina.t.salminen@nokia.com>
+	* Makefile.am, src/Makefile.am, data/Makefile.am: add *~ to
+	CLEANFILES.
 
-	* Imported some comments and minor additions, up to r16340.
-	* configure.ac: 1.2.6
+2006-12-01  Lucas Rocha  <lucas.rocha@nokia.com>
 
-2006-05-11 Johan Bilien <johan.bilien@nokia.com>
+	* src/hcp-rfs.c, src/hcp-program.c: get rid of osso-log.
 
-	* Imported group-sorting code
+2006-11-28  Lucas Rocha  <lucas.rocha@nokia.com>
 
-2006-05-10 Johan Bilien <johan.bilien@nokia.com>
+	* src/*.[ch]: general code cleanups, improve code reliability, fix
+	some GObject leaks, get rid of osso-log.
 
-	* configure.ac: 1.2.5
+2006-11-23  Lucas Rocha  <lucas.rocha@nokia.com>
 
-2006-05-10 Johan Bilien <johan.bilien@nokia.com>
+	* src/hcp-grid.c: fix warnings when icon default icon is used.
 
-	* configure.ac, Makefile.am: Link against hildonfm to make some
-	  applets happier (Closes N#27086)
+2006-11-14  Lucas Rocha  <lucas.rocha@nokia.com>
 
-2006-04-24 Johan Bilien <johan.bilien@nokia.com>
+	* src/hcp-app.c, src/hcp-app-view.c: fix focus behavior when
+	application list is updated.
 
-	* hildon-control-panel-main.[ch], hildon-cp-rfs.c: Added help
-	  topic to the RFS and CUD dialogs (Closes N#27548 and N#27549)
+2006-11-14  Lucas Rocha  <lucas.rocha@nokia.com>
 
-2006-04-10 Johan Bilien <johan.bilien@nokia.com>
+	* src/hcp-grid.c: fix focus behavior among grids.
 
-	* configure.ac: 1.2.4
+2006-11-14  Lucas Rocha  <lucas.rocha@nokia.com>
 
-2006-04-10 Johan Bilien <johan.bilien@nokia.com>
+	Initial port to GtkIconView. Some focus/size issues to 
+	be solved.
 
-	* hildon-control-panel-main.[ch], hildon-cp-rfs.c: The warning dialog
-	  for RFS and CUD is now implemented with a generic GtkDialog rather
-	  than a HildonNote (Closes N#25584 and N#25588)
+	* src/hcp-app-view.c, src/hcp-grid.h, src/hcp-app-view.h,
+	src/hcp-app-list.h, src/hcp-window.c, src/hcp-app.c,
+	src/hcp-grid.c
 
-2006-04-07 Johan Bilien <johan.bilien@nokia.com>
+	* src/hcp-grid-item.[ch], src/hcp-grid-item-private.c: removed.
 
-	* hildon-control-panel-main.c: Set the application name to "" so
-	  it doesn't appear in the title bar (Closes N#26023)
+2006-11-07  Lucas Rocha  <lucas.rocha@nokia.com>
 
-2006-04-03 Johan Bilien <johan.bilien@nokia.com>
+	* src/hcp-grid.c, src/hcp-app-list.c, src/hcp-grid-item.c: fixed
+	some memory leaks and memory access errors.
 
-	* configure.ac: 1.2.3
+2006-11-07  Lucas Rocha  <lucas.rocha@nokia.com>
 
-2006-04-03 Johan Bilien <johan.bilien@nokia.com>
+	* src/hcp-app.list.c: fixed a memory leak.
+	* src/hcp-window.c (hcp_window_keyboard_listener): added 
+	fullscreen support.
 
-	* hildon-control-panel-main.h: Corrected two logical ids
+2006-11-03  Lucas Rocha  <lucas.rocha@nokia.com>
 
-2006-03-20 Johan Bilien <johan.bilien@nokia.com>
-	* hildon-control-panel-main.c:
-	  - Move back to big icon by default, as per new specifications.
-	    (Closes N#24453, N#24777)
-	  - Send the library file to cp_plugin_save_state, not the .desktop file
-	    filename (Closes N#24287)
-	* configure.ac: 1.2.2
+	* src/hcp-window-c, src/hcp-main.c, src/hcp-app.c, 
+	src/hcp-app-view.c, src/hcp-app-list.c: several code cleanups.
 
-2006-03-13 Johan Bilien <johan.bilien@nokia.com>
-	* Fixed localization of the wrong code infobanner
-	* configure.ac: 1.2.1
+2006-11-03  Lucas Rocha  <lucas.rocha@nokia.com>
 
-2006-03-10 Johan Bilien <johan.bilien@nokia.com>
-	* Fixed a localisation logical ID
+	* src/hcp-window-c: fix crash on HCPAppList update triggered when
+	a new .desktop file is found.
 
-2006-03-06 Johan Bilien <johan.bilien@nokia.com>
-	* hildon-cp-rfc.c: Replaced calls to codelockui with calls to
-	  hildon-libs and libosso
-	* configure.ac: 1.2.0
+2006-11-02  Lucas Rocha  <lucas.rocha@nokia.com>
 
-2006-02-23 Johan Bilien <johan.bilien@nokia.com>
-	* hildon-control-panel-main.[ch]: Ported to HildonWindow / HildonProgram
+	* src/hcp-window.c, src/hcp-app-view.[ch], src/hcp-marshalers.list:
+	correct handling of focused item change.
 
-2006-02-21 Johan Bilien <johan.bilien@nokia.com>
-	* Small icon size is now the default (Closes N#22927)
+2006-11-02  Lucas Rocha  <lucas.rocha@nokia.com>
 
-2006-02-17 Johan Bilien <johan.bilien@nokia.com>
-	* Implemented new version of RFS UI:
-	  - Use codelockui instead of old dbus cruft
-	  - Added Clean-User-Data UI
-	* configure.ac: 1.1.0
+	* configure.ac, src/Makefile.am, src/hcp-marshalers.list: make 
+	marshalers automaticaly generated.
 
-2006-02-13 Johan Bilien <johan.bilien@nokia.com>
-	* hildon-control-panel-main.c:
-	  - Fixed a crash when building DBUS messages
-	  - Replaced RFS DBus call with shell script call
-	* configure.ac: 1.0.2
+2006-11-02  Lucas Rocha  <lucas.rocha@nokia.com>
 
-2005-12-15 Johan Bilien <johan.bilien@nokia.com>
-	* hildon-control-panel-main.c:
-	  - _retrieve_state(): check the return value of read
-	* Closes N#21333
-	* configure.ac: 1.0.1
+	* src/*.[ch], src/Makefile.am: first commit of 
+	code refactoring. Still very unstable.
 
-2005-12-15 Johan Bilien <johan.bilien@nokia.com>
-	* Ported to dbus >= 0.50.
-	* configure.ac: 1.0.0
+2006-10-30  Lucas Rocha  <lucas.rocha@nokia.com>
 
-2005-10-27 Karoliina Salminen  <karoliina.t.salminen@nokia.com>
-	* Patched bug N#20882 with Marius Vollmer's patch <marius.vollmer@nokia.com> :
-	* hildon-control-panel-main.c (_run_operator_wizard,
-	_reset_factory_settings): Call osso_rpc_free_val to free the
-	memory associated with the osso_rpc_t value.
+	* src/*.[ch], src/Makefile.am: all source code files use the 
+	same prefix.
 
-2005-09-09  Karoliina Salminen  <karoliina.t.salminen@nokia.com>
+2006-10-27  Lucas Rocha  <lucas.rocha@nokia.com>
 
-  * Bug squashing camp version, increased baseline to 0.11.0
-  * Patched bug N#18692
-  * Fixed memory leak from hildon-control-panel: 
-    hildon-control-panel-main.c: g_value_unset(&val); added to correspont its pair g_value_init.
+	* configure.ac, Makefile.am: updated for new directory tree.
+	* com.nokia.controlpanel.service.in, hildon-control-panel.pc.in,
+	hildon-control-panel.desktop.in, hildon-control-panel.schemas: moved
+	files to new data directory.
+	* data/Makefile.am: Makefile for new data directory.
 
-2005-08-26  Karoliina Salminen  <karoliina.t.salminen@nokia.com>
+2006-10-27  Lucas Rocha  <lucas.rocha@nokia.com>
 
-  * Updated dependency to UI spec 3.0 to fix integratability problems.
-  * Tagged version for Integration 0.10.0. This is meant for week 36 integration release.
+	* depmod, config.h.in, aclocal.m4, Makefile.in, config.guess,
+	config.sub, configure, controlpanel.sh.in, depcomp, install-sh, 
+	ltmain.sh, missing, mkinstalldirs: removed from repository.
+	* autogen.sh: added bootstrap script.
+	* MAINTAINERS: added maintainership file.
+	* src/Makefile.am: Makefile for new source code directory.
+	* *.[ch]: moved source code files to src directory.
 
-2005-08-26  Karoliina Salminen  <karoliina.t.salminen@nokia.com>
-	
-  * Updated dependency to UI spec 4.0 to fix localization problems.
-  * Tagged version for Integration 0.9.23. This is meant for week 35 integration release.
+2006-10-27  Lucas Rocha  <lucas.rocha@nokia.com>
 
-2005-08-26  Karoliina Salminen  <karoliina.t.salminen@nokia.com>
-
-  * Increased version number -> 0.9.22. Tagged for integration, this version is for week 35 integration release. 
-
-2005-08-26  Karoliina Salminen  <karoliina.t.salminen@nokia.com>
-
-  * Patched bug #17744
-  * Added the required call to inform active applet that statesave is required
-  * Increased version number
-
-2005-08-25  Karoliina Salminen  <karoliina.t.salminen@nokia.com>
-
-  * This version went to w34 integration release
-  * hildon-control-panel-main.c (_reset_factory_settings): Fix 17278: HW
-    Close key now correctly dismisses the reset to factory settings dialog
-
-2005-08-22  Karoliina Salminen  <karoliina.t.salminen@nokia.com>
-
-  * Patched bug #17347 - Entering the wrong lock code twice in Restore
-    factory settings crashes the Control panel application. hildon-
-    control-panel-main.c (_reset_factory_settings): String returned by
-    crypt() is static data, not dynamically allocated. Thus, removed
-    g_free() that caused memory corruption.
-
-2005-08-23  Karoliina Salminen  <karoliina.t.salminen@nokia.com>
-
-     * Bugfix version at stage.maemo.org repository.
-
-2005-08-11  Karoliina Salminen  <karoliina.t.salminen@nokia.com>
-
-     * Initial version in stage.maemo.org resository.
-
+	* Refactoring branch created.
+	* ChangeLog-20061027: created for old ChangeLog entries.

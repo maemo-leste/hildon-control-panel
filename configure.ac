@@ -1,5 +1,5 @@
 AC_INIT(Makefile.am)
-AM_INIT_AUTOMAKE(hildon-control-panel, 2.2.10)
+AM_INIT_AUTOMAKE(hildon-control-panel, 2.0.2)
 AM_CONFIG_HEADER(config.h)
 
 AC_ARG_ENABLE(debug, [AC_HELP_STRING([--enable-debug],[Debug (default=no)])],
@@ -13,61 +13,73 @@ AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_PROG_LIBTOOL
 
+AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal)
+
 AC_PATH_X
 AC_PATH_XTRA
 AC_SUBST(X_CFLAGS)
 
 AC_HEADER_STDC
 
-ALL_LINGUAS="en_GB"
-AC_SUBST(ALL_LINGUAS)
-AM_GLIB_GNU_GETTEXT
-
-if test foobar${hildon_use_debug} = foobaryes 
+if test "x${hildon_use_debug}" = "xyes"
 then
     CFLAGS="$CFLAGS -ggdb -O0 -DDEBUG"
 else
     CFLAGS="$CFLAGS -O2"
 fi
 
-# D-BUS headers do not compile with -pedantic. Once they are fixed, 
-#return the flag
-#CFLAGS="$CFLAGS -Wall -ansi -pedantic -Wmissing-prototypes -Wmissing-declarations -Werror" 
 CFLAGS="$CFLAGS -Wall -ansi -Wmissing-prototypes -Wmissing-declarations -Werror -lcrypt" 
 AC_SUBST(CFLAGS)
 
-PKG_CHECK_MODULES(HILDONFM, hildon-fm)
-AC_SUBST(HILDONFM_LIBS)
-AC_SUBST(HILDONFM_CFLAGS)
+ALL_LINGUAS="en_GB"
+AC_SUBST(ALL_LINGUAS)
+AM_GLIB_GNU_GETTEXT
+
+AC_ARG_ENABLE(maemo-tools,
+	      AS_HELP_STRING([--enable-maemo-tools],[Enable mobile operator, clear and restore user data tools (default=yes)]),
+	      [enable_maemo_tools=$enableval], 
+              [enable_maemo_tools=yes])
+
+AM_CONDITIONAL(USE_MAEMO_TOOLS, test "x$enable_maemo_tools" = "xyes")
+
+if test "x$enable_maemo_tools" = "xyes"; then
+    AC_DEFINE([MAEMO_TOOLS],[1],[Define to enable mobile operator, clear and restore user data tools])
+fi
+
+PKG_CHECK_MODULES(OSSOSETTINGS, 
+		  [osso-af-settings >= 0.9.0],
+		  [
+		  localedir=`pkg-config osso-af-settings --variable=localedir`
+                  hildondesktopentrydir=`pkg-config osso-af-settings --variable=desktopentrydir`
+		  ],[
+		  localedir="${datadir}/locale"
+                  hildondesktopentrydir="${datadir}/applications"
+		  ])
+
+AC_SUBST(hildondesktopentrydir)
+AC_SUBST(localedir)
 
 PKG_CHECK_MODULES(OSSO,libosso >= 0.10.0)
 AC_SUBST(OSSO_LIBS)
 AC_SUBST(OSSO_CFLAGS)
 
-PKG_CHECK_MODULES(HILDON, hildon-libs >= 0.7.1)
+PKG_CHECK_MODULES(HILDON, hildon-1)
 AC_SUBST(HILDON_LIBS)
 AC_SUBST(HILDON_CFLAGS)
 
-PKG_CHECK_MODULES(HILDONBASELIB, hildon-base-lib >= 0.7.1)
-AC_SUBST(HILDONBASELIB_LIBS)
-AC_SUBST(HILDONBASELIB_CFLAGS)
+PKG_CHECK_MODULES(GNOME_VFS, gnome-vfs-2.0 >= 2.8.3)
+AC_SUBST(GNOME_VFS_LIBS)
+AC_SUBST(GNOME_VFS_CFLAGS)
 
-PKG_CHECK_MODULES(HTML, libgtkhtml-3.8)
-AC_SUBST(HTML_LIBS)
-AC_SUBST(HTML_CFLAGS)
+PKG_CHECK_MODULES(HILDON_HELP, hildon-help)
+AC_SUBST(HILDON_HELP_LIBS)
+AC_SUBST(HILDON_HELP_CFLAGS)
 
-PKG_CHECK_MODULES(OSSOSETTINGS, osso-af-settings >= 0.8.1)
-localedir=`pkg-config osso-af-settings --variable=localedir`
-AC_SUBST(localedir)
-hildondesktopentrydir=`pkg-config osso-af-settings --variable=desktopentrydir`
-AC_SUBST(hildondesktopentrydir)
+PKG_CHECK_MODULES(GCONF, gconf-2.0 >= 2.6.2)
+AC_SUBST(GCONF_LIBS)
+AC_SUBST(GCONF_CFLAGS)
 
-PKG_CHECK_MODULES(LIBOSSOHELP, libossohelp >= 0.0.4)
-AC_SUBST(LIBOSSOHELP)
-AC_SUBST(LIBOSSOHELP_CFLAGS)
-
-desktopentrydir=${datadir}/applications
-hildoncpdesktopentrydir=${desktopentrydir}/hildon-control-panel
+hildoncpdesktopentrydir=${datadir}/applications/hildon-control-panel
 hildoncplibdir=${libdir}/hildon-control-panel
 
 AC_SUBST(hildondesktopentrydir)
@@ -75,7 +87,8 @@ AC_SUBST(hildoncpdesktopentrydir)
 AC_SUBST(hildoncplibdir)
 
 AC_OUTPUT(Makefile \
-	hildon-control-panel.pc \
-	hildon-control-panel.desktop \
-        com.nokia.controlpanel.service \
-        controlpanel.sh )
+	data/Makefile \
+	src/Makefile \
+	data/hildon-control-panel.pc \
+	data/hildon-control-panel.desktop \
+	data/com.nokia.controlpanel.service )
