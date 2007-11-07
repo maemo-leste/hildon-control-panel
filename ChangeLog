@@ -1,5 +1,9 @@
 2007-10-07  Lucas Rocha  <lucas.rocha@nokia.com>
 
+	* configure.ac: release 2.0.1
+
+2007-10-07  Lucas Rocha  <lucas.rocha@nokia.com>
+
 	* src/hcp-window.c (hcp_window_app_list_updated_cb): do not try to
 	focus previously selected item in case this is undefined. 
 	Fixes: NB#74138.

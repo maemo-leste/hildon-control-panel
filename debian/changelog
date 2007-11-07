@@ -1,3 +1,17 @@
+hildon-control-panel (1:2.0.1-1) unstable; urgency=low
+
+  * src/hcp-window.c (hcp_window_app_list_updated_cb): do not try to
+  focus previously selected item in case this is undefined. 
+  Fixes: NB#74138.
+
+  * src/hcp-app-view.c (hcp_app_view_selection_changed_cb): emit
+  focus-changed signal even if the widget is not properly allocated yet.
+  * src/hcp-window.c (hcp_window_init, hcp_window_retrieve_state):
+  correctly handle the case when there's no saved state yet to define
+  the initial focused applet. Fixes: NB#72771.
+
+ -- Lucas Rocha <lucas.rocha@nokia.com>  Wed,  7 Nov 2007 13:03:45 +0200
+
 hildon-control-panel (1:2.0.0-1) unstable; urgency=low
 
   * src/hcp-window.c (hcp_window_init, hcp_window_size_allocate):
