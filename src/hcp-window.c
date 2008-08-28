@@ -1,7 +1,7 @@
 /*
  * This file is part of hildon-control-panel
  *
- * Copyright (C) 2005 Nokia Corporation.
+ * Copyright (C) 2005-2008 Nokia Corporation.
  *
  * Author: Lucas Rocha <lucas.rocha@nokia.com>
  * Contact: Karoliina Salminen <karoliina.t.salminen@nokia.com>
@@ -30,6 +30,7 @@
 #include <hildon/hildon-help.h>
 #include <hildon/hildon-window.h>
 #include <hildon/hildon-program.h>
+#include <hildon/hildon-defines.h>
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>

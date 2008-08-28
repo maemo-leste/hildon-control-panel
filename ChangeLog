@@ -1,3 +1,11 @@
+2008-08-28  Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>
+
+	* configure.ac: release 2.2.0
+
+	* src/hcp-grid.c: Remove size_request handler hcp_grid_size_request.
+
+	* src/hcp-window.c: Include hildon/hildon-defines.h to fix building.
+
 2007-11-07  Lucas Rocha  <lucas.rocha@nokia.com>
 
 	* configure.ac: post release version bump.

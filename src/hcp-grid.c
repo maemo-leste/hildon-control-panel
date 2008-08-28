@@ -1,7 +1,7 @@
 /*
  * This file is part of hildon-control-panel
  *
- * Copyright (C) 2005 Nokia Corporation.
+ * Copyright (C) 2005-2008 Nokia Corporation.
  *
  * Author: Lucas Rocha <lucas.rocha@nokia.com>
  *
@@ -432,36 +432,11 @@ hcp_grid_keyboard_listener (GtkWidget   *widget,
 }
 
 static void
-hcp_grid_size_request (GtkWidget *widget, GtkRequisition *req)
-{
-  HCPGridPrivate *priv;
-  GtkTreeModel *store;
-  gint num_items, num_rows;
-  
-  g_return_if_fail (widget);
-  g_return_if_fail (HCP_IS_GRID (widget));
-
-  priv = HCP_GRID (widget)->priv;
-
-  store = gtk_icon_view_get_model (GTK_ICON_VIEW (widget));
-
-  num_items = gtk_tree_model_iter_n_children (GTK_TREE_MODEL (store), NULL);
-
-  num_rows = ceil ((double) num_items / HCP_GRID_NUM_COLUMNS);
-  
-  if (num_items > 0) 
-  {
-    req->height = num_rows * priv->row_height;
-  }
-}
-
-static void
 hcp_grid_class_init (HCPGridClass *class)
 {
   GObjectClass *g_object_class = G_OBJECT_CLASS (class);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (class);
 
-  widget_class->size_request = hcp_grid_size_request;
   widget_class->key_release_event = hcp_grid_keyboard_listener;
   widget_class->focus_in_event = hcp_grid_focus_in;
   widget_class->button_press_event = hcp_grid_button_pressed;

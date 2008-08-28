@@ -1,7 +1,7 @@
 Source: hildon-control-panel
 Section: x11
 Priority: optional
-Maintainer: Lucas Rocha <lucas.rocha@nokia.com>
+Maintainer:  Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>
 Build-Depends: debhelper (>= 4.0.0), libosso-gnomevfs2-dev, libhildon1-dev (>= 0.9.9), pkg-config, libosso-dev (>= 1.5), osso-af-settings, libhildonhelp-dev, maemo-launcher-dev (>= 0.22-1)
 Standards-Version: 3.6.0
 
