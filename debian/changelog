@@ -1,4 +1,4 @@
-hildon-control-panel (1:2.2.0-1~unreleased) unstable; urgency=low
+hildon-control-panel (1:2.2.0-1) unstable; urgency=low
 
   * First Fremantle edition.
   * Removed custom size_request handler hcp_grid_size_request because
