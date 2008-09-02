@@ -1,5 +1,10 @@
 2008-09-02  Claudio Saavedra  <ext-claudio.saavedra@nokia.com>
 
+	* configure.ac: release 2.2.1
+	* debian/changelog: update.
+
+2008-09-02  Claudio Saavedra  <ext-claudio.saavedra@nokia.com>
+
 	* data/hildon-control-panel.pc.in: Define datarootdir to be compatible
 	with autoconf 2.60 or newer. Fixes NB #85871.
 
