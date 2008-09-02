@@ -1,5 +1,6 @@
 prefix=@prefix@
 exec_prefix=@prefix@
+datarootdir = @datarootdir@
 libdir=@libdir@
 includedir=@includedir@
 localedir=@localedir@
