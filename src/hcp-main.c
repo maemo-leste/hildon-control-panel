@@ -47,16 +47,17 @@ int main (int argc, char **argv)
 
   textdomain (PACKAGE);
 
+  /* Initialize before calling any glib function */
+  gtk_init (&argc, &argv);
+  
+  if (!g_thread_supported ()) g_thread_init (NULL);
+  
+  gnome_vfs_init ();
+
   /* Set application name to "" as we only need 
    * the window title in the title bar */
   g_set_application_name ("");
-  
-  gtk_init (&argc, &argv);
 
-  gnome_vfs_init ();
-
-  if (!g_thread_supported ()) g_thread_init (NULL);
-  
   program = hcp_program_get_instance ();
 
   hcp_program_run (program);
