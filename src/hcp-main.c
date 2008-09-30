@@ -48,9 +48,9 @@ int main (int argc, char **argv)
   textdomain (PACKAGE);
 
   /* Initialize before calling any glib function */
-  gtk_init (&argc, &argv);
-  
   if (!g_thread_supported ()) g_thread_init (NULL);
+  
+  gtk_init (&argc, &argv);
   
   gnome_vfs_init ();
 
