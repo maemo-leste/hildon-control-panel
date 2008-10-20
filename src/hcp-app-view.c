@@ -365,7 +365,7 @@ hcp_app_view_class_init (HCPAppViewClass *class)
                                                      "Set view's icon size",
                                                      HCP_ICON_SIZE_SMALL,
                                                      HCP_ICON_SIZE_LARGE,
-                                                     HCP_ICON_SIZE_SMALL,
+                                                     HCP_ICON_SIZE_LARGE,
                                                      (G_PARAM_READABLE | 
                                                       G_PARAM_WRITABLE | 
                                                       G_PARAM_CONSTRUCT)));

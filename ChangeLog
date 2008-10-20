@@ -1,3 +1,15 @@
+2008-10-17 Peter Aradi <peter.aradi@blumsoft.eu>
+	
+	* src/hcp-app-view.c: change default value for icon size to
+	HCP_ICON_SIZE_LARGE. Fixes NB #90236.
+	* data/hildon-control-panel.schemas: changed
+	"/schemas/apps/osso/apps/controlpanel/icon_size" key value to "true".
+	Fixes NB #90236.
+
+2008-09-30  Peter Aradi <peter.aradi@blumsoft.eu>
+
+	* src/hcp-main.c: g_thread_init called earlier. Fixes NB #86237.
+
 2008-09-02  Claudio Saavedra  <ext-claudio.saavedra@nokia.com>
 
 	* configure.ac: release 2.2.1
