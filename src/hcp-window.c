@@ -31,6 +31,7 @@
 #include <hildon/hildon-window.h>
 #include <hildon/hildon-program.h>
 #include <hildon/hildon-defines.h>
+#include <hildon/hildon-pannable-area.h>
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
@@ -886,16 +887,13 @@ hcp_window_construct_ui (HCPWindow *window)
   g_signal_connect (G_OBJECT (window), "key_release_event",
                     G_CALLBACK (hcp_window_keyboard_listener), NULL);
 
-  scrolled_window = g_object_new (GTK_TYPE_SCROLLED_WINDOW,
-                                  "vscrollbar-policy", GTK_POLICY_ALWAYS,
-                                  "hscrollbar-policy", GTK_POLICY_NEVER,
-                                  NULL);
+  scrolled_window = g_object_new (HILDON_TYPE_PANNABLE_AREA, NULL);
 
   gtk_container_add (GTK_CONTAINER (window), scrolled_window);
-
-  gtk_scrolled_window_add_with_viewport (
-          GTK_SCROLLED_WINDOW (scrolled_window),
+  hildon_pannable_area_add_with_viewport (
+          HILDON_PANNABLE_AREA (scrolled_window),
           priv->view);
+
 }
 
 static void
