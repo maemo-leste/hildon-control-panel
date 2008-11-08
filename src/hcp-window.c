@@ -59,11 +59,8 @@ struct _HCPWindowPrivate
   HCPApp         *focused_item;
   HCPAppList     *al;
   GtkWidget      *view;
-  GtkWidget      *large_icons_menu_item;
-  GtkWidget      *small_icons_menu_item;
 
   /* For state save data */
-  gint            icon_size;
   gchar          *saved_focused_filename;
   gint            scroll_value;
 };
@@ -111,15 +108,6 @@ hcp_window_enforce_state (HCPWindow *window)
   priv = window->priv;
 
   /* Actually enforce the saved state */
-  if (priv->icon_size == 0)
-    hcp_app_view_set_icon_size (priv->view,
-                                HCP_ICON_SIZE_SMALL);
-  else if (priv->icon_size == 1)
-    hcp_app_view_set_icon_size (priv->view,
-                                HCP_ICON_SIZE_LARGE);
-  else 
-    g_warning ("Unknown iconsize");
-
   /* If the saved focused item filename is defined, try to 
    * focus on the item. */
   if (priv->saved_focused_filename)
@@ -135,7 +123,8 @@ hcp_window_enforce_state (HCPWindow *window)
                                priv->saved_focused_filename);
     
     if (app)
-      hcp_app_focus (app);
+ /*     hcp_app_focus (app); */
+      priv->focused_item = app;
 
     g_free (priv->saved_focused_filename);
     priv->saved_focused_filename = NULL;
@@ -346,8 +335,7 @@ hcp_window_retrieve_configuration (HCPWindow *window)
   HCPWindowPrivate *priv;
   GConfClient *client = NULL;
   GError *error = NULL;
-  gboolean icon_size;
-  
+
   g_return_if_fail (window);
   g_return_if_fail (HCP_IS_WINDOW (window));
 
@@ -356,52 +344,10 @@ hcp_window_retrieve_configuration (HCPWindow *window)
   client = gconf_client_get_default ();
 
   g_return_if_fail (client);
-
-  icon_size = gconf_client_get_bool (client,
-                                     HCP_GCONF_ICON_SIZE_KEY,
-                                     &error);
 
   if (error)
   {
     g_warning ("Error reading window settings from GConf: %s", error->message);
-    g_error_free (error);
-  }
-  else
-  {
-    priv->icon_size = icon_size ? TRUE : FALSE;
-  }
-
-  g_object_unref (client);
-}
-
-/* Save the configuration (large/small icons)  */
-static void 
-hcp_window_save_configuration (HCPWindow *window)
-{
-  HCPWindowPrivate *priv;
-  GConfClient *client = NULL;
-  GError *error = NULL;
-  gboolean icon_size;
-
-  g_return_if_fail (window);
-  g_return_if_fail (HCP_IS_WINDOW (window));
-
-  priv = window->priv;
-
-  client = gconf_client_get_default ();
-
-  g_return_if_fail (client);
-
-  icon_size = priv->icon_size ? TRUE : FALSE;
-
-  gconf_client_set_bool (client,
-                         HCP_GCONF_ICON_SIZE_KEY,
-                         icon_size,
-                         &error);
-
-  if (error)
-  {
-    g_warning ("Error saving window settings to GConf: %s", error->message);
     g_error_free (error);
   }
 
@@ -426,39 +372,8 @@ hcp_window_keyboard_listener (GtkWidget * widget,
   {
     switch (keyevent->keyval)
     {
-      case HILDON_HARDKEY_INCREASE:
-        if (priv->icon_size != 1) 
-        {
-          priv->icon_size = 1;
-
-          gtk_check_menu_item_set_active (
-                  GTK_CHECK_MENU_ITEM (priv->large_icons_menu_item),
-                  TRUE);
-
-          hcp_app_view_set_icon_size (priv->view, HCP_ICON_SIZE_LARGE);
-
-          hcp_window_save_configuration (window);
-  
-          return TRUE;
-        }
-        break;
-
-      case HILDON_HARDKEY_DECREASE:
-        if (priv->icon_size != 0)
-        {
-          priv->icon_size = 0;
-
-          gtk_check_menu_item_set_active (
-                  GTK_CHECK_MENU_ITEM (priv->small_icons_menu_item),
-                  TRUE);
-
-          hcp_app_view_set_icon_size (priv->view, HCP_ICON_SIZE_SMALL);
-
-          hcp_window_save_configuration (window);
-
-          return TRUE;
-        }
-        break;
+        default:
+          break;
     }
   }
   
@@ -566,48 +481,6 @@ hcp_window_run_operator_wizard (GtkWidget *widget, HCPWindow *window)
 #endif
 
 static void 
-hcp_window_iconsize (GtkWidget *widget, HCPWindow *window)
-{
-  HCPWindowPrivate *priv;
-
-  g_return_if_fail (window);
-  g_return_if_fail (HCP_IS_WINDOW (window));
-
-  priv = window->priv;
-
-  if (!gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget)))
-    return;
-  
-  if (widget == priv->large_icons_menu_item)
-  {
-    hcp_app_view_set_icon_size (priv->view,
-                                HCP_ICON_SIZE_LARGE);
-    priv->icon_size = 1;
-  }
-  else if (widget == priv->small_icons_menu_item)
-  {
-    hcp_app_view_set_icon_size (priv->view,
-                                HCP_ICON_SIZE_SMALL);
-    priv->icon_size = 0;
-  }
-  
-  hcp_window_save_configuration (window);
-}
-
-static void 
-hcp_window_open (GtkWidget *widget, HCPWindow *window)
-{
-  HCPWindowPrivate *priv;
-
-  g_return_if_fail (window);
-  g_return_if_fail (HCP_IS_WINDOW (window));
-
-  priv = window->priv;
-
-  hcp_app_launch (priv->focused_item, TRUE);
-}
-
-static void 
 hcp_window_topmost_status_change (GObject *gobject, 
 		                  GParamSpec *arg1,
 			          HCPWindow *window)
@@ -703,6 +576,11 @@ static void hcp_window_quit (GtkWidget *widget, HCPWindow *window)
   g_return_if_fail (window);
   g_return_if_fail (HCP_IS_WINDOW (window));
 
+  /* we can only close the window, when no applets are running */
+  /**@TODO review this */
+  HCPProgram *program = hcp_program_get_instance ();
+  program->execute = 0;
+
   hcp_window_save_state (window, FALSE);
 
   gtk_widget_destroy (GTK_WIDGET (window));
@@ -719,13 +597,12 @@ hcp_window_construct_ui (HCPWindow *window)
   
   GtkMenu *menu = NULL;
   GtkAccelGroup *accel_group;
-  GtkWidget *sub_view = NULL;
+
 #ifdef MAEMO_TOOLS
   GtkWidget *sub_tools = NULL;
 #endif
   GtkWidget *mi = NULL;
   GtkWidget *scrolled_window = NULL;
-  GSList *menugroup = NULL;
 
   g_return_if_fail (window);
   g_return_if_fail (HCP_IS_WINDOW (window));
@@ -737,17 +614,17 @@ hcp_window_construct_ui (HCPWindow *window)
   gtk_rc_parse_string ("  style \"hildon-control-panel-grid\" {"
               "    CPGrid::n_columns = 2"
           "    CPGrid::label_pos = 1"
+	      "    GtkWidget::hildon-mode = 1"
           "  }"
           " widget \"*.hildon-control-panel-grid\" "
           "    style \"hildon-control-panel-grid\"");
-
   /* Separators style */
   gtk_rc_parse_string ("  style \"hildon-control-panel-separator\" {"
           "    GtkSeparator::hildonlike-drawing = 1"
                       "  }"
           " widget \"*.hildon-control-panel-separator\" "
                       "    style \"hildon-control-panel-separator\"");
-
+  
   program = HILDON_PROGRAM (hildon_program_get_instance ());
 
   hildon_program_add_window (program, HILDON_WINDOW (window));
@@ -764,52 +641,6 @@ hcp_window_construct_ui (HCPWindow *window)
   menu = GTK_MENU (gtk_menu_new ());
 
   hildon_window_set_menu (HILDON_WINDOW (window), menu);
-
-  mi = gtk_menu_item_new_with_label (HCP_MENU_OPEN);
-
-  g_signal_connect (G_OBJECT (mi), "activate",
-                    G_CALLBACK (hcp_window_open), window);
-
-  gtk_menu_shell_append (GTK_MENU_SHELL (menu), mi);
-
-  /* View submenu */
-  sub_view = gtk_menu_new ();
-
-  mi = gtk_menu_item_new_with_label (HCP_MENU_SUB_VIEW);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM (mi), sub_view);
-
-  gtk_menu_shell_append (GTK_MENU_SHELL (menu), mi);
-
-  /* Small icon size */
-  mi = gtk_radio_menu_item_new_with_label
-      (menugroup, HCP_MENU_SMALL_ITEMS);
-  menugroup = gtk_radio_menu_item_get_group (GTK_RADIO_MENU_ITEM (mi));
-  priv->small_icons_menu_item = mi;
-
-  if (priv->icon_size == 0) {
-      gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(mi), TRUE);
-  }
-
-  gtk_menu_shell_append (GTK_MENU_SHELL(sub_view), mi);
-
-  g_signal_connect (G_OBJECT (mi), "activate",
-                    G_CALLBACK (hcp_window_iconsize), window);
-
-  /* Large icon size */
-  mi = gtk_radio_menu_item_new_with_label
-      (menugroup, HCP_MENU_LARGE_ITEMS);
-  priv->large_icons_menu_item = mi;
-
-  if (priv->icon_size == 1) {
-      gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (mi), TRUE);
-  }
-  menugroup = gtk_radio_menu_item_get_group (GTK_RADIO_MENU_ITEM (mi));
-
-  gtk_menu_shell_append (GTK_MENU_SHELL (sub_view), mi);
-
-  g_signal_connect (G_OBJECT (mi), "activate", 
-                    G_CALLBACK (hcp_window_iconsize), window);
 
 #ifdef MAEMO_TOOLS
   /* Tools submenu */
@@ -906,7 +737,6 @@ hcp_window_init (HCPWindow *window)
 
   priv = window->priv;
 
-  priv->icon_size = 1;
   priv->focused_item = NULL;
   priv->saved_focused_filename = NULL;
   priv->scroll_value = 0;
@@ -915,11 +745,7 @@ hcp_window_init (HCPWindow *window)
 
   hcp_window_retrieve_configuration (window);
 
-  if (priv->icon_size == 0)
-    priv->view = hcp_app_view_new (HCP_ICON_SIZE_SMALL);
-  else
-    priv->view = hcp_app_view_new (HCP_ICON_SIZE_LARGE);
-
+  priv->view = hcp_app_view_new ();
   g_signal_connect (G_OBJECT (priv->view), "focus-changed",
                     G_CALLBACK (hcp_window_app_view_focus_cb), window);
 
@@ -967,7 +793,8 @@ hcp_window_finalize (GObject *object)
 static void
 hcp_window_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
 {
-  static gboolean enforce_state = TRUE;
+/* Buggy applets can crash controlpanel, so disabled for now */
+  static gboolean enforce_state = FALSE;
 	
   GTK_WIDGET_CLASS (hcp_window_parent_class)->size_allocate (widget, allocation);
 
@@ -983,7 +810,6 @@ hcp_window_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
       program->execute = 0;
       hcp_app_launch (window->priv->focused_item, FALSE);
     }
-
     enforce_state = FALSE;
   }
 }

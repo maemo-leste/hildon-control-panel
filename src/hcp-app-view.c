@@ -33,7 +33,7 @@
 #include "hcp-app.h"
 #include "hcp-grid.h"
 #include "hcp-marshalers.h"
-
+#include <hildon/hildon-gtk.h>
 #define HCP_APP_VIEW_GET_PRIVATE(object) \
         (G_TYPE_INSTANCE_GET_PRIVATE ((object), HCP_TYPE_APP_VIEW, HCPAppViewPrivate))
 
@@ -55,7 +55,6 @@ enum
 struct _HCPAppViewPrivate 
 {
   GtkWidget   *first_grid;
-  HCPIconSize  icon_size;
 };
 
 static GtkListStore*
@@ -76,7 +75,7 @@ hcp_app_view_create_grid ()
 {
   GtkWidget *grid;
 
-  grid = hcp_grid_new ();
+  grid = hcp_grid_new (HILDON_UI_MODE_NORMAL);
   gtk_widget_set_name (grid, "hildon-control-panel-grid");
 
   return grid;
@@ -100,20 +99,18 @@ hcp_app_view_create_separator (const gchar *label)
 }
 
 static HCPApp *
-hcp_app_view_get_selected_app (GtkWidget *widget)
+hcp_app_view_get_selected_app (GtkWidget *widget, GtkTreePath *path)
 {
   GtkTreeModel *model;
-  GtkTreePath *path;
   HCPApp *app = NULL;
   GtkTreeIter iter;
   gint item_pos;
 
   g_return_val_if_fail (widget, NULL);
   g_return_val_if_fail (GTK_IS_ICON_VIEW (widget), NULL);
+  g_return_val_if_fail (path, NULL);
 
   model = gtk_icon_view_get_model (GTK_ICON_VIEW (widget));
-
-  path = hcp_grid_get_selected_item (HCP_GRID (widget));
 
   if (path == NULL) return NULL;
 
@@ -126,8 +123,6 @@ hcp_app_view_get_selected_app (GtkWidget *widget)
                         -1);
   }
 
-  gtk_tree_path_free (path);
-
   return app;
 }
 
@@ -136,69 +131,16 @@ hcp_app_view_launch_app (GtkWidget *widget,
                          GtkTreePath *path, 
                          gpointer user_data)
 {
-  HCPApp *app = hcp_app_view_get_selected_app (widget);
 
-  if (app != NULL)
-    hcp_app_launch (app, TRUE);
-}
+  HCPApp *app = hcp_app_view_get_selected_app (widget, path);
 
-static void 
-hcp_app_view_grid_selection_changed (GtkWidget *widget, gpointer user_data)
-{
-  GtkWidget *view = GTK_WIDGET (user_data);
-  GtkWidget *scrolled_window = view->parent->parent;
-  HCPApp *app = hcp_app_view_get_selected_app (widget);
-  GtkTreePath *path;
-  GtkAllocation allocation;
-  GtkAdjustment *adj;
-  guint row, row_height, position, visible_y;
-
-  if (app == NULL) return;
-  
-  g_return_if_fail (GTK_IS_SCROLLED_WINDOW (scrolled_window));
-
-  path = hcp_grid_get_selected_item (HCP_GRID (widget)); 
-  position = gtk_tree_path_get_indices (path) [0]; 
-
-  row = position / HCP_GRID_NUM_COLUMNS;
-  row_height = hcp_grid_get_row_height (HCP_GRID (widget));
-  
-  gtk_tree_path_free (path);
- 
-  adj = gtk_scrolled_window_get_vadjustment (
-                                GTK_SCROLLED_WINDOW (scrolled_window));
-
-  g_return_if_fail ((adj->upper - adj->lower) && view->allocation.height);
-
-  visible_y = view->allocation.y +
-     (gint)(view->allocation.height * adj->value / (adj->upper - adj->lower));
-
-  allocation.y = widget->allocation.y + (row * row_height);
-  allocation.height = row_height;
-
-  if (allocation.y >= 0)
-  {
-    if (allocation.y < visible_y)
-    {
-      adj->value = allocation.y * (adj->upper - adj->lower)
-                                   / view->allocation.height;
-
-      gtk_adjustment_value_changed (adj);
-    }
-    else if (allocation.y + allocation.height > 
-             visible_y + scrolled_window->allocation.height)
-    {
-      adj->value = (allocation.y + allocation.height
-             - scrolled_window->allocation.height) * (adj->upper - adj->lower)
-             / view->allocation.height;
-      
-      gtk_adjustment_value_changed (adj);
-    }
-  }
-
+  /* important for state saving of executed app */
   g_signal_emit (G_OBJECT (widget->parent), 
                  signals[SIGNAL_FOCUS_CHANGED], 
                  0, app);
+
+  if (app != NULL)
+    hcp_app_launch (app, TRUE);
 }
 
 static void
@@ -249,10 +191,6 @@ hcp_app_view_add_category (HCPCategory *category, HCPAppView *view)
 
     grid = hcp_app_view_create_grid ();
     store = hcp_app_view_create_store ();
- 
-    g_signal_connect (grid, "selection-changed",
-                      G_CALLBACK (hcp_app_view_grid_selection_changed),
-                      view);
 
     g_signal_connect (grid, "item-activated",
                       G_CALLBACK (hcp_app_view_launch_app),
@@ -277,6 +215,8 @@ hcp_app_view_add_category (HCPCategory *category, HCPAppView *view)
     g_slist_foreach (category->apps,
                      (GFunc) hcp_app_view_add_app,
                      grid);
+
+  hcp_grid_refresh_icons (HCP_GRID(grid));
 
     if (!view->priv->first_grid)
       view->priv->first_grid = grid;
@@ -308,10 +248,6 @@ hcp_app_view_get_property (GObject    *gobject,
 
   switch (prop_id)
   {
-    case PROP_ICON_SIZE:
-      g_value_set_int (value, priv->icon_size);
-      break;
-
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
       break;
@@ -330,10 +266,6 @@ hcp_app_view_set_property (GObject      *gobject,
   
   switch (prop_id)
   {
-    case PROP_ICON_SIZE:
-      priv->icon_size = g_value_get_int (value);
-      break;
-
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
       break;
@@ -358,27 +290,13 @@ hcp_app_view_class_init (HCPAppViewClass *class)
                       G_TYPE_NONE, 1,
                       HCP_TYPE_APP);
 
-  g_object_class_install_property (g_object_class,
-                                   PROP_ICON_SIZE,
-                                   g_param_spec_int ("icon-size",
-                                                     "Icon Size",
-                                                     "Set view's icon size",
-                                                     HCP_ICON_SIZE_SMALL,
-                                                     HCP_ICON_SIZE_LARGE,
-                                                     HCP_ICON_SIZE_LARGE,
-                                                     (G_PARAM_READABLE | 
-                                                      G_PARAM_WRITABLE | 
-                                                      G_PARAM_CONSTRUCT)));
-
   g_type_class_add_private (g_object_class, sizeof (HCPAppViewPrivate));
 }
 
 GtkWidget *
-hcp_app_view_new (HCPIconSize icon_size)
+hcp_app_view_new (void)
 {
-  GtkWidget *view = g_object_new (HCP_TYPE_APP_VIEW, 
-                                  "icon-size", icon_size,
-                                  NULL);
+  GtkWidget *view = g_object_new (HCP_TYPE_APP_VIEW, NULL);
 
   return view;
 }
@@ -412,49 +330,4 @@ hcp_app_view_populate (HCPAppView *view, HCPAppList *al)
                    (GFunc) hcp_app_view_add_category,
                    view);
 
-  hcp_app_view_set_icon_size (GTK_WIDGET (view), priv->icon_size);
-
-  /* Put focus on the first item of the first grid */
-  if (view->priv->first_grid) 
-  {
-    gtk_widget_grab_focus (priv->first_grid);
-    gtk_icon_view_select_path (GTK_ICON_VIEW (priv->first_grid),
-                               gtk_tree_path_new_first ());
-  }
-}
-
-void 
-hcp_app_view_set_icon_size (GtkWidget *view, HCPIconSize size)
-{
-  GtkWidget *grid = NULL;
-  GList *iter = NULL;
-  GList *list = NULL;
-
-  g_return_if_fail (view);
-  g_return_if_fail (HCP_IS_APP_VIEW (view));
-
-  list = iter = gtk_container_get_children (GTK_CONTAINER (view));
-
-  /* Iterate through all of them and set their mode */
-  while (iter != 0)
-  {
-    if (HCP_IS_GRID (iter->data))
-    {
-      grid = GTK_WIDGET (iter->data);
-
-      if (size == HCP_ICON_SIZE_SMALL) 
-      {
-        hcp_grid_set_icon_size (HCP_GRID (grid), HCP_ICON_SIZE_SMALL);
-      }
-
-      if (size == HCP_ICON_SIZE_LARGE) 
-      {
-        hcp_grid_set_icon_size (HCP_GRID (grid), HCP_ICON_SIZE_LARGE);
-      }
-    }
-
-    iter = iter->next;
-  }
-
-  g_list_free (list);
 }

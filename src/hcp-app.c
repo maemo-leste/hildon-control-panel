@@ -474,6 +474,7 @@ hcp_app_launch (HCPApp *app, gboolean user_activated)
 
   g_return_if_fail (app);
   g_return_if_fail (HCP_IS_APP (app));
+  g_return_if_fail (!hcp_app_is_running (app));
 
   if (!program->execute)
   {

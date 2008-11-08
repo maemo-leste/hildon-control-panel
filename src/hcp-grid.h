@@ -28,27 +28,29 @@
 
 G_BEGIN_DECLS
 
-typedef struct _HCPGrid HCPGrid;
-typedef struct _HCPGridClass HCPGridClass;
 typedef struct _HCPGridPrivate HCPGridPrivate;
 
-#define HCP_TYPE_GRID            (hcp_grid_get_type ())
-#define HCP_GRID(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), HCP_TYPE_GRID, HCPGrid))
-#define HCP_GRID_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass),  HCP_TYPE_GRID, HCPGridClass))
-#define HCP_IS_GRID(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), HCP_TYPE_GRID))
-#define HCP_IS_GRID_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),  HCP_TYPE_GRID))
-#define HCP_GRID_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),  HCP_TYPE_GRID, HCPGridClass))
+#define HCP_TYPE_GRID			 (hcp_grid_get_type())
+#define HCP_GRID(obj) 	 	     (G_TYPE_CHECK_INSTANCE_CAST ((obj), HCP_TYPE_GRID, HCPGrid))
+#define HCP_GRID_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), HCP_TYPE_GRID, HCPGridClass))
+#define HCP_IS_GRID(obj)		 (G_TYPE_CHECK_INSTANCE_TYPE ((obj), HCP_TYPE_GRID))
+#define HCP_IS_GRID_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), HCP_TYPE_GRID))
+#define HCP_GRID_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), HCP_TYPE_GRID, HCPGridClass))
 
 #define HCP_DEFAULT_ICON_BASENAME  "qgn_list_gene_unknown_file"
 
 #define HCP_GRID_NUM_COLUMNS       2
 
+typedef struct {
+  GtkIconView parent;
+  HCPGridPrivate* priv;
+} HCPGrid;
 
-typedef enum 
-{
-  HCP_ICON_SIZE_SMALL = 27,
-  HCP_ICON_SIZE_LARGE = 66 
-} HCPIconSize;
+typedef struct {
+  GtkIconViewClass parent_class;
+} HCPGridClass;
+
+GType hcp_grid_get_type (void);
 
 typedef enum {
   HCP_STORE_ICON = 0,
@@ -57,29 +59,9 @@ typedef enum {
   HCP_STORE_NUM_COLUMNS
 } HCPStoreColumn;
 
-struct _HCPGrid 
-{
-  GtkIconView icon_view;
-
-  HCPGridPrivate *priv;
-};
-
-struct _HCPGridClass 
-{
-   GtkIconViewClass icon_view_class;
-};
-
-GType         hcp_grid_get_type          (void);
-
-GtkWidget    *hcp_grid_new               (void);
-
-GtkTreePath  *hcp_grid_get_selected_item (HCPGrid     *grid);
-
-guint         hcp_grid_get_row_height    (HCPGrid     *grid);
-
-void          hcp_grid_set_icon_size     (HCPGrid     *grid, 
-                                          HCPIconSize  icon_size);
+GtkWidget* hcp_grid_new (HildonUIMode);
+void hcp_grid_refresh_icons (HCPGrid*);
 
 G_END_DECLS
 
-#endif
+#endif /* HCP_GRID_H */
