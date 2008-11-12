@@ -1,3 +1,31 @@
+hildon-control-panel (1:2.2.2-1) unstable; urgency=low
+
+  * Peter:
+        * src/hcp-app-view.c
+        * src/hcp-grid.h
+        * src/hcp-app-view.h
+        * src/hcp-window.c
+        * src/hcp-app.c
+        * src/hcp-grid.c
+        * data/hildon-control-panel.schemas: 
+        Changed behaviour of Control Panel to be compatible with
+        Hildon 2.2 style.
+         - no focus and launch (no visible selection)
+         - when CP applets are tapped, they launch immediately
+         - the view is pannable (no scrollbar)
+         - the view has large icons
+         Please see NB# 91702 for more details.
+        
+        * src/hcp-app-view.c: change default value for icon size to
+        HCP_ICON_SIZE_LARGE. Fixes: NB#90236.
+        * data/hildon-control-panel.schemas: changed
+        "/schemas/apps/osso/apps/controlpanel/icon_size" key value to "true".
+        Fixes: NB#90236.
+
+        * src/hcp-main.c: g_thread_init called earlier. Fixes: NB#86237.
+
+ -- Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>  Wed, 12 Nov 2008 12:44:55 +0200
+
 hildon-control-panel (1:2.2.1-1) unstable; urgency=low
 
   * New release.
