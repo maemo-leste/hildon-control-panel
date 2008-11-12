@@ -596,11 +596,6 @@ hcp_window_construct_ui (HCPWindow *window)
   HildonProgram *program;
   
   GtkMenu *menu = NULL;
-  GtkAccelGroup *accel_group;
-
-#ifdef MAEMO_TOOLS
-  GtkWidget *sub_tools = NULL;
-#endif
   GtkWidget *mi = NULL;
   GtkWidget *scrolled_window = NULL;
 
@@ -643,20 +638,10 @@ hcp_window_construct_ui (HCPWindow *window)
   hildon_window_set_menu (HILDON_WINDOW (window), menu);
 
 #ifdef MAEMO_TOOLS
-  /* Tools submenu */
-  sub_tools = gtk_menu_new ();
-
-  mi = gtk_menu_item_new_with_label (HCP_MENU_SUB_TOOLS);
-
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM(mi), sub_tools);
-
-  gtk_menu_shell_append (GTK_MENU_SHELL(menu), mi);
-
-  /* Run operator wizard */
   mi = gtk_menu_item_new_with_label
       (HCP_MENU_SETUP_WIZARD);
 
-  gtk_menu_shell_append (GTK_MENU_SHELL(sub_tools), mi);
+  gtk_menu_shell_append (GTK_MENU_SHELL(menu), mi);
 
   g_signal_connect (G_OBJECT (mi), "activate",
                     G_CALLBACK (hcp_window_run_operator_wizard), window);
@@ -664,7 +649,7 @@ hcp_window_construct_ui (HCPWindow *window)
   /* Reset Factory Settings */
   mi = gtk_menu_item_new_with_label (HCP_MENU_RFS);
 
-  gtk_menu_shell_append (GTK_MENU_SHELL (sub_tools), mi);
+  gtk_menu_shell_append (GTK_MENU_SHELL (menu), mi);
 
   g_signal_connect (G_OBJECT (mi), "activate",
                     G_CALLBACK (hcp_window_reset_factory_settings), window);
@@ -672,7 +657,7 @@ hcp_window_construct_ui (HCPWindow *window)
   /* Clean User Data */
   mi = gtk_menu_item_new_with_label (HCP_MENU_CUD);
 
-  gtk_menu_shell_append (GTK_MENU_SHELL (sub_tools), mi);
+  gtk_menu_shell_append (GTK_MENU_SHELL (menu), mi);
 
   g_signal_connect (G_OBJECT (mi), "activate",
                     G_CALLBACK (hcp_window_clear_user_data), window);
@@ -681,33 +666,10 @@ hcp_window_construct_ui (HCPWindow *window)
   /* Help! */
   mi = gtk_menu_item_new_with_label (HCP_MENU_HELP);
 
-#ifdef MAEMO_TOOLS
-  gtk_menu_shell_append (GTK_MENU_SHELL (sub_tools), mi);
-#else
   gtk_menu_shell_append (GTK_MENU_SHELL (menu), mi);
-#endif
 
   g_signal_connect(G_OBJECT (mi), "activate",
                    G_CALLBACK (hcp_window_launch_help), window);
-
-  /* Close */
-  accel_group = gtk_accel_group_new ();
-  gtk_window_add_accel_group (GTK_WINDOW (window), accel_group);
-  gtk_menu_set_accel_group (GTK_MENU (menu), accel_group);
-  
-  mi = gtk_menu_item_new_with_label (HCP_MENU_CLOSE);
-
-  g_signal_connect (GTK_OBJECT(mi), "activate",
-                    G_CALLBACK(hcp_window_quit), window);
-
-  gtk_widget_add_accelerator (mi, 
-		              "activate", 
-			      accel_group, 
-			      GDK_Q, 
-			      GDK_CONTROL_MASK, 
-			      GTK_ACCEL_VISIBLE);
-  
-  gtk_menu_shell_append (GTK_MENU_SHELL (menu), mi);
 
   gtk_widget_show_all (GTK_WIDGET (menu));
 
