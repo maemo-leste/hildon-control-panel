@@ -435,49 +435,6 @@ hcp_window_reset_factory_settings (GtkWidget *widget, HCPWindow *window)
   return TRUE;
 }
 
-static void 
-hcp_window_run_operator_wizard (GtkWidget *widget, HCPWindow *window)
-{
-  HCPProgram *program = hcp_program_get_instance ();
-  osso_rpc_t returnvalues;
-  osso_return_t returnstatus;
-
-  returnstatus = osso_rpc_run_with_defaults
-      (program->osso, HCP_OPERATOR_WIZARD_DBUS_SERVICE,
-       HCP_OPERATOR_WIZARD_LAUNCH,
-       &returnvalues, 
-       DBUS_TYPE_INVALID);
-
-  switch (returnstatus)
-  {
-    case OSSO_OK:
-      break;
-
-    case OSSO_INVALID:
-      g_warning ("Invalid parameter in operator_wizard launch");
-      break;
-
-    case OSSO_RPC_ERROR:
-    case OSSO_ERROR:
-    case OSSO_ERROR_NAME:
-    case OSSO_ERROR_NO_STATE:
-    case OSSO_ERROR_STATE_SIZE:
-      if (returnvalues.type == DBUS_TYPE_STRING) 
-      {    
-        g_warning ("Operator wizard launch failed: %s\n",returnvalues.value.s);
-      }
-      else
-      {
-        g_warning ("Operator wizard launch failed, unspecified");
-      }
-      break;            
-
-    default:
-      g_warning ("Unknown error type %d", returnstatus);
-  }
-  
-  osso_rpc_free_val (&returnvalues);
-}
 #endif
 
 static void 
@@ -638,13 +595,6 @@ hcp_window_construct_ui (HCPWindow *window)
   hildon_window_set_menu (HILDON_WINDOW (window), menu);
 
 #ifdef MAEMO_TOOLS
-  mi = gtk_menu_item_new_with_label
-      (HCP_MENU_SETUP_WIZARD);
-
-  gtk_menu_shell_append (GTK_MENU_SHELL(menu), mi);
-
-  g_signal_connect (G_OBJECT (mi), "activate",
-                    G_CALLBACK (hcp_window_run_operator_wizard), window);
 
   /* Reset Factory Settings */
   mi = gtk_menu_item_new_with_label (HCP_MENU_RFS);
