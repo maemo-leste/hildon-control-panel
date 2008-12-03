@@ -52,7 +52,7 @@
 #define HCP_WINDOW_GET_PRIVATE(object) \
         (G_TYPE_INSTANCE_GET_PRIVATE ((object), HCP_TYPE_WINDOW, HCPWindowPrivate))
 
-G_DEFINE_TYPE (HCPWindow, hcp_window, HILDON_TYPE_WINDOW);
+G_DEFINE_TYPE (HCPWindow, hcp_window, HILDON_TYPE_STACKABLE_WINDOW);
 
 struct _HCPWindowPrivate 
 {

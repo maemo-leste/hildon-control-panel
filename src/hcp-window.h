@@ -25,7 +25,7 @@
 #ifndef HCP_WINDOW_H
 #define HCP_WINDOW_H
 
-#include <hildon/hildon-window.h>
+#include <hildon/hildon-stackable-window.h>
 
 #include <glib-object.h>
 
@@ -44,14 +44,14 @@ typedef struct _HCPWindowPrivate HCPWindowPrivate;
 
 struct _HCPWindow 
 {
-  HildonWindow win;
+  HildonStackableWindow win;
 
   HCPWindowPrivate *priv;
 };
 
 struct _HCPWindowClass 
 {
-  HildonWindowClass parent_class;
+  HildonStackableWindowClass parent_class;
 };
 
 GType        hcp_window_get_type    (void);

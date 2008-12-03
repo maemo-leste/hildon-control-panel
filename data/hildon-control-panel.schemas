@@ -7,7 +7,7 @@
       <owner>controlpanel</owner>
       <type>list</type>
       <list_type>string</list_type>
-      <default>[copa_ia_general,copa_ia_connectivity,copa_ia_personalisation]</default>
+      <default>[copa_ia_personalisation,copa_ia_connectivity,copa_ia_general]</default>
       <locale name="C"/>
     </schema>
     <schema>
@@ -16,7 +16,7 @@
       <owner>controlpanel</owner>
       <type>list</type>
       <list_type>string</list_type>
-      <default>[general,connectivity,personalisation]</default>
+      <default>[personalisation,connectivity,general]</default>
       <locale name="C"/>
     </schema>
   </schemalist>
