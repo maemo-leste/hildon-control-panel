@@ -34,6 +34,7 @@
 #include "hcp-grid.h"
 #include "hcp-app.h"
 #include <hildon/hildon-gtk.h>
+#include <hildon/hildon.h>
 
 #define HCP_GRID_GET_PRIVATE(object) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((object), HCP_TYPE_GRID, HCPGridPrivate))
@@ -43,7 +44,7 @@ G_DEFINE_TYPE (HCPGrid, hcp_grid, GTK_TYPE_ICON_VIEW)
 #define HCP_GRID_ITEM_WIDTH  328 
 #define HCP_GRID_X_PADDING   4
 #define HCP_GRID_Y_PADDING   2
-#define HCP_ICON_SIZE        66
+#define HCP_ICON_SIZE        HILDON_ICON_PIXEL_SIZE_THUMB
 
 struct _HCPGridPrivate {
   GtkCellRenderer *text_cell;

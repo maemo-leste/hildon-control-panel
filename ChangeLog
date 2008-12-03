@@ -1,4 +1,8 @@
 2008-12-03 Peter Aradi <peter.aradi@blumsoft.eu>
+	* src/hcp-grid.c:
+	Use thumbsized icons.
+	
+2008-12-03 Peter Aradi <peter.aradi@blumsoft.eu>
 	* src/hcp-window.c:
 	* src/hcp-window.h:
 	HCPWindow is now derived from HildonStackableWindow.
