@@ -1,8 +1,14 @@
+2008-12-16 Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>
+
+	Release 2.2.3
+
 2008-12-03 Peter Aradi <peter.aradi@blumsoft.eu>
+
 	* src/hcp-grid.c:
 	Use thumbsized icons.
 	
 2008-12-03 Peter Aradi <peter.aradi@blumsoft.eu>
+
 	* src/hcp-window.c:
 	* src/hcp-window.h:
 	HCPWindow is now derived from HildonStackableWindow.
@@ -12,11 +18,13 @@
 	Fixes #NB 92795
 
 2008-11-24 Peter Aradi <peter.aradi@blumsoft.eu>
+
 	* src/hcp-window.c:
 	Menu now conforms to UI spec v 1.4
 	Fixes #NB 90260
 
 2008-11-12 Peter Aradi <peter.aradi@blumsoft.eu>
+
 	* src/hcp-window.c:
 	The contents of former "Tools" submenu are shown when menu is pressed.
 	Related is NB#91702.
@@ -34,7 +42,8 @@
 	* src/hcp-app.c
 	* src/hcp-grid.c
 	* data/hildon-control-panel.schemas: 
-	Changed behaviour of Control Panel to be compatible with Hildon 2.2 style.
+	Changed behaviour of Control Panel to be compatible with
+	Hildon 2.2 style.
 	 - no focus and launch (no visible selection)
 	 - when CP applets are tapped, they launch immediately
 	 - the view is pannable (no scrollbar)
