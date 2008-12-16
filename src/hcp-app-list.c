@@ -77,6 +77,11 @@ static int callback_pending = 0;
 #define XMAS 1
 
 #ifdef XMAS
+/* A collection of dirty, ugly, primitive hacks for emergency */
+/* TODO fix this mess by filing bugs to all applet developers */
+/* and removing this */
+
+static int sharing_accounts = -1;
 
 typedef enum {
  NAMES,
@@ -155,6 +160,7 @@ const char* hcp_icon_names_old[] = {
 "qgn_list_cp_tana",
 "qgn_stat_fm_transmitter",
 "qgn_list_cp_peninput",
+"qgn_list_cp_fmtx",
 NULL
 };
 
@@ -180,6 +186,7 @@ const char* hcp_icon_names_new[] = {
  "control_tv_out",
  "general_fm_transmitter",	
  "control_pen_input",
+ "general_fm_transmitter",
  NULL
 };
 
@@ -200,27 +207,42 @@ hcp_translate (const gchar* name_read, hcp_str_type type)
       p_trans = hcp_icon_names_new;
       break;
     default:
-      return name_read;
+      return g_strdup (name_read);
       break;
   }
-/*
-    for(i=0; hcp_logical_ids[i]; i++)
-    {
-      if (!g_strcmp0 (name_read, hcp_logical_ids[i]))
-      {
-        return (hcp_ui_strings[i]);
-      }
-    }
-*/
+
+  /* Sharing doesn't have an icon yet TODO file bug against UI spec. */
+  if (sharing_accounts !=-1){
+  if (!g_strcmp0 (name_read, "qgn_list_cp_accounts") \
+      && type == ICONS)
+  {
+     sharing_accounts = -1;
+     return g_strdup ("general_web");
+  }
+  } 
   for (i=0; p[i]; i++)
   {
       if (!g_strcmp0 (name_read, p[i]))
       {
-        return (p_trans[i]);
+        if (sharing_accounts == -1) {
+          if (!g_strcmp0 (name_read, "Sharing accounts"))
+            sharing_accounts=i;
+        }
+        return g_strdup(p_trans[i]);
       }
   }
 
-  return name_read;
+  if (!g_strcmp0 (name_read, "conn_ti_cellular_cpa"))
+  {
+    return g_strdup (dgettext("osso-connectivity-ui", "conn_ti_phone_cpa"));
+  }
+
+  if (!g_strcmp0 (name_read, "pres_ap_feature_name"))
+  {
+    return g_strdup (dgettext("osso-statusbar-presence", "pres_ap_feature_name"));
+  }
+
+  return g_strdup (name_read);
 }
 #endif
 static gboolean 
@@ -657,9 +679,9 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
   
     g_hash_table_insert (priv->apps, g_strdup (plugin), app);
 
-/*    g_free (name); */
+    g_free (name);
     g_free (plugin);
-/*    g_free (icon); */
+    g_free (icon);
     g_free (category);
     g_free (text_domain);
   }

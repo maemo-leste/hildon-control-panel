@@ -2,6 +2,15 @@
 
 	Release 2.2.3
 
+2008-12-16 Peter Aradi <peter.aradi@blumsoft.eu>
+	* src/hcp-app-list.c:
+	logical ids -> UI strings XMAS hack
+	old icons -> new icons XMAS hack
+	* src/hcp-main.c:
+	Icon initialization
+	* src/hcp-window.c:
+	removed help from menu, according to UI spec
+	
 2008-12-03 Peter Aradi <peter.aradi@blumsoft.eu>
 
 	* src/hcp-grid.c:

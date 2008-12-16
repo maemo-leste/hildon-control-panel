@@ -380,38 +380,6 @@ hcp_window_keyboard_listener (GtkWidget * widget,
   return FALSE;
 }
 
-static void 
-hcp_window_launch_help (GtkWidget *widget, HCPWindow *window)
-{
-  HCPProgram *program = hcp_program_get_instance (); 
-  osso_return_t help_ret;
-  
-  help_ret = hildon_help_show (program->osso, 
-                               HCP_OSSO_HELP_ID, 0);
-
-  switch (help_ret)
-  {
-    case OSSO_OK:
-      break;
-
-    case OSSO_ERROR:
-      g_warning ("HELP: ERROR (No help for such topic ID)\n");
-      break;
-
-    case OSSO_RPC_ERROR:
-      g_warning ("HELP: RPC ERROR (RPC failed for HelpApp/Browser)\n");
-      break;
-
-    case OSSO_INVALID:
-      g_warning ("HELP: INVALID (invalid argument)\n");
-      break;
-
-    default:
-      g_warning ("HELP: Unknown error!\n");
-      break;
-  }
-}
-
 #ifdef MAEMO_TOOLS
 static gboolean 
 hcp_window_clear_user_data (GtkWidget *widget, HCPWindow *window)
@@ -613,14 +581,6 @@ hcp_window_construct_ui (HCPWindow *window)
                     G_CALLBACK (hcp_window_clear_user_data), window);
 #endif
   
-  /* Help! */
-  mi = gtk_menu_item_new_with_label (HCP_MENU_HELP);
-
-  gtk_menu_shell_append (GTK_MENU_SHELL (menu), mi);
-
-  g_signal_connect(G_OBJECT (mi), "activate",
-                   G_CALLBACK (hcp_window_launch_help), window);
-
   gtk_widget_show_all (GTK_WIDGET (menu));
 
   /* Set the keyboard listening callback */
