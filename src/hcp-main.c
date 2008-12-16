@@ -32,6 +32,7 @@
 #include <glib-object.h>
 #include <glib/gi18n.h>
 #include <libgnomevfs/gnome-vfs.h>
+#include <hildon/hildon.h>
 
 #include "hcp-program.h"
 
@@ -51,6 +52,7 @@ int main (int argc, char **argv)
   if (!g_thread_supported ()) g_thread_init (NULL);
   
   gtk_init (&argc, &argv);
+  hildon_init();
   
   gnome_vfs_init ();
 

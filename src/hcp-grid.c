@@ -91,8 +91,11 @@ hcp_grid_update_icon (GtkTreeModel *model,
 
   if (icon_pixbuf == NULL) 
   {
-    g_warning ("Couldn't load icon \"%s\": %s", icon, error->message);
-    g_error_free (error);
+    if (error)
+    {
+      g_warning ("Couldn't load icon \"%s\": %s", icon, error->message);
+      g_error_free (error);
+    }
 
     error = NULL;
 
