@@ -1,3 +1,36 @@
+hildon-control-panel (1:2.2.3-1) unstable; urgency=low
+
+        Peter Aradi:
+
+        * src/hcp-app-list.c:
+        logical ids -> UI strings XMAS hack
+        old icons -> new icons XMAS hack
+        * src/hcp-main.c:
+        Icon initialization
+        * src/hcp-window.c:
+        removed help from menu, according to UI spec
+        
+        * src/hcp-grid.c:
+        Use thumbsized icons.
+        
+        * src/hcp-window.c:
+        * src/hcp-window.h:
+        HCPWindow is now derived from HildonStackableWindow.
+        Fixes: NB#94225
+        * data/hildon-control-panel.schemas:
+        Changed order of groups.
+        Fixes: NB#92795
+
+        * src/hcp-window.c:
+        Menu now conforms to UI spec v 1.4
+        Fixes: NB#90260
+
+        * src/hcp-window.c:
+        The contents of former "Tools" submenu are shown when menu is pressed.
+        Related to NB#91702.
+
+ -- Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>  Tue, 16 Dec 2008 15:53:09 +0200
+
 hildon-control-panel (1:2.2.2-1) unstable; urgency=low
 
   * Peter:
