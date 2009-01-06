@@ -74,177 +74,6 @@ struct _HCPAppListPrivate
 
 static int callback_pending = 0;
 
-#define XMAS 1
-
-#ifdef XMAS
-/* A collection of dirty, ugly, primitive hacks for emergency */
-/* TODO fix this mess by filing bugs to all applet developers */
-/* and removing this */
-
-static int sharing_accounts = -1;
-
-typedef enum {
- NAMES,
- ICONS
-}hcp_str_type;
-
-const char* hcp_logical_ids[] = {
-"conn_ti_bluetooth_cpa",
-"conn_set_ti_conn_set",
-"dati_ap_application_title",
-"devi_ap_application_title",
-"disp_ap_application_title",
-"cpal_ti_language_and_regional_title",
-"memo_ti_memory",
-"pers_ti_personalization",
-"ctrp_ti_screen_calibration",
-"secu_security_dialog_title",
-"tein_ti_text_input_title",
-"conn_ti_my_devices",
-"loca_ti_location_cpa",
-"share_cpa_ti",
-"fmtx_ti_fm_transmitter",
-"tvou_ap_cpa",
-"sync_ap_name",
-"cema_ap_application_title",
-"profi_ti_cpa_profiles",
-"Synchronization",
-"Sharing accounts",
-NULL
-};
-
-const char* hcp_ui_strings[] = {
-"Bluetooth",
-"Connectivity",
-"Date and time",
-"About product",
-"Display",
-"Language and region",
-"Memory",
-"Themes",
-"Screen calibration",
-"Device lock",
-"Text input settings",
-"Phone",
-"GPS location",
-"Sharing accounts",
-"FM transmitter",
-"TV Out",
-"Transfer & Sync",
-"Certificate manager",
-"Profiles",
-"Transfer & Sync",
-"Sharing Accounts",
-NULL
-};
-
-const char* hcp_icon_names_old[] = {
-"qgn_list_cp_accounts",
-"qgn_list_cpa_cert_manager",
-"qgn_list_synchronization",
-"qgn_list_cp_isetup",
-"qgn_list_cp_datetime",
-"qgn_list_cp_devicesetup",
-"qgn_stat_profile",
-"qgn_list_cp_disply", 
-"qgn_list_cp_memory",
-"qgn_list_cp_personal", 
-"qgn_list_cp_keyboard",
-"qgn_list_btno_gen_peripheral_keyboard",
-"qgn_list_cp_phone",
-"qgn_list_cp_presence",
-"qgn_list_cp_regional",
-"qgn_list_cp_calibration",
-"qgn_list_cp_security",
-"qgn_list_cp_soundset",
-"qgn_list_cp_tana",
-"qgn_stat_fm_transmitter",
-"qgn_list_cp_peninput",
-"qgn_list_cp_fmtx",
-NULL
-};
-
-const char* hcp_icon_names_new[] = {
- "control_accounts",	
- "general_certificate",	
- "general_synchronization",	
- "control_internet_setup",	
- "control_date_time",	
- "control_device_setup",	
- "general_profile",	
- "general_brightness",	
- "general_removable_memory_card",	
- "control_personalization",	
- "control_keyboard",	
- "control_keyboard",
- "general_call",	
- "control_presence",	
- "control_language",	
- "control_calibration",	
- "general_locked",	
- "general_speaker",	
- "control_tv_out",
- "general_fm_transmitter",	
- "control_pen_input",
- "general_fm_transmitter",
- NULL
-};
-
-static const gchar*
-hcp_translate (const gchar* name_read, hcp_str_type type)
-{
-  gint i;
-  const char** p = NULL;
-  const char** p_trans = NULL;
-  switch (type)
-  {
-    case NAMES:
-      p = hcp_logical_ids;
-      p_trans = hcp_ui_strings;
-      break;
-    case ICONS:
-      p = hcp_icon_names_old;
-      p_trans = hcp_icon_names_new;
-      break;
-    default:
-      return g_strdup (name_read);
-      break;
-  }
-
-  /* Sharing doesn't have an icon yet TODO file bug against UI spec. */
-  if (sharing_accounts !=-1){
-  if (!g_strcmp0 (name_read, "qgn_list_cp_accounts") \
-      && type == ICONS)
-  {
-     sharing_accounts = -1;
-     return g_strdup ("general_web");
-  }
-  } 
-  for (i=0; p[i]; i++)
-  {
-      if (!g_strcmp0 (name_read, p[i]))
-      {
-        if (sharing_accounts == -1) {
-          if (!g_strcmp0 (name_read, "Sharing accounts"))
-            sharing_accounts=i;
-        }
-        return g_strdup(p_trans[i]);
-      }
-  }
-
-  if (!g_strcmp0 (name_read, "conn_ti_cellular_cpa"))
-  {
-    return g_strdup (dgettext("osso-connectivity-ui", "conn_ti_phone_cpa"));
-  }
-
-  if (!g_strcmp0 (name_read, "pres_ap_feature_name"))
-  {
-    return g_strdup (dgettext("osso-statusbar-presence", "pres_ap_feature_name"));
-  }
-
-  return g_strdup (name_read);
-}
-#endif
 static gboolean 
 hcp_monitor_reread_desktop_entries (HCPAppList *al)
 {
@@ -586,19 +415,11 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
       continue;
     }
 
-#ifdef XMAS
-    name =(gchar*) hcp_translate ((const char*)g_key_file_get_locale_string (keyfile,
-                                         HCP_DESKTOP_GROUP,
-                                         HCP_DESKTOP_KEY_NAME,
-                                         NULL /* current locale */,
-                                         &error), NAMES);
-#else
     name = g_key_file_get_locale_string (keyfile,
                                          HCP_DESKTOP_GROUP,
                                          HCP_DESKTOP_KEY_NAME,
                                          NULL /* current locale */,
                                          &error);
-#endif
 
     if (error)
     {
@@ -618,17 +439,10 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
       g_error_free (error);
       continue;
     }
-#ifdef XMAS
-    icon = (gchar*) hcp_translate (g_key_file_get_string (keyfile,
-                                  HCP_DESKTOP_GROUP,
-                                  HCP_DESKTOP_KEY_ICON,
-                                  &error), ICONS);
-#else
-    icon = g_key_file_get_string (keyfile,
+   icon = g_key_file_get_string (keyfile,
                                   HCP_DESKTOP_GROUP,
                                   HCP_DESKTOP_KEY_ICON,
                                   &error);
-#endif
     if (error)
     {
       g_error_free (error);
