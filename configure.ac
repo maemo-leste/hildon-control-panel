@@ -79,6 +79,10 @@ PKG_CHECK_MODULES(GCONF, gconf-2.0 >= 2.6.2)
 AC_SUBST(GCONF_LIBS)
 AC_SUBST(GCONF_CFLAGS)
 
+PKG_CHECK_MODULES(CODELOCKUI, codelockui >= 1.5.6)
+AC_SUBST(CODELOCKUI_LIBS)
+AC_SUBST(CODELOCKUI_CFLAGS)
+
 hildoncpdesktopentrydir=${datadir}/applications/hildon-control-panel
 hildoncplibdir=${libdir}/hildon-control-panel
 

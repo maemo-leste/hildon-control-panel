@@ -26,6 +26,7 @@ INCLUDES = \
 	$(HILDON_HELP_CFLAGS) \
 	$(GCONF_CFLAGS) \
 	$(GNOME_VFS_CFLAGS) \
+	$(CODELOCKUI_CFLAGS)\
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DPREFIXDIR=\"$(prefix)\" \
 	-DCONTROLPANEL_ENTRY_DIR=\"$(hildoncpdesktopentrydir)\" \
@@ -73,7 +74,8 @@ controlpanel_LDADD = \
 	$(OSSO_LIBS) \
 	$(HILDON_HELP_LIBS) \
 	$(GCONF_LIBS) \
-	$(GNOME_VFS_LIBS)
+	$(GNOME_VFS_LIBS) \
+	$(CODELOCKUI_LIBS)
 
 hildon_cp_pluginincludeinstdir=$(includedir)/hildon-cp-plugin
 hildon_cp_pluginincludeinst_DATA = hildon-cp-plugin-interface.h

@@ -1,5 +1,12 @@
 2008-12-18 Peter Aradi <peter.aradi@blumsoft.eu>
 	
+	* src/hcp-rfs.c:
+	libcodelockui is used for password check instead of d-bus query from
+	mce.
+	HildonNote is used for displaying confirmation notes.
+
+2008-12-18 Peter Aradi <peter.aradi@blumsoft.eu>
+	
 	* src/hcp-app-list.c:
 	removed XMAS fixes
 

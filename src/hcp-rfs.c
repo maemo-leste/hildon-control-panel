@@ -31,6 +31,8 @@
 #include <hildon/hildon-code-dialog.h>
 #include <hildon/hildon-banner.h>
 #include <hildon/hildon-help.h>
+#include <hildon/hildon-note.h>
+#include <codelockui.h>
 #include <libosso.h>
 
 #include <glib/gi18n.h>
@@ -44,13 +46,6 @@
 #define HCP_RFS_INFOBANNER_CANCEL  _("rfs_bd_cancel")
 #define HCP_RFS_IB_WRONG_LOCKCODE  dgettext("hildon-libs", "secu_info_incorrectcode")
 
-#define HCP_MCE_DBUS_SERVICE       "com.nokia.mce"
-#define HCP_MCE_DBUS_REQUEST_IF    "com.nokia.mce.request"
-#define HCP_MCE_DBUS_REQUEST_PATH  "/com/nokia/mce/request"
-#define HCP_MCE_PASSWORD_VALIDATE  "validate_devicelock_code"
-
-#define HCP_DEFAULT_SALT "$1$JE5Gswee$"
-
 #define HCP_RFC_WARNING_DIALOG_WIDTH 450
 
 /*
@@ -62,143 +57,44 @@ static gboolean hcp_rfs_display_warning (HCPProgram  *program,
                                          const gchar *help_topic)
 {
   GtkWidget *confirm_dialog;
-  GtkWidget *label;
   gint ret;
 
-  confirm_dialog = gtk_dialog_new_with_buttons (
-      title,
-      GTK_WINDOW (program->window),
-      GTK_DIALOG_MODAL, 
-      HCP_RFS_INFOBANNER_OK, GTK_RESPONSE_OK,
-      HCP_RFS_INFOBANNER_CANCEL, GTK_RESPONSE_CANCEL,
-      NULL
-      );
-  
-  gtk_window_set_position (GTK_WINDOW (confirm_dialog),
-                           GTK_WIN_POS_NONE);
-
-  hildon_help_dialog_help_enable (GTK_DIALOG (confirm_dialog),
-                                  help_topic,
-                                  program->osso);
-
-  gtk_dialog_set_has_separator (GTK_DIALOG (confirm_dialog), FALSE);
-
-  label = gtk_label_new (warning);
-  
-  gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
-
-  gtk_widget_set_size_request (label,
-                               380,
-                               -1);
-
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (confirm_dialog)->vbox), 
-                     label);
-
-  gtk_widget_set_size_request (confirm_dialog,
-                               HCP_RFC_WARNING_DIALOG_WIDTH,
-                               -1);
+  confirm_dialog = hildon_note_new_confirmation (NULL, warning);
+  gtk_window_set_transient_for (GTK_WINDOW(confirm_dialog), GTK_WINDOW(program->window));
 
   gtk_widget_show_all  (confirm_dialog);
   ret = gtk_dialog_run (GTK_DIALOG (confirm_dialog));
 
   gtk_widget_destroy (GTK_WIDGET (confirm_dialog));
 
-  if (ret == GTK_RESPONSE_CANCEL || 
-          ret == GTK_RESPONSE_DELETE_EVENT) {
-      return FALSE;
+  if (ret == GTK_RESPONSE_OK) {
+    return TRUE;
   }
 
-  return TRUE;
-}
-
-/*
- * Sends dbus message to MCE to check the lock code
- * Returns 0 if not correct, 1 if correct, -1 if an error occured
- */
-static gint 
-hcp_rfs_check_lock_code (HCPProgram *program, const gchar *code)
-{
-  gchar *crypted_code;
-  osso_return_t ret;
-  osso_rpc_t returnvalue;
-  gint result;
-
-  crypted_code = crypt  (code, HCP_DEFAULT_SALT);
-  crypted_code = rindex (crypted_code, '$') + 1;
-
-  ret = osso_rpc_run_system (program->osso, 
-                      HCP_MCE_DBUS_SERVICE,
-                      HCP_MCE_DBUS_REQUEST_PATH,
-                      HCP_MCE_DBUS_REQUEST_IF,
-                      HCP_MCE_PASSWORD_VALIDATE,
-                      &returnvalue,
-                      DBUS_TYPE_STRING,
-                      crypted_code,
-                      DBUS_TYPE_STRING,
-                      HCP_DEFAULT_SALT,
-                      DBUS_TYPE_INVALID);
-
-  switch (ret)
-  {
-    case OSSO_INVALID:
-      g_warning ("Lockcode query call failed: Invalid parameter");
-      osso_rpc_free_val (&returnvalue);
-      return -1;
-
-    case OSSO_RPC_ERROR:
-    case OSSO_ERROR:
-    case OSSO_ERROR_NAME:
-    case OSSO_ERROR_NO_STATE:
-    case OSSO_ERROR_STATE_SIZE:
-      if (returnvalue.type == DBUS_TYPE_STRING)
-      {
-        g_warning ("Lockcode query call failed: %s", returnvalue.value.s);
-      }
-      else
-      {
-        g_warning ("Lockcode query call failed: unspecified");
-      }
-      osso_rpc_free_val (&returnvalue);
-      return -1;
-
-    case OSSO_OK:
-        break;
-
-    default:
-      g_warning ("Lockcode query call failed: unknown"
-  	         " error type %d", ret);
-      osso_rpc_free_val (&returnvalue);
-      return -1;
-  }
-
-  if (returnvalue.type != DBUS_TYPE_BOOLEAN)
-  {
-    g_warning ("Lockcode query call failed: unexpected return "
-               "value type %d", returnvalue.type);
-
-    osso_rpc_free_val (&returnvalue);
-    return -1;
-  }
-
-  result = (gint)returnvalue.value.b;
-  osso_rpc_free_val (&returnvalue);
-  
-  return result;
+  return FALSE;
 }
 
 /*
  * Prompts the user for the lock password.
  * Returns TRUE if correct password, FALSE if cancelled
  */
+/* NOTE: implementation now uses libcodelockui */
 static gboolean 
 hcp_rfs_check_lock_code_dialog (HCPProgram *program)
 {
-  GtkWidget *dialog;
+  GtkWidget *dialog; 
   gint ret;
   gint password_correct = FALSE;
+  CodeLockUI clui;
 
-  dialog = hildon_code_dialog_new ();
-  
+  if (!codelockui_init (program->osso))
+  {
+    g_warning ("codelockui init error!");
+    return FALSE;
+  }
+
+  dialog = codelock_create_dialog (&clui, TIMEOUT_FOOBAR, FALSE);
+
   hildon_help_dialog_help_enable (GTK_DIALOG (dialog),
                                   HCP_CODE_DIALOG_HELP_TOPIC,
                                   program->osso);
@@ -213,21 +109,20 @@ hcp_rfs_check_lock_code_dialog (HCPProgram *program)
   while (!password_correct)
   {
     gtk_widget_set_sensitive (dialog, TRUE);
-    
+
     ret = gtk_dialog_run (GTK_DIALOG (dialog));
 
     gtk_widget_set_sensitive (dialog, FALSE);
 
     if (ret == GTK_RESPONSE_CANCEL ||
       ret == GTK_RESPONSE_DELETE_EVENT) {
-      gtk_widget_destroy (dialog);
-      
+      codelock_destroy_dialog (&clui);
+
       return FALSE;
     }
 
-    password_correct = hcp_rfs_check_lock_code ( 
-            program,
-            hildon_code_dialog_get_code (HILDON_CODE_DIALOG (dialog)));
+    password_correct = codelock_is_passwd_correct (
+            codelock_get_code(&clui));
 
     if (!password_correct)
     {
@@ -235,11 +130,12 @@ hcp_rfs_check_lock_code_dialog (HCPProgram *program)
                                       NULL,
                                       HCP_RFS_IB_WRONG_LOCKCODE);
 
-      hildon_code_dialog_clear_code (HILDON_CODE_DIALOG (dialog));
+  /*    hildon_code_dialog_clear_code (HILDON_CODE_DIALOG (dialog)); */
+      codelock_clear_code (&clui);
     }
   }
 
-  gtk_widget_destroy (dialog);
+  codelock_destroy_dialog (&clui);
 
   if (password_correct == -1)
   {
@@ -281,7 +177,7 @@ hcp_rfs (const gchar *warning, const gchar *title,
       return TRUE;
     }
   }
-          
+
   if (hcp_rfs_check_lock_code_dialog (hcp_program_get_instance ()))
   {
     /* Password is correct, proceed */
