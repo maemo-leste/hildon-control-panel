@@ -1,8 +1,19 @@
-hildon-control-panel (1:2.2.4-1~unreleased) unstable; urgency=low
+hildon-control-panel (1:2.2.4-1) unstable; urgency=low
 
-  * unreleased
+  Peter Aradi <peter.aradi@blumsoft.eu>:
+        
+        * src/hcp-rfs.c:
+        libcodelockui is used for password check instead of d-bus query from
+        mce.
+        HildonNote is used for displaying confirmation notes.
+        Fixes: NB#96274, NB#97055, NB#96246
 
- -- Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>  Tue, 16 Dec 2008 16:09:30 +0200
+        * src/hcp-app-list.c:
+        removed XMAS fixes
+
+        * Added build dependency libcodelockui1-dev
+
+ -- Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>  Thu, 08 Jan 2009 11:00:39 +0200
 
 hildon-control-panel (1:2.2.3-1) unstable; urgency=low
 

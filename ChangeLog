@@ -1,3 +1,9 @@
+2009-01-08 Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>
+
+	Release 2.2.4
+
+	* configure.ac: 2.2.4
+
 2008-12-18 Peter Aradi <peter.aradi@blumsoft.eu>
 	
 	* src/hcp-rfs.c:
