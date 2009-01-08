@@ -4,6 +4,7 @@
 	libcodelockui is used for password check instead of d-bus query from
 	mce.
 	HildonNote is used for displaying confirmation notes.
+	Fixes: NB#96274, NB#97055, NB#96246
 
 2008-12-18 Peter Aradi <peter.aradi@blumsoft.eu>
 	
