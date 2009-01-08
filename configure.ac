@@ -59,7 +59,7 @@ PKG_CHECK_MODULES(OSSOSETTINGS,
 AC_SUBST(hildondesktopentrydir)
 AC_SUBST(localedir)
 
-PKG_CHECK_MODULES(HCP_DEPS
+PKG_CHECK_MODULES(HCP_DEPS,
 	[
 	libosso >= 0.10.0
 	hildon-1
