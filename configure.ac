@@ -59,29 +59,15 @@ PKG_CHECK_MODULES(OSSOSETTINGS,
 AC_SUBST(hildondesktopentrydir)
 AC_SUBST(localedir)
 
-PKG_CHECK_MODULES(OSSO,libosso >= 0.10.0)
-AC_SUBST(OSSO_LIBS)
-AC_SUBST(OSSO_CFLAGS)
-
-PKG_CHECK_MODULES(HILDON, hildon-1)
-AC_SUBST(HILDON_LIBS)
-AC_SUBST(HILDON_CFLAGS)
-
-PKG_CHECK_MODULES(GNOME_VFS, gnome-vfs-2.0 >= 2.8.3)
-AC_SUBST(GNOME_VFS_LIBS)
-AC_SUBST(GNOME_VFS_CFLAGS)
-
-PKG_CHECK_MODULES(HILDON_HELP, hildon-help)
-AC_SUBST(HILDON_HELP_LIBS)
-AC_SUBST(HILDON_HELP_CFLAGS)
-
-PKG_CHECK_MODULES(GCONF, gconf-2.0 >= 2.6.2)
-AC_SUBST(GCONF_LIBS)
-AC_SUBST(GCONF_CFLAGS)
-
-PKG_CHECK_MODULES(CODELOCKUI, codelockui >= 1.5.6)
-AC_SUBST(CODELOCKUI_LIBS)
-AC_SUBST(CODELOCKUI_CFLAGS)
+PKG_CHECK_MODULES(HCP_DEPS
+	[
+	libosso >= 0.10.0
+	hildon-1
+	gnome-vfs-2.0 >= 2.8.3
+	hildon-help
+	gconf-2.0 >= 2.6.2
+	codelockui >= 1.5.6
+	])
 
 hildoncpdesktopentrydir=${datadir}/applications/hildon-control-panel
 hildoncplibdir=${libdir}/hildon-control-panel
