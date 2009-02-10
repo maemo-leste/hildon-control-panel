@@ -29,9 +29,9 @@
 #include <strings.h>
 
 #include <hildon/hildon-code-dialog.h>
-#include <hildon/hildon-banner.h>
 #include <hildon/hildon-help.h>
 #include <hildon/hildon-note.h>
+#include <hildon/hildon-banner.h>
 #include <codelockui.h>
 #include <libosso.h>
 
@@ -44,7 +44,7 @@
 
 #define HCP_RFS_INFOBANNER_OK      _("rfs_bd_ok")
 #define HCP_RFS_INFOBANNER_CANCEL  _("rfs_bd_cancel")
-#define HCP_RFS_IB_WRONG_LOCKCODE  dgettext("hildon-libs", "secu_info_incorrectcode")
+#define HCP_RFS_IB_WRONG_LOCKCODE  dgettext("osso-system-lock", "secu_info_incorrectcode")
 
 #define HCP_RFC_WARNING_DIALOG_WIDTH 450
 
@@ -126,7 +126,8 @@ hcp_rfs_check_lock_code_dialog (HCPProgram *program)
 
     if (!password_correct)
     {
-      hildon_banner_show_information (dialog,
+	   
+      hildon_banner_show_information (NULL,
                                       NULL,
                                       HCP_RFS_IB_WRONG_LOCKCODE);
 

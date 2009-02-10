@@ -1,7 +1,18 @@
+2009-02-10  Peter Aradi <peter.aradi@blumsoft.eu>
+
+	* configure.ac:
+	Corrected version number of libcodelockui.
+
+	* src/hpc-rfs.c:
+	Made lock code failure banner system modal.
+	Updated localization domain for incorrect code message.
+	Fixes: NB#98945
+	
 2009-01-21 Peter Aradi <peter.aradi@blumsoft.eu>
 
 	* data/hildon-control-panel.desktop.in:
 	Updated icon name, localization domain, Category and position in .desktop file
+	Fixes: NB#100776
 
 2009-01-08 Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>
 
