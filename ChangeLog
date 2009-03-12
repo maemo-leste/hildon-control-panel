@@ -1,10 +1,26 @@
+2009-03-12 Peter Aradi <peter.aradi@maemo.org>
+	* debian/control:
+	* configure.ac:
+	* src/hcp-rfs.c:
+	* src/hcp-rfs.h:
+	Removed dependency from libhildonhelp0.
+	Fixes: NB#105167 - "hildon-control-panel shouldn't depend on
+	libhildonhelp0"
+
+	* src/hcp-window.c:
+	Updated menu to use new implementation.
+
+	* data/hildon-control-panel.desktop.in:
+	Added X-Maemo-Wm-Class property.
+	Fixes: NB#103049 - "Blank screen is displaying..."
+
 2009-02-10 Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>
 
 	Release 2.2.5
 
 	* configure.ac: 2.2.5
 
-2009-02-10  Peter Aradi <peter.aradi@blumsoft.eu>
+2009-02-10 Peter Aradi <peter.aradi@maemo.org>
 
 	* configure.ac:
 	Corrected version number of libcodelockui.
@@ -14,7 +30,7 @@
 	Updated localization domain for incorrect code message.
 	Fixes: NB#98945
 	
-2009-01-21 Peter Aradi <peter.aradi@blumsoft.eu>
+2009-01-21 Peter Aradi <peter.aradi@maemo.org>
 
 	* data/hildon-control-panel.desktop.in:
 	Updated icon name, localization domain, Category and position in
@@ -27,7 +43,7 @@
 
 	* configure.ac: 2.2.4
 
-2008-12-18 Peter Aradi <peter.aradi@blumsoft.eu>
+2008-12-18 Peter Aradi <peter.aradi@maemo.org>
 	
 	* src/hcp-rfs.c:
 	libcodelockui is used for password check instead of d-bus query from
@@ -35,7 +51,7 @@
 	HildonNote is used for displaying confirmation notes.
 	Fixes: NB#96274, NB#97055, NB#96246
 
-2008-12-18 Peter Aradi <peter.aradi@blumsoft.eu>
+2008-12-18 Peter Aradi <peter.aradi@maemo.org>
 	
 	* src/hcp-app-list.c:
 	removed XMAS fixes
@@ -44,7 +60,7 @@
 
 	Release 2.2.3
 
-2008-12-16 Peter Aradi <peter.aradi@blumsoft.eu>
+2008-12-16 Peter Aradi <peter.aradi@maemo.org>
 
 	* src/hcp-app-list.c:
 	logical ids -> UI strings XMAS hack
@@ -54,12 +70,12 @@
 	* src/hcp-window.c:
 	removed help from menu, according to UI spec
 	
-2008-12-03 Peter Aradi <peter.aradi@blumsoft.eu>
+2008-12-03 Peter Aradi <peter.aradi@maemo.org>
 
 	* src/hcp-grid.c:
 	Use thumbsized icons.
 	
-2008-12-03 Peter Aradi <peter.aradi@blumsoft.eu>
+2008-12-03 Peter Aradi <peter.aradi@maemo.org>
 
 	* src/hcp-window.c:
 	* src/hcp-window.h:
@@ -69,13 +85,13 @@
 	Changed order of groups.
 	Fixes #NB 92795
 
-2008-11-24 Peter Aradi <peter.aradi@blumsoft.eu>
+2008-11-24 Peter Aradi <peter.aradi@maemo.org>
 
 	* src/hcp-window.c:
 	Menu now conforms to UI spec v 1.4
 	Fixes #NB 90260
 
-2008-11-12 Peter Aradi <peter.aradi@blumsoft.eu>
+2008-11-12 Peter Aradi <peter.aradi@maemo.org>
 
 	* src/hcp-window.c:
 	The contents of former "Tools" submenu are shown when menu is pressed.
@@ -85,7 +101,7 @@
 
 	Release 2.2.2
 
-2008-11-07 Peter Aradi <peter.aradi@blumsoft.eu>
+2008-11-07 Peter Aradi <peter.aradi@maemo.org>
 
 	* src/hcp-app-view.c
 	* src/hcp-grid.h
@@ -102,7 +118,7 @@
 	 - the view has large icons
 	 Please see NB# 91702 for more details.
 
-2008-10-17 Peter Aradi <peter.aradi@blumsoft.eu>
+2008-10-17 Peter Aradi <peter.aradi@maemo.org>
 	
 	* src/hcp-app-view.c: change default value for icon size to
 	HCP_ICON_SIZE_LARGE. Fixes NB #90236.
@@ -110,7 +126,7 @@
 	"/schemas/apps/osso/apps/controlpanel/icon_size" key value to "true".
 	Fixes NB #90236.
 
-2008-09-30  Peter Aradi <peter.aradi@blumsoft.eu>
+2008-09-30  Peter Aradi <peter.aradi@maemo.org>
 
 	* src/hcp-main.c: g_thread_init called earlier. Fixes NB #86237.
 

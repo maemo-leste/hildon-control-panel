@@ -29,7 +29,6 @@
 #include <strings.h>
 
 #include <hildon/hildon-code-dialog.h>
-#include <hildon/hildon-help.h>
 #include <hildon/hildon-note.h>
 #include <hildon/hildon-banner.h>
 #include <codelockui.h>
@@ -39,8 +38,6 @@
 
 #include "hcp-rfs.h"
 #include "hcp-program.h"
-
-#define HCP_CODE_DIALOG_HELP_TOPIC "Features_restorefactorysettings_passwordquerydialog"
 
 #define HCP_RFS_INFOBANNER_OK      _("rfs_bd_ok")
 #define HCP_RFS_INFOBANNER_CANCEL  _("rfs_bd_cancel")
@@ -53,8 +50,7 @@
  */
 static gboolean hcp_rfs_display_warning (HCPProgram  *program,
                                          const gchar *warning,
-                                         const gchar *title,
-                                         const gchar *help_topic)
+                                         const gchar *title)
 {
   GtkWidget *confirm_dialog;
   gint ret;
@@ -95,10 +91,6 @@ hcp_rfs_check_lock_code_dialog (HCPProgram *program)
 
   dialog = codelock_create_dialog (&clui, TIMEOUT_FOOBAR, FALSE);
 
-  hildon_help_dialog_help_enable (GTK_DIALOG (dialog),
-                                  HCP_CODE_DIALOG_HELP_TOPIC,
-                                  program->osso);
-
   gtk_widget_show_all (dialog);
 
   gtk_window_set_transient_for (GTK_WINDOW (dialog),
@@ -131,7 +123,6 @@ hcp_rfs_check_lock_code_dialog (HCPProgram *program)
                                       NULL,
                                       HCP_RFS_IB_WRONG_LOCKCODE);
 
-  /*    hildon_code_dialog_clear_code (HILDON_CODE_DIALOG (dialog)); */
       codelock_clear_code (&clui);
     }
   }
@@ -167,12 +158,12 @@ hcp_rfs_launch_script (const gchar *script)
 
 gboolean 
 hcp_rfs (const gchar *warning, const gchar *title,
-         const gchar *script, const gchar *help_topic)
+         const gchar *script)
 {
   if (warning)
   {
     if (!hcp_rfs_display_warning (hcp_program_get_instance (), 
-                                  warning, title, help_topic))
+                                  warning, title))
     {
       /* User canceled, return */
       return TRUE;

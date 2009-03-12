@@ -14,3 +14,4 @@ X-Osso-Type=application/x-executable
 X-Osso-User-Position=14
 X-Maemo-Category=Main
 X-Text-Domain=hildon-control-panel
+X-Maemo-Wm-Class=Controlpanel

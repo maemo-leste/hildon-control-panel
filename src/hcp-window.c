@@ -27,7 +27,6 @@
 #endif
 
 #include <libosso.h>
-#include <hildon/hildon-help.h>
 #include <hildon/hildon-window.h>
 #include <hildon/hildon-program.h>
 #include <hildon/hildon-defines.h>
@@ -74,10 +73,7 @@ struct _HCPWindowPrivate
 #define HCP_MENU_SETUP_WIZARD _("copa_me_tools_setup_wizard")
 #define HCP_MENU_RFS          _("copa_me_tools_rfs")
 #define HCP_MENU_CUD          _("copa_me_tools_cud")
-#define HCP_MENU_HELP         _("copa_me_tools_help")
 #define HCP_MENU_CLOSE        _("copa_me_close")
-
-#define HCP_OSSO_HELP_ID "Utilities_controlpanel_mainview"
 
 #define HCP_STATE_GROUP         "HildonControlPanel"
 #define HCP_STATE_FOCUSED       "Focussed"
@@ -90,12 +86,10 @@ struct _HCPWindowPrivate
 #define HCP_RFS_WARNING        _("refs_ia_text")
 #define HCP_RFS_WARNING_TITLE  _("rfs_ti_restore")
 #define HCP_RFS_SCRIPT         "/usr/sbin/osso-app-killer-rfs.sh"
-#define HCP_RFS_HELP_TOPIC     "Features_restorefactorysettings_closealldialog"
 
 #define HCP_CUD_WARNING        _("cud_ia_text")
 #define HCP_CUD_WARNING_TITLE  _("cud_ti_clear")
 #define HCP_CUD_SCRIPT         "/usr/sbin/osso-app-killer-cud.sh"
-#define HCP_CUD_HELP_TOPIC     "Features_clearuserdata_dialog"
 
 static void 
 hcp_window_enforce_state (HCPWindow *window)
@@ -386,8 +380,7 @@ hcp_window_clear_user_data (GtkWidget *widget, HCPWindow *window)
 {
   hcp_rfs (HCP_CUD_WARNING,
            HCP_CUD_WARNING_TITLE,
-           HCP_CUD_SCRIPT,
-           HCP_CUD_HELP_TOPIC);
+           HCP_CUD_SCRIPT);
 
   return TRUE;
 }
@@ -397,8 +390,7 @@ hcp_window_reset_factory_settings (GtkWidget *widget, HCPWindow *window)
 {
   hcp_rfs (HCP_RFS_WARNING,
            HCP_RFS_WARNING_TITLE,
-           HCP_RFS_SCRIPT,
-           HCP_RFS_HELP_TOPIC);
+           HCP_RFS_SCRIPT);
 
   return TRUE;
 }
@@ -520,7 +512,7 @@ hcp_window_construct_ui (HCPWindow *window)
 
   HildonProgram *program;
   
-  GtkMenu *menu = NULL;
+  HildonAppMenu *menu = NULL;
   GtkWidget *mi = NULL;
   GtkWidget *scrolled_window = NULL;
 
@@ -530,6 +522,7 @@ hcp_window_construct_ui (HCPWindow *window)
   priv = window->priv;
 
   /* Why is this not read from the gtkrc?? -- Jobi */
+#if 0 
   /* Control Panel Grid */
   gtk_rc_parse_string ("  style \"hildon-control-panel-grid\" {"
               "    CPGrid::n_columns = 2"
@@ -544,11 +537,12 @@ hcp_window_construct_ui (HCPWindow *window)
                       "  }"
           " widget \"*.hildon-control-panel-separator\" "
                       "    style \"hildon-control-panel-separator\"");
+#endif
   
   program = HILDON_PROGRAM (hildon_program_get_instance ());
 
   hildon_program_add_window (program, HILDON_WINDOW (window));
-
+  
   gtk_window_set_title (GTK_WINDOW (window),
                         HCP_TITLE);
 
@@ -558,26 +552,26 @@ hcp_window_construct_ui (HCPWindow *window)
   g_signal_connect(G_OBJECT (program), "notify::is-topmost",
                    G_CALLBACK (hcp_window_topmost_status_change), window);
 
-  menu = GTK_MENU (gtk_menu_new ());
+  menu = HILDON_APP_MENU (hildon_app_menu_new ());
 
-  hildon_window_set_menu (HILDON_WINDOW (window), menu);
+  hildon_stackable_window_set_main_menu (HILDON_STACKABLE_WINDOW (window), menu);
 
 #ifdef MAEMO_TOOLS
 
   /* Reset Factory Settings */
-  mi = gtk_menu_item_new_with_label (HCP_MENU_RFS);
+  mi = gtk_button_new_with_label (HCP_MENU_RFS);
 
-  gtk_menu_shell_append (GTK_MENU_SHELL (menu), mi);
+  hildon_app_menu_append (menu, GTK_BUTTON(mi));
 
-  g_signal_connect (G_OBJECT (mi), "activate",
+  g_signal_connect (mi, "clicked",
                     G_CALLBACK (hcp_window_reset_factory_settings), window);
 
   /* Clean User Data */
-  mi = gtk_menu_item_new_with_label (HCP_MENU_CUD);
+  mi = gtk_button_new_with_label (HCP_MENU_CUD);
 
-  gtk_menu_shell_append (GTK_MENU_SHELL (menu), mi);
+  hildon_app_menu_append (menu, GTK_BUTTON(mi));
 
-  g_signal_connect (G_OBJECT (mi), "activate",
+  g_signal_connect (mi, "clicked",
                     G_CALLBACK (hcp_window_clear_user_data), window);
 #endif
   
@@ -666,7 +660,7 @@ static void
 hcp_window_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
 {
 /* Buggy applets can crash controlpanel, so disabled for now */
-  static gboolean enforce_state = FALSE;
+  static gboolean enforce_state = TRUE;
 	
   GTK_WIDGET_CLASS (hcp_window_parent_class)->size_allocate (widget, allocation);
 

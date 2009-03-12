@@ -26,7 +26,6 @@
 
 gboolean hcp_rfs (const char *warning, 
                   const char *title, 
-                  const char *script, 
-                  const char *help_topic);
+                  const char *script); 
 
 #endif

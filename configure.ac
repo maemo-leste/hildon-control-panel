@@ -64,7 +64,6 @@ PKG_CHECK_MODULES(HCP_DEPS,
 	libosso >= 0.10.0
 	hildon-1
 	gnome-vfs-2.0 >= 2.8.3
-	hildon-help
 	gconf-2.0 >= 2.6.2
 	codelockui >= 1:1.5.6
 	])
