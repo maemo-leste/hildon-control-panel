@@ -146,6 +146,7 @@ hcp_app_load (HCPApp *app)
     dlclose (priv->handle);
 
     priv->handle = NULL;
+	return;
   }
 
   if (!priv->save_state)
