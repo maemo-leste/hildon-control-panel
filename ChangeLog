@@ -1,9 +1,17 @@
+2009-02-10 Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>
+
+	Release 2.2.6
+
+	* configure.ac: 2.2.6
+
 2009-03-12 Peter Aradi <peter.aradi@maemo.org>
+
 	* src/hcp-app.c:
 	return in case execute function is not found in plugin.
 	Fixes: NB#102452 - "Coverity findings in hildon-control-panel"
 
 2009-03-12 Peter Aradi <peter.aradi@maemo.org>
+
 	* debian/control:
 	* configure.ac:
 	* src/hcp-rfs.c:

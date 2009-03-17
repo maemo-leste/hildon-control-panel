@@ -1,3 +1,12 @@
+hildon-control-panel (1:2.2.6-1) unstable; urgency=low
+
+  Peter Aradi:
+  * Fixes: NB#102452 - Coverity findings in hildon-control-panel
+  * Fixes: NB#105167 - hildon-control-panel shouldn't depend on libhildonhelp0
+  * Fixes: NB#103049 - Blank screen is displaying...
+
+ -- Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>  Tue, 17 Mar 2009 15:13:44 +0200
+
 hildon-control-panel (1:2.2.5-1) unstable; urgency=low
 
   Peter Aradi <peter.aradi@blumsoft.eu>
