@@ -188,7 +188,8 @@ hcp_app_idle_launch (PluginLaunchData *d)
   g_return_val_if_fail (HCP_IS_APP (d->app), FALSE);
 
   priv = d->app->priv;
-  
+
+  /* required for checking eg. save_state availability and to be on the safe side */
   hcp_app_load (d->app);
 
   if (!priv->handle)
@@ -197,8 +198,13 @@ hcp_app_idle_launch (PluginLaunchData *d)
   priv->is_running = TRUE;
 
   /* Always use hcp->window as parent. If CP is launched without
-   * UI (run_applet RPC) the applet's dialog will be system modal */ 
-  priv->exec (program->osso, program->window, d->user_activated);
+   * UI (run_applet RPC) the applet's dialog will be system modal */
+
+  gchar* basename = g_path_get_basename (priv->plugin);
+  
+  osso_cp_plugin_execute (program->osso, basename,
+                          program->window, d->user_activated);
+  g_free (basename);
 
   priv->is_running = FALSE;
 
@@ -523,9 +529,10 @@ hcp_app_save_state (HCPApp *app)
   g_return_if_fail (HCP_IS_APP (app));
 
   priv = app->priv;
+  gchar* basename = g_path_get_basename (priv->plugin);
+  osso_cp_plugin_save_state (program->osso, basename, NULL);
 
-  if (priv->save_state)
-    priv->save_state (program->osso, NULL /* What is expected here? -- Jobi */);
+  g_free (basename);
 }
 
 gboolean
@@ -551,7 +558,7 @@ hcp_app_can_save_state (HCPApp *app)
 
   priv = app->priv;
 
-  return (priv->save_state == NULL);
+  return (priv->save_state != NULL);
 }
 
 gint

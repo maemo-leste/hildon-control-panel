@@ -1,3 +1,9 @@
+2009-03-23 Peter Aradi <peter.aradi@maemo.org>
+	
+	* src/hcp-app.c:
+	using libosso functions for executing and state saving
+	hcp_app_can_save_state was returning the opposite
+
 2009-03-17 Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>
 
 	Release 2.2.6
