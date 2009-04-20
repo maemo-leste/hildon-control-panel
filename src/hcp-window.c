@@ -31,6 +31,8 @@
 #include <hildon/hildon-program.h>
 #include <hildon/hildon-defines.h>
 #include <hildon/hildon-pannable-area.h>
+#include <hildon/hildon-button.h>
+#include <hildon/hildon-helper.h>
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
@@ -65,15 +67,8 @@ struct _HCPWindowPrivate
 };
 
 #define HCP_TITLE             _("copa_ap_cp_name")
-#define HCP_MENU_OPEN         _("copa_me_open")
-#define HCP_MENU_SUB_VIEW     _("copa_me_view")
-#define HCP_MENU_SMALL_ITEMS  _("copa_me_view_small")
-#define HCP_MENU_LARGE_ITEMS  _("copa_me_view_large")
-#define HCP_MENU_SUB_TOOLS    _("copa_me_tools")
-#define HCP_MENU_SETUP_WIZARD _("copa_me_tools_setup_wizard")
 #define HCP_MENU_RFS          _("copa_me_tools_rfs")
 #define HCP_MENU_CUD          _("copa_me_tools_cud")
-#define HCP_MENU_CLOSE        _("copa_me_close")
 
 #define HCP_STATE_GROUP         "HildonControlPanel"
 #define HCP_STATE_FOCUSED       "Focussed"
@@ -84,11 +79,9 @@ struct _HCPWindowPrivate
 #define HCP_OPERATOR_WIZARD_LAUNCH       "launch_operator_wizard"
 
 #define HCP_RFS_WARNING        _("refs_ia_text")
-#define HCP_RFS_WARNING_TITLE  _("rfs_ti_restore")
 #define HCP_RFS_SCRIPT         "/usr/sbin/osso-app-killer-rfs.sh"
 
 #define HCP_CUD_WARNING        _("cud_ia_text")
-#define HCP_CUD_WARNING_TITLE  _("cud_ti_clear")
 #define HCP_CUD_SCRIPT         "/usr/sbin/osso-app-killer-cud.sh"
 
 static void 
@@ -379,7 +372,6 @@ static gboolean
 hcp_window_clear_user_data (GtkWidget *widget, HCPWindow *window)
 {
   hcp_rfs (HCP_CUD_WARNING,
-           HCP_CUD_WARNING_TITLE,
            HCP_CUD_SCRIPT);
 
   return TRUE;
@@ -389,7 +381,6 @@ static gboolean
 hcp_window_reset_factory_settings (GtkWidget *widget, HCPWindow *window)
 {
   hcp_rfs (HCP_RFS_WARNING,
-           HCP_RFS_WARNING_TITLE,
            HCP_RFS_SCRIPT);
 
   return TRUE;
@@ -559,15 +550,23 @@ hcp_window_construct_ui (HCPWindow *window)
 #ifdef MAEMO_TOOLS
 
   /* Reset Factory Settings */
-  mi = gtk_button_new_with_label (HCP_MENU_RFS);
-
+  mi = hildon_button_new_with_text (HILDON_SIZE_AUTO_WIDTH |
+									HILDON_SIZE_FINGER_HEIGHT, 
+									HILDON_BUTTON_ARRANGEMENT_VERTICAL,
+									HCP_MENU_RFS, NULL);
+  hildon_helper_set_logical_font (mi, "SmallSystemFont");
+ 
   hildon_app_menu_append (menu, GTK_BUTTON(mi));
 
   g_signal_connect (mi, "clicked",
                     G_CALLBACK (hcp_window_reset_factory_settings), window);
 
   /* Clean User Data */
-  mi = gtk_button_new_with_label (HCP_MENU_CUD);
+  mi = hildon_button_new_with_text (HILDON_SIZE_AUTO_WIDTH |
+									HILDON_SIZE_FINGER_HEIGHT, 
+									HILDON_BUTTON_ARRANGEMENT_VERTICAL,
+									HCP_MENU_CUD, NULL);
+  hildon_helper_set_logical_font (mi, "SmallSystemFont");
 
   hildon_app_menu_append (menu, GTK_BUTTON(mi));
 

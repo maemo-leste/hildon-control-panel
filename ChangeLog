@@ -1,3 +1,18 @@
+2009-04-20 Peter Aradi <peter.aradi@maemo.org>
+	* src/hcp-rfs.c:
+	* src/hcp-rfs.h:
+	* src/hcp-window.c:
+	Fixed L10n issues.
+	* debian/control:
+	osso-system-lock-l10n-mr | osso-system-lock-l10n-mr0 added to Depends,
+	because secu_info_incorrectcode is shown
+	replaced hildon-theme-harry with hildon-theme-alpha in Recommends
+	section.
+	* src/hcp-window.c:
+	changed font type in application menu
+	Fixes: NB#108452 - "Control Panel Settings Option 
+	Â§copa_me_tools_rfsÂ§ is truncated"
+
 2009-03-23 Peter Aradi <peter.aradi@maemo.org>
 	
 	* src/hcp-app.c:

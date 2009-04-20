@@ -25,7 +25,6 @@
 #define __HCP_RFS_H__
 
 gboolean hcp_rfs (const char *warning, 
-                  const char *title, 
                   const char *script); 
 
 #endif

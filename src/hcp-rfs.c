@@ -39,8 +39,6 @@
 #include "hcp-rfs.h"
 #include "hcp-program.h"
 
-#define HCP_RFS_INFOBANNER_OK      _("rfs_bd_ok")
-#define HCP_RFS_INFOBANNER_CANCEL  _("rfs_bd_cancel")
 #define HCP_RFS_IB_WRONG_LOCKCODE  dgettext("osso-system-lock", "secu_info_incorrectcode")
 
 #define HCP_RFC_WARNING_DIALOG_WIDTH 450
@@ -49,8 +47,7 @@
  * Asks the user for confirmation, returns TRUE if confirmed
  */
 static gboolean hcp_rfs_display_warning (HCPProgram  *program,
-                                         const gchar *warning,
-                                         const gchar *title)
+                                         const gchar *warning)
 {
   GtkWidget *confirm_dialog;
   gint ret;
@@ -157,13 +154,12 @@ hcp_rfs_launch_script (const gchar *script)
 
 
 gboolean 
-hcp_rfs (const gchar *warning, const gchar *title,
-         const gchar *script)
+hcp_rfs (const gchar *warning, const gchar *script)
 {
   if (warning)
   {
     if (!hcp_rfs_display_warning (hcp_program_get_instance (), 
-                                  warning, title))
+                                  warning))
     {
       /* User canceled, return */
       return TRUE;
