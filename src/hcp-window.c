@@ -659,7 +659,7 @@ static void
 hcp_window_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
 {
 /* Buggy applets can crash controlpanel, so disabled for now */
-  static gboolean enforce_state = TRUE;
+  static gboolean enforce_state = FALSE;
 	
   GTK_WIDGET_CLASS (hcp_window_parent_class)->size_allocate (widget, allocation);
 
