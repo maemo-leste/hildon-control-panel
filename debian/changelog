@@ -1,8 +1,10 @@
-hildon-control-panel (1:2.2.7-1~unreleased) unstable; urgency=low
+hildon-control-panel (1:2.2.7-1) unstable; urgency=low
 
   Peter:
   * Fixes: NB#112470 - Control panel crashes while launching cellular applet
     while SIM is missing
+  * Fixes: NB#108452 - Control Panel Settings Option copa_me_tools_rfs is
+    truncated
 
  -- Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>  Fri, 24 Apr 2009 10:49:40 +0300
 

@@ -1,3 +1,9 @@
+2009-04-24 Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>
+
+	Release 2.2.7
+
+	* configure.ac: 2.2.7
+
 2009-04-23 Peter Aradi <peter.aradi@maemo.org>
 
 	* src/hcp-window.c:
