@@ -1,3 +1,11 @@
+hildon-control-panel (1:2.2.7-1~unreleased) unstable; urgency=low
+
+  Peter:
+  * Fixes: NB#112470 - Control panel crashes while launching cellular applet
+    while SIM is missing
+
+ -- Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>  Fri, 24 Apr 2009 10:49:40 +0300
+
 hildon-control-panel (1:2.2.6-1) unstable; urgency=low
 
   Peter Aradi:

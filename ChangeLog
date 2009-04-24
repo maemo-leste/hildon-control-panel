@@ -1,8 +1,8 @@
 2009-04-23 Peter Aradi <peter.aradi@maemo.org>
 
 	* src/hcp-window.c:
-	Fixes: NB#112470 - "Control panel crashes while launching phone applet
-	while SIM is missing"
+	Fixes: NB#112470 - "Control panel crashes while launching cellular
+	applet while SIM is missing"
 
 2009-04-20 Peter Aradi <peter.aradi@maemo.org>
 
