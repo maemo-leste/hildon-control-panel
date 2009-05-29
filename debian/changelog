@@ -1,8 +1,17 @@
-hildon-control-panel (1:2.2.8-1~unreleased) unstable; urgency=low
+hildon-control-panel (1:2.2.8-1) unstable; urgency=low
 
-  * writeme
+  Peter:
+  * Fixes: NB#118112 - Control panel displays without elements if HildonWindow
+    sizes itself
+  * Fixes: NB#116905 - Two row layout of settings (control panel) is not
+    centered
+  * Fixes: NB#115122 - Sharing Account Setup dialogs becoming non-responsive
+    after minimizing & maximizing
+  * Fixes: NB#117320 - "Transfer and sync" application is hangs for sometimes
+    when "Transfer $ sync:welcome" dialog is displayed and launch and close
+    camera application
 
- -- Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>  Fri, 24 Apr 2009 11:11:25 +0300
+ -- Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>  Fri, 29 May 2009 18:28:01 +0300
 
 hildon-control-panel (1:2.2.7-1) unstable; urgency=low
 
