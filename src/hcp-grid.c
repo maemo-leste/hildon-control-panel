@@ -196,6 +196,10 @@ hcp_grid_refresh_icons (HCPGrid* grid)
 
   model = gtk_icon_view_get_model (GTK_ICON_VIEW (grid));
   gtk_tree_model_foreach (model, hcp_grid_update_icon, grid);
+  GtkRequisition req;
+  gtk_widget_size_request (GTK_WIDGET(grid), &req);
+  GtkAllocation alloc = {0,0,req.width, req.height};
+  gtk_widget_size_allocate (GTK_WIDGET(grid), &alloc);
   gtk_widget_queue_resize (GTK_WIDGET (grid));
 }
 

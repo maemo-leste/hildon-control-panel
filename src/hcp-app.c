@@ -197,14 +197,9 @@ hcp_app_idle_launch (PluginLaunchData *d)
 
   priv->is_running = TRUE;
 
-  /* Always use hcp->window as parent. If CP is launched without
-   * UI (run_applet RPC) the applet's dialog will be system modal */
+  /* Always use hcp->window as parent. */
 
-  gchar* basename = g_path_get_basename (priv->plugin);
-  
-  osso_cp_plugin_execute (program->osso, basename,
-                          program->window, d->user_activated);
-  g_free (basename);
+  priv->exec (program->osso, program->window, d->user_activated);
 
   priv->is_running = FALSE;
 
@@ -529,10 +524,9 @@ hcp_app_save_state (HCPApp *app)
   g_return_if_fail (HCP_IS_APP (app));
 
   priv = app->priv;
-  gchar* basename = g_path_get_basename (priv->plugin);
-  osso_cp_plugin_save_state (program->osso, basename, NULL);
 
-  g_free (basename);
+  if (priv->save_state)
+    priv->save_state (program->osso, NULL);
 }
 
 gboolean

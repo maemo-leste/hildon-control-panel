@@ -1,3 +1,13 @@
+2009-05-29 Peter Aradi <peter.aradi@maemo.org>
+
+	* src/hcp-window.c:
+	* src/hcp-grid.c:
+	Fixes: NB#118112 - Control panel displays without elements if HildonWindow sizes itself
+	Fixes: NB#116905 - Two row layout of settings (control panel) is not centered
+	* src/hcp-app.c:
+	Fixes: NB#115122 - S A Setup dialogs becoming non-responsive...
+	Fixes: NB#117320 - T and S application is hangs for sometimes when...
+
 2009-04-24 Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>
 
 	Release 2.2.7

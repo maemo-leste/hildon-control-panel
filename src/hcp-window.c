@@ -586,9 +586,16 @@ hcp_window_construct_ui (HCPWindow *window)
   scrolled_window = g_object_new (HILDON_TYPE_PANNABLE_AREA, NULL);
 
   gtk_container_add (GTK_CONTAINER (window), scrolled_window);
+
+  GtkWidget *align = gtk_alignment_new (0,0,0,0);
+  gtk_alignment_set_padding (GTK_ALIGNMENT(align),0,0, 68,0);
+
+  gtk_container_add (GTK_CONTAINER(align), GTK_WIDGET(priv->view));
+
+  /*gtk_container_add (GTK_CONTAINER(view), align); */
   hildon_pannable_area_add_with_viewport (
           HILDON_PANNABLE_AREA (scrolled_window),
-          priv->view);
+          align);
 
 }
 
