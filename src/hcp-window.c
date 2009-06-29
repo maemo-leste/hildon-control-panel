@@ -473,9 +473,6 @@ hcp_window_app_list_updated_cb (HCPAppList *al, HCPWindow *window)
 
   g_free (focused);
 
-  if (app)
-    hcp_app_focus (app);
-
   hcp_window_enforce_state (window);
 }
 
@@ -512,28 +509,10 @@ hcp_window_construct_ui (HCPWindow *window)
 
   priv = window->priv;
 
-  /* Why is this not read from the gtkrc?? -- Jobi */
-#if 0 
-  /* Control Panel Grid */
-  gtk_rc_parse_string ("  style \"hildon-control-panel-grid\" {"
-              "    CPGrid::n_columns = 2"
-          "    CPGrid::label_pos = 1"
-	      "    GtkWidget::hildon-mode = 1"
-          "  }"
-          " widget \"*.hildon-control-panel-grid\" "
-          "    style \"hildon-control-panel-grid\"");
-  /* Separators style */
-  gtk_rc_parse_string ("  style \"hildon-control-panel-separator\" {"
-          "    GtkSeparator::hildonlike-drawing = 1"
-                      "  }"
-          " widget \"*.hildon-control-panel-separator\" "
-                      "    style \"hildon-control-panel-separator\"");
-#endif
-  
   program = HILDON_PROGRAM (hildon_program_get_instance ());
 
   hildon_program_add_window (program, HILDON_WINDOW (window));
-  
+
   gtk_window_set_title (GTK_WINDOW (window),
                         HCP_TITLE);
 
@@ -588,11 +567,11 @@ hcp_window_construct_ui (HCPWindow *window)
   gtk_container_add (GTK_CONTAINER (window), scrolled_window);
 
   GtkWidget *align = gtk_alignment_new (0,0,0,0);
-  gtk_alignment_set_padding (GTK_ALIGNMENT(align),0,0, 68,0);
+
+  gtk_alignment_set_padding (GTK_ALIGNMENT(align),0,0, HILDON_MARGIN_TRIPLE,HILDON_MARGIN_TRIPLE);
 
   gtk_container_add (GTK_CONTAINER(align), GTK_WIDGET(priv->view));
 
-  /*gtk_container_add (GTK_CONTAINER(view), align); */
   hildon_pannable_area_add_with_viewport (
           HILDON_PANNABLE_AREA (scrolled_window),
           align);

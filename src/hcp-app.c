@@ -494,27 +494,6 @@ hcp_app_launch (HCPApp *app, gboolean user_activated)
 }
 
 void
-hcp_app_focus (HCPApp *app)
-{
-  HCPAppPrivate *priv;
-
-  g_return_if_fail (app);
-  g_return_if_fail (HCP_IS_APP (app));
-
-  priv = app->priv;
-
-  if (priv->grid) 
-  {
-    GtkTreePath *path;
-
-    gtk_widget_grab_focus (priv->grid);
-    path = gtk_tree_path_new_from_indices (priv->item_pos, -1);
-    gtk_icon_view_select_path (GTK_ICON_VIEW (priv->grid), path);
-    gtk_tree_path_free (path);
-  }
-}
-
-void
 hcp_app_save_state (HCPApp *app)
 {
   HCPAppPrivate *priv;

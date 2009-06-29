@@ -75,46 +75,24 @@ hcp_app_view_create_grid ()
 {
   GtkWidget *grid;
 
-  grid = hcp_grid_new (HILDON_UI_MODE_NORMAL);
+  grid = hcp_grid_new ();
   gtk_widget_set_name (grid, "hildon-control-panel-grid");
 
   return grid;
 }
 
-static GtkWidget*
-hcp_app_view_create_separator (const gchar *label)
-{
-  GtkWidget *hbox = gtk_hbox_new (FALSE, 5);
-  GtkWidget *separator_1 = gtk_hseparator_new ();
-  GtkWidget *separator_2 = gtk_hseparator_new ();
-  GtkWidget *label_1 = gtk_label_new (label);
-
-  gtk_widget_set_name (separator_1, "hildon-control-panel-separator");
-  gtk_widget_set_name (separator_2, "hildon-control-panel-separator");
-  gtk_box_pack_start (GTK_BOX(hbox), separator_1, TRUE, TRUE, 0);
-  gtk_box_pack_start (GTK_BOX(hbox), label_1, FALSE, FALSE, 5);
-  gtk_box_pack_start (GTK_BOX(hbox), separator_2, TRUE, TRUE, 0);
-
-  return hbox;
-}
-
 static HCPApp *
-hcp_app_view_get_selected_app (GtkWidget *widget, GtkTreePath *path)
+hcp_app_view_get_selected_app (GtkWidget *widget, gpointer pos)
 {
   GtkTreeModel *model;
   HCPApp *app = NULL;
   GtkTreeIter iter;
-  gint item_pos;
+  gint item_pos = GPOINTER_TO_INT(pos);
 
   g_return_val_if_fail (widget, NULL);
-  g_return_val_if_fail (GTK_IS_ICON_VIEW (widget), NULL);
-  g_return_val_if_fail (path, NULL);
+  g_return_val_if_fail (HCP_IS_GRID (widget), NULL);
 
-  model = gtk_icon_view_get_model (GTK_ICON_VIEW (widget));
-
-  if (path == NULL) return NULL;
-
-  item_pos = gtk_tree_path_get_indices (path) [0];
+  model = hcp_grid_get_model (HCP_GRID(widget));
 
   if (gtk_tree_model_iter_nth_child (GTK_TREE_MODEL (model), 
                                      &iter, NULL, item_pos)) {
@@ -128,11 +106,10 @@ hcp_app_view_get_selected_app (GtkWidget *widget, GtkTreePath *path)
 
 static void
 hcp_app_view_launch_app (GtkWidget *widget, 
-                         GtkTreePath *path, 
+                         gpointer pos,
                          gpointer user_data)
 {
-
-  HCPApp *app = hcp_app_view_get_selected_app (widget, path);
+  HCPApp *app = hcp_app_view_get_selected_app (widget, pos);
 
   /* important for state saving of executed app */
   g_signal_emit (G_OBJECT (widget->parent), 
@@ -152,7 +129,7 @@ hcp_app_view_add_app (HCPApp *app, HCPGrid *grid)
   gchar *name = NULL;
   gchar *text_domain = NULL;
 
-  store = gtk_icon_view_get_model (GTK_ICON_VIEW (grid));
+  store = hcp_grid_get_model(grid);
 
   g_object_get (G_OBJECT (app),
                 "name", &name,
@@ -185,7 +162,7 @@ hcp_app_view_add_category (HCPCategory *category, HCPAppView *view)
   /* If a group has items */
   if (category->apps)
   {
-    GtkWidget *grid, *separator;
+    GtkWidget *grid, *frame;
     GtkListStore *store;
     GList *focus_chain = NULL;
 
@@ -195,21 +172,20 @@ hcp_app_view_add_category (HCPCategory *category, HCPAppView *view)
     g_signal_connect (grid, "item-activated",
                       G_CALLBACK (hcp_app_view_launch_app),
                       NULL);
-  
-    /* If we are creating a group with a defined name, we use
-     * it in the separator */
-    separator = hcp_app_view_create_separator (_(category->name));
 
-    /* Pack the separator and the corresponding grid to the vbox */
-    gtk_box_pack_start (GTK_BOX (view), separator, FALSE, FALSE, 0);
-    gtk_box_pack_start (GTK_BOX (view), grid, FALSE, TRUE, 0);
+    /* frame title is used instead of separator */
+    frame = gtk_frame_new (_(category->name));
+    gtk_frame_set_label_align (GTK_FRAME(frame), 0.5, 0.5);
+    gtk_container_add (GTK_CONTAINER(frame), grid);
+
+    gtk_box_pack_start (GTK_BOX (view), frame, FALSE, TRUE, 0);
 
     gtk_container_get_focus_chain (GTK_CONTAINER (view), &focus_chain);
     focus_chain = g_list_append (focus_chain, grid);
     gtk_container_set_focus_chain (GTK_CONTAINER (view), focus_chain);
     g_list_free (focus_chain);
 
-    gtk_icon_view_set_model (GTK_ICON_VIEW (grid), 
+    hcp_grid_set_model (HCP_GRID(grid), 
                              GTK_TREE_MODEL (store));
 
     g_slist_foreach (category->apps,
@@ -232,7 +208,7 @@ hcp_app_view_init (HCPAppView *view)
 
   g_object_set (G_OBJECT (view), 
                 "homogeneous", FALSE,
-                "spacing", 6, 
+                "spacing", 35, 
                 NULL);
 }
 
