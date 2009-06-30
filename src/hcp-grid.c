@@ -154,7 +154,7 @@ hcp_grid_update_icon (GtkTreeModel *model,
   gtk_box_pack_start (GTK_BOX(hbox), image, FALSE, FALSE, 0);
   gtk_box_pack_start (GTK_BOX(hbox), label, FALSE, FALSE, 0);
 
-  gtk_label_set_line_wrap (label, FALSE);
+  gtk_label_set_line_wrap (GTK_LABEL(label), FALSE);
 
   gtk_container_add (GTK_CONTAINER(align), hbox);
 
