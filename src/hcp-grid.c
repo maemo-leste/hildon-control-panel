@@ -158,8 +158,8 @@ hcp_grid_update_icon (GtkTreeModel *model,
 
   gtk_container_add (GTK_CONTAINER(align), hbox);
 
-  GtkWidget *button = gtk_button_new();
-  gtk_widget_set_size_request (button, HCP_GRID_ITEM_WIDTH, 70);
+  GtkWidget *button = hildon_gtk_button_new (HILDON_SIZE_FINGER_HEIGHT);
+  gtk_widget_set_size_request (button, HCP_GRID_ITEM_WIDTH, -1);
 
   gtk_container_add (GTK_CONTAINER(button), align);
 
