@@ -1,3 +1,8 @@
+2009-07-01 Peter Aradi <peter.aradi@maemo.org>
+	* src/hcp-window.c:
+	Fixes: NB#12334 - Logical string 'cud_ia_text' is shown when execute Clear
+	device
+
 2009-06-29 Peter Aradi <peter.aradi@maemo.org>
 	* src/hcp-app-view.c:
 	* src/hcp-grid.c:

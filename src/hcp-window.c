@@ -371,6 +371,7 @@ hcp_window_keyboard_listener (GtkWidget * widget,
 static gboolean 
 hcp_window_clear_user_data (GtkWidget *widget, HCPWindow *window)
 {
+  textdomain(PACKAGE);
   hcp_rfs (HCP_CUD_WARNING,
            HCP_CUD_SCRIPT);
 
@@ -380,6 +381,7 @@ hcp_window_clear_user_data (GtkWidget *widget, HCPWindow *window)
 static gboolean 
 hcp_window_reset_factory_settings (GtkWidget *widget, HCPWindow *window)
 {
+  textdomain(PACKAGE);
   hcp_rfs (HCP_RFS_WARNING,
            HCP_RFS_SCRIPT);
 
