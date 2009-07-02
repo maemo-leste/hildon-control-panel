@@ -1,6 +1,6 @@
 hildon-control-panel (1:2.2.10-1) unstable; urgency=low
 
-  * Fixes: NB#12334 - Logical string 'cud_ia_text' is shown when execute Clear
+  * Fixes: NB#123334 - Logical string 'cud_ia_text' is shown when execute Clear
     device
 
  -- Peter Aradi <peter.aradi@maemo.org>  Wed, 01 Jul 2009 12:51:23 +0100
