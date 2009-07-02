@@ -1,3 +1,9 @@
+hildon-control-panel (1:2.2.11-1) unstable; urgency=low
+
+  * new
+
+ -- Aapo Kojo <aapo.kojo@nokia.com>  Thu, 02 Jul 2009 13:58:12 +0300
+
 hildon-control-panel (1:2.2.10-1) unstable; urgency=low
 
   * Fixes: NB#123334 - Logical string 'cud_ia_text' is shown when execute Clear
