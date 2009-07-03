@@ -1,6 +1,6 @@
 hildon-control-panel (1:2.2.11-1) unstable; urgency=low
 
-  * new
+  * reverting changes to old UI
 
  -- Aapo Kojo <aapo.kojo@nokia.com>  Thu, 02 Jul 2009 13:58:12 +0300
 
