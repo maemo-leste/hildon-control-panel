@@ -25,6 +25,7 @@
 #define HCP_GRID_H
 
 #include <gtk/gtk.h>
+
 G_BEGIN_DECLS
 
 typedef struct _HCPGridPrivate HCPGridPrivate;
@@ -41,12 +42,12 @@ typedef struct _HCPGridPrivate HCPGridPrivate;
 #define HCP_GRID_NUM_COLUMNS       2
 
 typedef struct {
-  GtkTable parent;
+  GtkIconView parent;
   HCPGridPrivate* priv;
 } HCPGrid;
 
 typedef struct {
-  GtkTableClass parent_class;
+  GtkIconViewClass parent_class;
 } HCPGridClass;
 
 GType hcp_grid_get_type (void);
@@ -58,10 +59,9 @@ typedef enum {
   HCP_STORE_NUM_COLUMNS
 } HCPStoreColumn;
 
-GtkWidget* hcp_grid_new (void);
+GtkWidget* hcp_grid_new (HildonUIMode);
 void hcp_grid_refresh_icons (HCPGrid*);
-void hcp_grid_set_model (HCPGrid *grid, GtkTreeModel *model);
-GtkTreeModel* hcp_grid_get_model (HCPGrid *grid);
+
 G_END_DECLS
 
 #endif /* HCP_GRID_H */

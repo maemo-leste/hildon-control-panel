@@ -70,6 +70,8 @@ GObject*     hcp_app_new            (void);
 void         hcp_app_launch         (HCPApp   *app, 
                                      gboolean  user_activated);
 
+void         hcp_app_focus          (HCPApp   *app); 
+
 void         hcp_app_save_state     (HCPApp   *app);
 
 gboolean     hcp_app_is_running     (HCPApp   *app);
