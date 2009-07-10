@@ -50,6 +50,7 @@ enum
   PROP_IS_RUNNING,
   PROP_GRID,
   PROP_ITEM_POS,
+  PROP_SUGGESTED_POS,
   PROP_TEXT_DOMAIN
 };
 
@@ -62,6 +63,7 @@ struct _HCPAppPrivate
     gboolean                 is_running;
     GtkWidget               *grid;
     gint                     item_pos;
+    gint                     sugg_pos;
     gchar                   *text_domain;
     void                    *handle;
     hcp_plugin_exec_f       *exec;
@@ -91,6 +93,7 @@ hcp_app_init (HCPApp *app)
   app->priv->item_pos = -1;
   app->priv->text_domain = NULL;
   app->priv->save_state = NULL;
+  app->priv->sugg_pos = G_MAXINT;
 }
 
 static void
@@ -314,6 +317,10 @@ hcp_app_get_property (GObject    *gobject,
       g_value_set_int (value, priv->item_pos);
       break;
 
+    case PROP_SUGGESTED_POS:
+      g_value_set_int (value, priv->sugg_pos);
+      break;
+
     case PROP_TEXT_DOMAIN:
       g_value_set_string (value, priv->text_domain);
       break;
@@ -368,6 +375,10 @@ hcp_app_set_property (GObject      *gobject,
 
     case PROP_ITEM_POS:
       priv->item_pos = g_value_get_int (value);
+      break;
+
+    case PROP_SUGGESTED_POS:
+      priv->sugg_pos = g_value_get_int (value);
       break;
 
     case PROP_TEXT_DOMAIN:
@@ -447,6 +458,16 @@ hcp_app_class_init (HCPAppClass *class)
                                                      -1,
                                                      100,
                                                      -1,
+                                                      (G_PARAM_READABLE | G_PARAM_WRITABLE)));
+
+  g_object_class_install_property (g_object_class,
+                                   PROP_SUGGESTED_POS,
+                                   g_param_spec_int ("suggested-pos",
+                                                     "Suggested item position",
+                                                     "Application position defined in the .desktop file",
+                                                     0,
+                                                     G_MAXINT,
+                                                     G_MAXINT,
                                                       (G_PARAM_READABLE | G_PARAM_WRITABLE)));
 
   g_object_class_install_property (g_object_class,
@@ -560,6 +581,10 @@ hcp_app_sort_func (const HCPApp *a, const HCPApp *b)
 {
   g_return_val_if_fail (a && b, 0);
 
-  /* Sort by the translated name */
-  return strcmp (_(a->priv->name), _(b->priv->name));
+  /* sort by position or translated name (if position is equal) */
+  gint ret = a->priv->sugg_pos != b->priv->sugg_pos ? \
+             (a->priv->sugg_pos < b->priv->sugg_pos ? -1 : 1) : \
+             strcmp (_(a->priv->name), _(b->priv->name));
+
+  return ret;
 }

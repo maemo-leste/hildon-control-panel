@@ -72,6 +72,7 @@ struct _HCPAppListPrivate
  * the entries in msecs */
 #define HCP_DIR_READ_DELAY 500
 
+#define HCP_POS_REL_PATH "apporder/applets.desktop"
 static int callback_pending = 0;
 
 static gboolean 
@@ -357,7 +358,7 @@ hcp_app_list_class_init (HCPAppListClass *class)
 
   g_type_class_add_private (g_object_class, sizeof (HCPAppListPrivate));
 }
- 
+
 static void 
 hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
 {
@@ -365,7 +366,9 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
   GDir *dir;
   GError *error = NULL;
   const char *filename;
-  GKeyFile *keyfile;
+  GKeyFile *keyfile, *pos_keyfile;
+  gchar *pos_path = NULL;
+  gboolean use_pos = TRUE;
 
   g_return_if_fail (al);
   g_return_if_fail (HCP_IS_APP_LIST (al));
@@ -384,6 +387,15 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
 
   keyfile = g_key_file_new ();
 
+  /* try to open keyfile with app positions */
+  pos_keyfile = g_key_file_new ();
+  pos_path = g_strdup_printf ( "%s/"HCP_POS_REL_PATH, dir_path );
+  if (!g_key_file_load_from_file (pos_keyfile, pos_path, G_KEY_FILE_NONE, NULL))
+  {
+    g_debug ("no keyfile found or there was a problem while parsing %s", pos_path);
+    use_pos = FALSE;
+  }
+
   while ((filename = g_dir_read_name (dir)))
   {
     GObject *app = NULL;
@@ -394,11 +406,12 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
     gchar *icon = NULL;
     gchar *category = NULL;
     gchar *text_domain = NULL;
+    gint pos = 0;
 
     /* Only consider .desktop files */
     if (!g_str_has_suffix (filename, ".desktop"))
-      continue;   
-    
+      continue;
+
     desktop_path = g_build_filename (dir_path, filename, NULL);
 
     g_key_file_load_from_file (keyfile,
@@ -439,7 +452,8 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
       g_error_free (error);
       continue;
     }
-   icon = g_key_file_get_string (keyfile,
+
+    icon = g_key_file_get_string (keyfile,
                                   HCP_DESKTOP_GROUP,
                                   HCP_DESKTOP_KEY_ICON,
                                   &error);
@@ -448,7 +462,7 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
       g_error_free (error);
       error = NULL;
     }
-    
+
     category = g_key_file_get_string (keyfile,
                                       HCP_DESKTOP_GROUP,
                                       HCP_DESKTOP_KEY_CATEGORY,
@@ -471,26 +485,44 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
       error = NULL;
     }
 
+    /* try to read position from global .desktop file */
+    if (use_pos && category)
+    {
+      gchar* group_title = g_ascii_strdown (category, -1);
+      pos = g_key_file_get_integer (pos_keyfile,
+                                    group_title,
+                                    filename,
+                                    NULL);
+      g_free(group_title);
+    }
+
     app = hcp_app_new ();
 
-    g_object_set (G_OBJECT (app), 
+    g_object_set (G_OBJECT (app),
                   "name", name,
                   "plugin", plugin,
                   "icon", icon,
                   NULL); 
 
     if (category != NULL)
-      g_object_set (G_OBJECT (app), 
+      g_object_set (G_OBJECT (app),
                     "category", category,
                     NULL); 
-    
+
     if (text_domain != NULL)
     {
-      g_object_set (G_OBJECT (app), 
+      g_object_set (G_OBJECT (app),
                     "text-domain", text_domain,
                     NULL);
     }
-  
+
+    if (pos)
+    {
+      g_object_set (G_OBJECT (app),
+                    "suggested-pos", pos,
+                    NULL);
+    }
+
     g_hash_table_insert (priv->apps, g_strdup (plugin), app);
 
     g_free (name);
@@ -501,7 +533,9 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
   }
 
   g_key_file_free (keyfile);
+  g_key_file_free (pos_keyfile);
   g_dir_close (dir);
+  g_free (pos_path);
 }
 
 static gint
