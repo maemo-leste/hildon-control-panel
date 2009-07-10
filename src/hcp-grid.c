@@ -159,6 +159,11 @@ hcp_grid_init (HCPGrid *grid)
   grid->priv->text_cell = gtk_cell_renderer_text_new ();
   gtk_cell_renderer_set_fixed_size (grid->priv->text_cell, 248,-1);
 
+  /* FIXME: it seems that text truncation only works with GtkLabel */
+  g_object_set (G_OBJECT(grid->priv->text_cell), "ellipsize", PANGO_ELLIPSIZE_END, NULL);
+
+  gtk_cell_renderer_text_set_fixed_height_from_font (GTK_CELL_RENDERER_TEXT(grid->priv->text_cell),1);
+
   gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (grid), 
 		  	      grid->priv->text_cell, 
 			      FALSE);
@@ -188,8 +193,8 @@ hcp_grid_init (HCPGrid *grid)
      based on HCPAppView width. */
   gtk_icon_view_set_item_width (GTK_ICON_VIEW (grid), 
 		  		HCP_GRID_ITEM_WIDTH);
- 
 }
+
 void
 hcp_grid_refresh_icons (HCPGrid* grid)
 {
