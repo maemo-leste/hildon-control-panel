@@ -1,3 +1,9 @@
+hildon-control-panel (1:2.2.11-2) unstable; urgency=low
+
+  * Fixes: NB#97295 - Applet order not following UI spec
+
+ -- Peter Aradi <peter.aradi@maemo.org>  Mon, 13 Jul 2009 11:39:15 +0100
+
 hildon-control-panel (1:2.2.11-1) unstable; urgency=low
 
   * reverting changes to old UI
