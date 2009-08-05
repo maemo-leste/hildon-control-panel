@@ -54,7 +54,7 @@ struct _HCPProgram
   GtkWidget      *window;
   HCPAppList     *al;
   osso_context_t *osso;
-  gint            execute;
+  GList          *running_applets;
 };
 
 struct _HCPProgramClass 

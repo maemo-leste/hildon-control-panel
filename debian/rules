@@ -102,6 +102,10 @@ ifeq "$(strip $(LAUNCHER))" "yes"
     $(CURDIR)/debian/build/usr/bin/controlpanel.launch
 	ln -s /usr/bin/maemo-invoker \
               $(CURDIR)/debian/build/usr/bin/controlpanel
+	mv $(CURDIR)/debian/build/usr/bin/cpa_loader \
+    $(CURDIR)/debian/build/usr/bin/cpa_loader.launch
+	ln -s /usr/bin/maemo-invoker \
+              $(CURDIR)/debian/build/usr/bin/cpa_loader
 endif 
 
 

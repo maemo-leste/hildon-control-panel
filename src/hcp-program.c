@@ -40,15 +40,13 @@
 G_DEFINE_TYPE (HCPProgram, hcp_program, G_TYPE_OBJECT);
 
 #define HCP_APP_NAME     "controlpanel"
-#define HCP_APP_VERSION  "0.1"
+#define HCP_APP_VERSION  "0.2"
 
 #define HCP_RPC_SERVICE                     "com.nokia.controlpanel"
 #define HCP_RPC_PATH                        "/com/nokia/controlpanel/rpc"
 #define HCP_RPC_INTERFACE                   "com.nokia.controlpanel.rpc"
 #define HCP_RPC_METHOD_RUN_APPLET           "run_applet"
-#define HCP_RPC_METHOD_SAVE_STATE_APPLET    "save_state_applet"
 #define HCP_RPC_METHOD_TOP_APPLICATION      "top_application"
-#define HCP_RPC_METHOD_IS_APPLET_RUNNING    "is_applet_running"
 
 static void
 hcp_program_show_window (HCPProgram *program)
@@ -93,79 +91,18 @@ hcp_program_rpc_handler (const gchar *interface,
 
     if (app)
     {
-      if (!hcp_app_is_running (app))
-      {
-          hcp_app_launch (app, user_activated.value.b);
-      }
+      if (!program->window)
+        hcp_program_show_window (program);
+      else
+        gtk_window_present (GTK_WINDOW (program->window));
 
-      if (GTK_IS_WINDOW (program->window))
-          gtk_window_present (GTK_WINDOW (program->window));
-
-      retval->type = DBUS_TYPE_INT32;
-      retval->value.i = 0;
-
-      return OSSO_OK;
-    }
-  }
-  else if ((!strcmp (method, HCP_RPC_METHOD_SAVE_STATE_APPLET)))
-  {
-    osso_rpc_t applet;
-    GHashTable *apps = NULL;
-    HCPApp *app = NULL;
-    
-    if (arguments->len != 1)
-      goto error;
-
-    applet = g_array_index (arguments, osso_rpc_t, 0);
-
-    if (applet.type != DBUS_TYPE_STRING)
-      goto error;
-    
-    g_object_get (G_OBJECT (program->al),
-                  "apps", &apps,
-                  NULL);
-
-    app = g_hash_table_lookup (apps, applet.value.s);
-
-    if (app)
-    {
-      if (hcp_app_is_running (app))
-      {
-        hcp_app_save_state (app);
-      }
+      hcp_app_launch (app, user_activated.value.b);
 
       retval->type = DBUS_TYPE_INT32;
       retval->value.i = 0;
 
       return OSSO_OK;
     }
-  }
-  else if ((!strcmp (method, HCP_RPC_METHOD_IS_APPLET_RUNNING)))
-  {
-    osso_rpc_t applet;
-    GHashTable *apps = NULL;
-    HCPApp *app = NULL;
-    
-    if (arguments->len != 1)
-      goto error;
-
-    applet = g_array_index (arguments, osso_rpc_t, 0);
-
-    if (applet.type != DBUS_TYPE_STRING)
-      goto error;
-    
-    g_object_get (G_OBJECT (program->al),
-                  "apps", &apps,
-                  NULL);
-
-    app = g_hash_table_lookup (apps, applet.value.s);
-
-    retval->type = DBUS_TYPE_BOOLEAN;
-    retval->value.b = (app && hcp_app_is_running (app))?
-                            TRUE:
-                            FALSE;
-
-    return OSSO_OK;
   }
   else if ((!strcmp (method, HCP_RPC_METHOD_TOP_APPLICATION)))
   {
@@ -226,7 +163,7 @@ hcp_program_hw_signal_cb (osso_hw_state_t *state, HCPProgram *program)
 static void
 hcp_program_init (HCPProgram *program)
 {
-  program->execute = 0;
+  program->running_applets = NULL;
 
   program->al = (HCPAppList *) hcp_app_list_new ();
   hcp_app_list_update (program->al);
@@ -248,6 +185,11 @@ hcp_program_finalize (GObject *object)
   g_return_if_fail (HCP_IS_PROGRAM (object));
 
   program = HCP_PROGRAM (object);
+
+  if (program->running_applets != NULL)
+  {
+    g_list_free (program->running_applets);
+  }
 
   if (program->al != NULL) 
   {

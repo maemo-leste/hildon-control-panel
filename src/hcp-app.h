@@ -42,15 +42,6 @@ typedef struct _HCPAppPrivate HCPAppPrivate;
 #define HCP_IS_APP_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),  HCP_TYPE_APP))
 #define HCP_APP_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),  HCP_TYPE_APP, HCPAppClass))
 
-typedef osso_return_t (hcp_plugin_exec_f) (
-                       osso_context_t * osso,
-                       gpointer data,
-                       gboolean user_activated);
-
-typedef osso_return_t (hcp_plugin_save_state_f) (
-                       osso_context_t * osso,
-                       gpointer data);
-
 struct _HCPApp 
 {
   GObject gobject;
@@ -80,6 +71,9 @@ gboolean     hcp_app_can_save_state (HCPApp   *app);
 
 gint         hcp_app_sort_func      (const HCPApp *a, 
                                      const HCPApp *b);
+
+/* result shouldn't be freed */
+gchar       *hcp_app_get_plugin     (HCPApp   *app);
 
 G_END_DECLS
 

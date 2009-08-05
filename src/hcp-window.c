@@ -27,6 +27,8 @@
 #endif
 
 #include <libosso.h>
+#include <stdlib.h>
+#include <signal.h>
 #include <hildon/hildon-window.h>
 #include <hildon/hildon-program.h>
 #include <hildon/hildon-defines.h>
@@ -61,8 +63,8 @@ struct _HCPWindowPrivate
   HCPAppList     *al;
   GtkWidget      *view;
 
-  /* For state save data */
-  gchar          *saved_focused_filename;
+  /* For retrieve/state save data */
+  gchar         **running_apps;
   gint            scroll_value;
 };
 
@@ -71,9 +73,8 @@ struct _HCPWindowPrivate
 #define HCP_MENU_CUD          _("copa_me_tools_cud")
 
 #define HCP_STATE_GROUP         "HildonControlPanel"
-#define HCP_STATE_FOCUSED       "Focussed"
+#define HCP_STATE_FOCUSED       "Running"
 #define HCP_STATE_SCROLL_VALUE  "ScrollValue"
-#define HCP_STATE_EXECUTE       "Execute"
 
 #define HCP_OPERATOR_WIZARD_DBUS_SERVICE "operator_wizard"
 #define HCP_OPERATOR_WIZARD_LAUNCH       "launch_operator_wizard"
@@ -94,31 +95,44 @@ hcp_window_enforce_state (HCPWindow *window)
 
   priv = window->priv;
 
+/*  g_debug ("ENFORCE STATE"); */
+
   /* Actually enforce the saved state */
-  /* If the saved focused item filename is defined, try to 
-   * focus on the item. */
-  if (priv->saved_focused_filename)
+  /* Load previously opened applets ... */
+  if (priv->running_apps)
   {
     GHashTable *apps = NULL;
-    HCPApp *app = NULL;
+    HCPApp     *app = NULL;
+    gint        i;
 
     g_object_get (G_OBJECT (priv->al),
                   "apps", &apps,
                   NULL);
 
-    app = g_hash_table_lookup (apps,
-                               priv->saved_focused_filename);
+    for (i = 0; priv->running_apps && priv->running_apps[i] != NULL; i++)
+    {
+/*      g_debug ("reload applet [%d]: '%s'", i, priv->running_apps[i]); */
+      app = g_hash_table_lookup (apps,
+                                 priv->running_apps[i]);
+      hcp_app_launch (app, FALSE); /* load/restore applet ... */
+    }
     
+    /* the latest/topmost applet should be focused : */
     if (app)
  /*     hcp_app_focus (app); */
       priv->focused_item = app;
 
-    g_free (priv->saved_focused_filename);
-    priv->saved_focused_filename = NULL;
+    g_strfreev (priv->running_apps);
+    priv->running_apps = NULL;
   }
+}
 
-  /* HCPProgram will start the possible plugin in 
-   * program->execute */
+static void 
+hcp_window_showed (GtkWidget *unused,
+                   HCPWindow *window)
+{
+  /* For restoring previous state ... */
+  hcp_window_enforce_state (window);
 }
 
 static void 
@@ -130,14 +144,14 @@ hcp_window_retrieve_state (HCPWindow *window)
   GKeyFile *keyfile = NULL;
   osso_return_t ret;
   GError *error = NULL;
-  gchar *focused = NULL;
   gint scroll_value;
-  gboolean execute;
 
   g_return_if_fail (window);
   g_return_if_fail (HCP_IS_WINDOW (window));
 
   priv = window->priv;
+
+/*  g_debug ("LOAD STATE"); */
 
   ret = osso_state_read (program->osso, &state);
 
@@ -168,10 +182,10 @@ hcp_window_retrieve_state (HCPWindow *window)
     goto cleanup;
   }
 
-  focused = g_key_file_get_string (keyfile,
-                                   HCP_STATE_GROUP,
-                                   HCP_STATE_FOCUSED,
-                                   &error);
+  priv->running_apps = g_key_file_get_string_list (keyfile,
+                                                   HCP_STATE_GROUP,
+                                                   HCP_STATE_FOCUSED,
+                                                   NULL, &error);
 
   if (error)
   {
@@ -180,16 +194,6 @@ hcp_window_retrieve_state (HCPWindow *window)
     goto cleanup;
   }
 
-  if (g_str_has_suffix (focused, ".so"))
-  {
-    priv->saved_focused_filename = focused;
-  }
-  else
-  {
-    priv->saved_focused_filename = NULL;
-    g_free (focused);
-  }
-	  
   scroll_value = g_key_file_get_integer (keyfile,
                                          HCP_STATE_GROUP,
                                          HCP_STATE_SCROLL_VALUE,
@@ -204,20 +208,6 @@ hcp_window_retrieve_state (HCPWindow *window)
   
   priv->scroll_value = scroll_value;
   
-  execute = g_key_file_get_boolean (keyfile,
-                                    HCP_STATE_GROUP,
-                                    HCP_STATE_EXECUTE,
-                                    &error);
-
-  if (error)
-  {
-    g_warning ("An error occured when reading application state: %s",
-               error->message);
-    goto cleanup;
-  }
-  
-  program->execute = execute;
-
 cleanup:
   if (error)
     g_error_free (error);
@@ -235,8 +225,9 @@ hcp_window_save_state (HCPWindow *window, gboolean clear_state)
   HCPProgram *program = hcp_program_get_instance ();
   osso_state_t state = { 0, };
   GKeyFile *keyfile = NULL;
+  GList *temp;
+  gint i;
   osso_return_t ret;
-  gchar *focused = NULL;
   GError *error = NULL;
 
   g_return_if_fail (window);
@@ -259,26 +250,35 @@ hcp_window_save_state (HCPWindow *window, gboolean clear_state)
 
   keyfile = g_key_file_new ();
 
-  g_object_get (G_OBJECT (priv->focused_item),
-                "plugin", &focused,
-                NULL);
+/* ====== Save the running applets with correct ordering ... ====== */
+  int length = g_list_length (program->running_applets);
+  /* yes, i really want a pointer array ... */
+  priv->running_apps = g_new0 (gchar*, length + 1);
 
-  g_key_file_set_string (keyfile,
-                         HCP_STATE_GROUP,
-                         HCP_STATE_FOCUSED,
-                         priv->focused_item?focused:"");
+/*  g_debug ("SAVING STATE"); */
 
-  g_free (focused);
+  /* Get the plugin so-name string array */
+  for (temp = program->running_applets, i = 0;
+       temp != NULL; temp = temp->next, i++)
+  {
+    priv->running_apps[i] = hcp_app_get_plugin (((HCPApp*) temp->data));
+/*    g_debug ("running_apps[%d] = '%s'", i, priv->running_apps[i]); */
+  }
+
+  g_key_file_set_string_list (keyfile,
+                              HCP_STATE_GROUP,
+                              HCP_STATE_FOCUSED,
+              (const gchar**) priv->running_apps,
+                      (gsize) length);
+
+  g_free (priv->running_apps);
+
+/* ====== Save scroll value ... ====== */
   
   g_key_file_set_integer (keyfile,
                           HCP_STATE_GROUP,
                           HCP_STATE_SCROLL_VALUE,
                           priv->scroll_value);
-
-  g_key_file_set_boolean (keyfile,
-                          HCP_STATE_GROUP,
-                          HCP_STATE_EXECUTE,
-                          program->execute);
 
   state.state_data = g_key_file_to_data (keyfile,
                                          &state.state_size,
@@ -294,12 +294,11 @@ hcp_window_save_state (HCPWindow *window, gboolean clear_state)
     g_warning ("An error occured when writing application state");
   }
 
-  /* If a plugin is running, save its state */
-  if (program->execute && priv->focused_item && 
-      hcp_app_is_running (priv->focused_item))
-  {
-    hcp_app_save_state (priv->focused_item);
-  }
+  /* If some plugins are running, save their state */
+  if (program->running_applets)
+    g_list_foreach (program->running_applets,
+                    (GFunc) hcp_app_save_state,
+		    NULL);
 
 cleanup:
   if (error)
@@ -313,6 +312,19 @@ cleanup:
 
   if (keyfile)
     g_key_file_free (keyfile);
+}
+
+static void
+save_state_now (int signal)
+{
+  if (signal == 15)
+  {
+    HCPProgram *program = hcp_program_get_instance ();
+    hcp_window_save_state (HCP_WINDOW (program->window), FALSE);
+
+    /* Immediatly exit ... */
+    exit (0);
+  }
 }
 
 /* Retrieve the configuration (large/small icons)  */
@@ -391,34 +403,6 @@ hcp_window_reset_factory_settings (GtkWidget *widget, HCPWindow *window)
 #endif
 
 static void 
-hcp_window_topmost_status_change (GObject *gobject, 
-		                  GParamSpec *arg1,
-			          HCPWindow *window)
-{
-  HCPWindowPrivate *priv;
-  HildonProgram *program = HILDON_PROGRAM (gobject);
-
-  g_return_if_fail (window);
-  g_return_if_fail (HCP_IS_WINDOW (window));
-
-  priv = window->priv;
-
-  if (hildon_program_get_is_topmost (program)) {
-    hildon_program_set_can_hibernate (program, FALSE);
-  } else {
-    /* Do not set ourselves as background killable if we are
-     * running an applet which doesn't implement state-saving */
-    if (!priv->focused_item ||
-        (!hcp_app_is_running (priv->focused_item) || 
-         hcp_app_can_save_state (priv->focused_item)))
-    {
-        hcp_window_save_state (window, FALSE);
-        hildon_program_set_can_hibernate (program, TRUE);
-    }
-  }
-}
-
-static void 
 hcp_window_app_view_focus_cb (HCPAppView *view,
                               HCPApp     *app, 
                               HCPWindow  *window)
@@ -481,17 +465,14 @@ hcp_window_app_list_updated_cb (HCPAppList *al, HCPWindow *window)
   hcp_window_enforce_state (window);
 }
 
+/* Normal quit ... */
 static void hcp_window_quit (GtkWidget *widget, HCPWindow *window)
 {
   g_return_if_fail (window);
   g_return_if_fail (HCP_IS_WINDOW (window));
 
-  /* we can only close the window, when no applets are running */
-  /**@TODO review this */
-  HCPProgram *program = hcp_program_get_instance ();
-  program->execute = 0;
-
-  hcp_window_save_state (window, FALSE);
+  /* Clear the previously save state */
+  hcp_window_save_state (window, TRUE);
 
   gtk_widget_destroy (GTK_WIDGET (window));
 
@@ -542,8 +523,8 @@ hcp_window_construct_ui (HCPWindow *window)
   g_signal_connect (G_OBJECT (window), "destroy",
                     G_CALLBACK (hcp_window_quit), window);
 
-  g_signal_connect(G_OBJECT (program), "notify::is-topmost",
-                   G_CALLBACK (hcp_window_topmost_status_change), window);
+  g_signal_connect_after (G_OBJECT (window), "show",
+                          G_CALLBACK (hcp_window_showed), window);
 
   menu = HILDON_APP_MENU (hildon_app_menu_new ());
 
@@ -553,9 +534,9 @@ hcp_window_construct_ui (HCPWindow *window)
 
   /* Reset Factory Settings */
   mi = hildon_button_new_with_text (HILDON_SIZE_AUTO_WIDTH |
-									HILDON_SIZE_FINGER_HEIGHT, 
-									HILDON_BUTTON_ARRANGEMENT_VERTICAL,
-									HCP_MENU_RFS, NULL);
+                                    HILDON_SIZE_FINGER_HEIGHT, 
+                                    HILDON_BUTTON_ARRANGEMENT_VERTICAL,
+                                    HCP_MENU_RFS, NULL);
   hildon_helper_set_logical_font (mi, "SmallSystemFont");
  
   hildon_app_menu_append (menu, GTK_BUTTON(mi));
@@ -599,6 +580,9 @@ hcp_window_construct_ui (HCPWindow *window)
           HILDON_PANNABLE_AREA (scrolled_window),
           align);
 
+  /* hildon-desktop will send SIGTERM (15) signal on bgkilling */
+  signal (15, save_state_now); 
+  hildon_program_set_can_hibernate (program, TRUE);
 }
 
 static void
@@ -612,7 +596,6 @@ hcp_window_init (HCPWindow *window)
   priv = window->priv;
 
   priv->focused_item = NULL;
-  priv->saved_focused_filename = NULL;
   priv->scroll_value = 0;
 
   priv->al = g_object_ref (program->al);
@@ -655,48 +638,15 @@ hcp_window_finalize (GObject *object)
     priv->focused_item = NULL;
   }
 
-  if (priv->saved_focused_filename)
-  {
-    g_free (priv->saved_focused_filename);
-    priv->saved_focused_filename = NULL;
-  }
-
   G_OBJECT_CLASS (hcp_window_parent_class)->finalize (object);
-}
-
-static void
-hcp_window_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
-{
-/* Buggy applets can crash controlpanel, so disabled for now */
-  static gboolean enforce_state = FALSE;
-	
-  GTK_WIDGET_CLASS (hcp_window_parent_class)->size_allocate (widget, allocation);
-
-  if (enforce_state)
-  {
-    HCPProgram *program = hcp_program_get_instance ();
-    HCPWindow *window = HCP_WINDOW (widget);
-
-    hcp_window_enforce_state (HCP_WINDOW (widget));
-
-    if (program->execute == 1 && window->priv->focused_item) 
-    {
-      program->execute = 0;
-      hcp_app_launch (window->priv->focused_item, FALSE);
-    }
-    enforce_state = FALSE;
-  }
 }
 
 static void
 hcp_window_class_init (HCPWindowClass *class)
 {
   GObjectClass *g_object_class = (GObjectClass *) class;
-  GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
   g_object_class->finalize = hcp_window_finalize;
-
-  widget_class->size_allocate = hcp_window_size_allocate;
 
   g_type_class_add_private (g_object_class, sizeof (HCPWindowPrivate));
 }
