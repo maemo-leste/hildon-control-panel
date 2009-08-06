@@ -134,11 +134,11 @@ main (int argc, char **argv)
   plugin = g_new0 (hcp_app_data, 1); 
 
   plugin->soname = g_strdup (argv[1]);
-  plugin->name = argv[2];
+  plugin->name = g_strdup (argv[2]);
   /* Set WM_CLASS ... */
 /*  g_debug ("Set WM_CLASS to '%s'", argv[2]); */
-  g_set_prgname (argv[2]);
-  gdk_set_program_class (argv[2]);
+  g_set_prgname (plugin->name);
+  gdk_set_program_class (plugin->name);
 
   g_set_application_name ("");
 

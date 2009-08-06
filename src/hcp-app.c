@@ -460,15 +460,14 @@ get_xid_by_wm_class (gchar *wm_class)
 static gboolean
 try_focus (HCPApp *app)
 {
-#ifdef HD_PROPERLY_RAISING
   XClientMessageEvent  xclient;
-#endif
   HCPProgram          *program = hcp_program_get_instance ();
   g_return_val_if_fail (hcp_app_is_running (app), FALSE);
 
+  /* 'app' is already the topmost -> no need to raising */
   if (!program->running_applets ||
-      !program->running_applets->next)
-    return FALSE; /* only one applet shown, no need to raising */
+      (g_list_last (program->running_applets)->data == app))
+    return FALSE;
 
   if (app->priv->xid == None)
     app->priv->xid = get_xid_by_wm_class (app->priv->wm_class);
@@ -478,6 +477,7 @@ try_focus (HCPApp *app)
   if (app->priv->xid == None)
     return FALSE; /* plugin window isn't exists anymore ...*/
 
+  /* Topping window: */
 #ifndef HD_PROPERLY_RAISING
   /* XXX: HACK: force restacking with quickly unmapping / mapping */
   gdk_error_trap_push ();
@@ -491,7 +491,9 @@ try_focus (HCPApp *app)
   gdk_error_trap_push ();
   XRaiseWindow (GDK_DISPLAY (), app->priv->xid);
   gdk_error_trap_pop ();
+#endif
 
+  /* Focusing window */
   memset (&xclient, 0, sizeof (xclient));
   xclient.type = ClientMessage;
   xclient.window = app->priv->xid;
@@ -508,7 +510,6 @@ try_focus (HCPApp *app)
               SubstructureRedirectMask | SubstructureNotifyMask,
               (XEvent *)&xclient);
   gdk_error_trap_pop ();
-#endif
 
   /* move to the end of the list (to save proper ordering...) */
   program->running_applets = g_list_remove (program->running_applets,
