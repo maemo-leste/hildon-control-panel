@@ -1,3 +1,46 @@
+2009-08-05 David Kedves <dkedves@blumsoft.eu>
+
+	* debian/rules:
+	* src/hcp-app-loader.c:
+	* src/Makefile.am:
+	 - Moving applet-running code to hcp-app-loader.c, it's needed
+	   because applets should run in a separate process from HCP.
+	   (I tried fork () too but all applets crashed somewhere... :-S )
+	  - Setting the WM_CLASS to some known value,
+	    to get the applet window later.
+	  - HCP main window-Xid passed by hpc-app.c, create a wrapper widget
+	    for proper transiency setting in applets
+	* src/hcp-app.[ch]:
+	 - Support for topping a previously opened applet
+	 - Maintaining a list (program->running_applets) of running applets
+	   for proper state saving
+	 + Added some function to get applets XID by WM_CLASS:
+	  - search_window_r, get_xid_by_wm_class, wm_class_from_so_name
+	 + other new functions:
+	  - hcp_app_get_plugin, cpa_child_watch, try_focues
+	 + Dropped functions (cpa_loader doing these now):
+	  - hcp_app_load, hcp_app_unload, hcp_app_idle_launch
+	 + HCPApp private struct changes:
+	  - removed handle and execute / save state function pointers
+	  - added wm_class, pid
+	 + Support to run multiple different applets concurrently :
+	   by g_spawn_async, so applets aren't block the HCP anymore
+	* src/hcp-program.[ch]:
+	 - run_applet RPC method always present the HCP window first
+	 + dropped old (unused) RPC method implementations:
+	  - save_state_applet / is_applet_running
+	 + State saving related changes:
+	  - removed execute from widget struct
+	  - added running_applets list to widget struct
+	* src/hcp-window.[ch]:
+	 + State saving related changes:
+	  - Changed Focussed entry in state file to Running applets list
+	  - On enforce-state reloading applets with the proper ordering 
+	  - Added a signal-handler to state-saving (HD sends SIGTERM on bgkill)
+	  - On window_quit we should not save the state, but clear it
+	  - enforce_state should be run on window show event instead of
+	    size-allocate
+
 2009-07-10 Peter Aradi <peter.aradi@maemo.org>
 
 	* src/hcp-app.c:

@@ -422,7 +422,9 @@ search_window_r (gchar *wm_class,
     }
   }
 
-  if (gdk_error_trap_pop () == BadWindow)
+  /* On X error, should not try query the actual window tree */
+  gdk_flush (); /* for trap_pop */
+  if (gdk_error_trap_pop ())
     return; /* Current 'w' Window is closed meanwhile ... */
 
   /* Recursion to child windows ... */
@@ -458,29 +460,61 @@ get_xid_by_wm_class (gchar *wm_class)
 static gboolean
 try_focus (HCPApp *app)
 {
-  GdkWindow   *applet;
-  HCPProgram  *program = hcp_program_get_instance ();
+#ifdef HD_PROPERLY_RAISING
+  XClientMessageEvent  xclient;
+#endif
+  HCPProgram          *program = hcp_program_get_instance ();
   g_return_val_if_fail (hcp_app_is_running (app), FALSE);
+
+  if (!program->running_applets ||
+      !program->running_applets->next)
+    return FALSE; /* only one applet shown, no need to raising */
 
   if (app->priv->xid == None)
     app->priv->xid = get_xid_by_wm_class (app->priv->wm_class);
 
+  g_debug ("applet xid: 0x%lx", (unsigned long) app->priv->xid);
+
   if (app->priv->xid == None)
-    return FALSE; /* applet closed meanwhile ... */
+    return FALSE; /* plugin window isn't exists anymore ...*/
 
-  applet = gdk_window_foreign_new ((GdkNativeWindow) app->priv->xid);
-  if (applet == NULL)
-    return FALSE; /* applet closed meanwhile ... */
+#ifndef HD_PROPERLY_RAISING
+  /* XXX: HACK: force restacking with quickly unmapping / mapping */
+  gdk_error_trap_push ();
+  XUnmapWindow (GDK_DISPLAY (), app->priv->xid);
+  gdk_error_trap_pop ();
 
-  gdk_window_focus (applet, GDK_CURRENT_TIME);
+  gdk_error_trap_push ();
+  XMapRaised (GDK_DISPLAY (), app->priv->xid);
+  gdk_error_trap_pop ();
+#else /* HD_PROPERLY_RAISING */
+  gdk_error_trap_push ();
+  XRaiseWindow (GDK_DISPLAY (), app->priv->xid);
+  gdk_error_trap_pop ();
+
+  memset (&xclient, 0, sizeof (xclient));
+  xclient.type = ClientMessage;
+  xclient.window = app->priv->xid;
+  xclient.message_type = gdk_x11_get_xatom_by_name ("_NET_ACTIVE_WINDOW");
+  xclient.format = 32;
+  xclient.data.l[0] = 1; /* requestor type; we're an app */
+  xclient.data.l[1] = 0;
+  xclient.data.l[2] = None; /* currently active window */
+  xclient.data.l[3] = 0; 
+  xclient.data.l[4] = 0; 
+  
+  gdk_error_trap_push ();
+  XSendEvent (GDK_DISPLAY (), GDK_ROOT_WINDOW (), False,
+              SubstructureRedirectMask | SubstructureNotifyMask,
+              (XEvent *)&xclient);
+  gdk_error_trap_pop ();
+#endif
 
   /* move to the end of the list (to save proper ordering...) */
   program->running_applets = g_list_remove (program->running_applets,
                                             (gconstpointer) app);
   program->running_applets = g_list_append (program->running_applets,
                                             (gpointer) app);
-
-  g_object_unref (applet);
 
   return TRUE;
 }
