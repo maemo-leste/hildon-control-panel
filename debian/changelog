@@ -1,4 +1,4 @@
-hildon-control-panel (1:2.2.12-1~unreleased) unstable; urgency=low
+hildon-control-panel (1:2.2.12-1) unstable; urgency=low
 
   David Kedves:
   * Applets now running in separate processes from HCP
@@ -11,7 +11,7 @@ hildon-control-panel (1:2.2.12-1~unreleased) unstable; urgency=low
   * Fixes: NB#102740 - The maesync CP dialog is not closed when clicked on the
     status area.
 
- -- Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>  Tue, 04 Aug 2009 17:14:28 +0300
+ -- Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>  Thu, 06 Aug 2009 12:26:37 +0300
 
 hildon-control-panel (1:2.2.11-2) unstable; urgency=low
 
