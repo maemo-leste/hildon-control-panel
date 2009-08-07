@@ -1,3 +1,9 @@
+hildon-control-panel (1:2.2.14-1~unreleased) unstable; urgency=low
+
+  * foo
+
+ -- Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>  Fri,  7 Aug 2009 14:33:52 +0300
+
 hildon-control-panel (1:2.2.13-1) unstable; urgency=low
 
   Regression fixes [ David Kedves ]
