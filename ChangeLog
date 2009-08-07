@@ -1,3 +1,20 @@
+2009-08-07 Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>
+
+	Release 2.2.13
+
+	* configure.ac: 2.2.13
+
+2009-08-07 David Kedves <dkedves@blumsoft.eu>
+
+	* data/applets.desktop:
+	* data/Makefile.am:
+	 - Include the applet ordering desktop file
+	* src/hcp-window.c:
+	 - On delete event, close the applets too
+	* src/hcp-app-view.c:
+	 - Only one applets should be started via
+	   HCP main window at a time
+
 2009-08-06 Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>
 
 	Release 2.2.12

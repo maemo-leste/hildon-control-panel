@@ -465,6 +465,31 @@ hcp_window_app_list_updated_cb (HCPAppList *al, HCPWindow *window)
   hcp_window_enforce_state (window);
 }
 
+/* End current task */
+static void
+hcp_window_end_task (GtkWidget *widget,
+                     GdkEvent  *event,
+                     HCPWindow *window)
+{
+  g_return_if_fail (window);
+  g_return_if_fail (HCP_IS_WINDOW (window));
+
+  HCPProgram *program = hcp_program_get_instance ();
+
+  /* This sends TERM signak to applet processes ... */
+  if (program->running_applets)
+    g_list_foreach (program->running_applets,
+                    (GFunc) hcp_app_save_state,
+                    NULL);
+
+  hcp_window_save_state (window, TRUE);
+
+  gtk_widget_destroy (GTK_WIDGET (window));
+
+  gtk_main_quit ();
+}
+
+
 /* Normal quit ... */
 static void hcp_window_quit (GtkWidget *widget, HCPWindow *window)
 {
@@ -522,6 +547,9 @@ hcp_window_construct_ui (HCPWindow *window)
 
   g_signal_connect (G_OBJECT (window), "destroy",
                     G_CALLBACK (hcp_window_quit), window);
+
+  g_signal_connect (G_OBJECT (window), "delete-event",
+                    G_CALLBACK (hcp_window_end_task), window);
 
   g_signal_connect_after (G_OBJECT (window), "show",
                           G_CALLBACK (hcp_window_showed), window);

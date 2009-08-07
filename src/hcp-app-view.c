@@ -30,6 +30,7 @@
 
 #include "hcp-app-view.h"
 #include "hcp-app-list.h"
+#include "hcp-program.h"
 #include "hcp-app.h"
 #include "hcp-grid.h"
 #include "hcp-marshalers.h"
@@ -131,6 +132,12 @@ hcp_app_view_launch_app (GtkWidget *widget,
                          GtkTreePath *path, 
                          gpointer user_data)
 {
+  HCPProgram* program = hcp_program_get_instance ();
+
+  /* Users should able to start only one applet at a time
+   * from HCP main window (more can be started by libosso) */
+  if (program->running_applets)
+    return;
 
   HCPApp *app = hcp_app_view_get_selected_app (widget, path);
 

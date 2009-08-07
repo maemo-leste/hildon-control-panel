@@ -21,7 +21,8 @@
 
 EXTRA_DIST = hildon-control-panel.pc.in \
 	com.nokia.controlpanel.service.in \
-	hildon-control-panel.desktop.in
+	hildon-control-panel.desktop.in \
+	applets.desktop
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = hildon-control-panel.pc

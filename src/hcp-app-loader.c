@@ -2,6 +2,8 @@
 #include <config.h>
 #endif
 
+#define _XOPEN_SOURCE 2009
+#include <unistd.h>
 #include <libosso.h>
 #include <dlfcn.h>
 #include <ctype.h>
@@ -121,10 +123,10 @@ main (int argc, char **argv)
    * argv[4] "%lu" -> CPA_parent xid
    */
     g_debug ("Parameters are: %s plugin.so plugin-name"
-             " 0/1 [user_activated]", argv[0]);
+             " 0/1 [user_activated] xwindow-id", argv[0]);
     return 1;
   }
-
+  
   if (!g_thread_supported ()) g_thread_init (NULL);
   
   hildon_gtk_init (&argc, &argv);

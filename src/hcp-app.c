@@ -26,7 +26,7 @@
 #include <config.h>
 #endif
 
-#define _XOPEN_SOURCE
+#define _XOPEN_SOURCE 2009
 #include <unistd.h>
 #include <dlfcn.h>
 #include <string.h>
