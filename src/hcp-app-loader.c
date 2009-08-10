@@ -150,7 +150,9 @@ main (int argc, char **argv)
 
   /* Hack begin ... */
   plugin->parent = gtk_widget_new (GTK_TYPE_WINDOW, "type", GTK_WINDOW_TOPLEVEL, NULL);
-  GTK_OBJECT_FLAGS (plugin->parent) |= (GTK_REALIZED);
+  gtk_widget_realize (plugin->parent);
+  /* Some applets are trying to query the parent window size ... */
+  gtk_widget_set_size_request (plugin->parent, 800, 480);
   plugin->parent->window = gdk_window_foreign_new ((GdkNativeWindow) hcp);
   /* ... hack end */
 
