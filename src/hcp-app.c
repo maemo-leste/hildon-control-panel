@@ -417,7 +417,13 @@ search_window_r (gchar *wm_class,
     if (prop)
     {
       if (strcasecmp ((char*) prop, wm_class) == 0)
-        *result = g_slist_append (*result, GUINT_TO_POINTER (w));
+      {
+        XWindowAttributes attrs = { 0 };
+        XGetWindowAttributes(GDK_DISPLAY (), w, &attrs);
+        /* we should ignore unmapped applet windows ... */
+        if (attrs.map_state != IsUnmapped)
+          *result = g_slist_append (*result, GUINT_TO_POINTER (w));
+      }
       XFree (prop);
     }
   }

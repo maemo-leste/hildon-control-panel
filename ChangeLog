@@ -1,3 +1,9 @@
+2009-08-11 David Kedves <dkedves@blumsoft.eu>
+
+	* src/hcp-app.c:
+	 - Ignore unmapped windows when looking for applet window-id
+	   (the idea from Peter)
+
 2009-08-10 David Kedves <dkedves@blumsoft.eu>
 
 	* src/hcp-app-loader.c:
