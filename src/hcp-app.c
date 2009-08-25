@@ -26,20 +26,12 @@
 #include <config.h>
 #endif
 
-#define _XOPEN_SOURCE 2009
-#include <unistd.h>
 #include <dlfcn.h>
 #include <string.h>
-#include <strings.h>
-#include <ctype.h>
-#include <sys/types.h>
-#include <signal.h>
 
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
-#include <gdk/gdkx.h>
-#include <X11/Xatom.h>
 
 #include "hcp-program.h"
 #include "hcp-app.h"
@@ -73,17 +65,19 @@ struct _HCPAppPrivate
     gint                     item_pos;
     gint                     sugg_pos;
     gchar                   *text_domain;
-    gchar                   *wm_class;
-    Window                   xid;
-    GPid                     pid;
+    void                    *handle;
+    hcp_plugin_exec_f       *exec;
+    hcp_plugin_save_state_f *save_state;
 };
 
 typedef struct _PluginLaunchData
 {
   HCPApp     *app;
   gboolean    user_activated;
-  char       *hcp_xid;
 } PluginLaunchData;
+
+#define HCP_PLUGIN_EXEC_SYMBOL        "execute"
+#define HCP_PLUGIN_SAVE_STATE_SYMBOL  "save_state"
 
 static void
 hcp_app_init (HCPApp *app)
@@ -92,14 +86,144 @@ hcp_app_init (HCPApp *app)
 
   app->priv->name = NULL;
   app->priv->plugin = NULL;
-  app->priv->wm_class = NULL;
   app->priv->icon = NULL;
   app->priv->category = NULL;
   app->priv->is_running = FALSE;
   app->priv->grid = NULL;
   app->priv->item_pos = -1;
   app->priv->text_domain = NULL;
+  app->priv->save_state = NULL;
   app->priv->sugg_pos = G_MAXINT;
+}
+
+static void
+hcp_app_load (HCPApp *app)
+{
+  gchar *plugin_path = NULL;
+  HCPAppPrivate *priv;
+
+  g_return_if_fail (app);
+  g_return_if_fail (HCP_IS_APP (app));
+
+  priv = app->priv; 
+
+  g_return_if_fail (priv->plugin);
+
+  if (*priv->plugin == G_DIR_SEPARATOR)
+  {
+    /* .desktop provided fullpath, use that */
+    plugin_path = g_strdup (priv->plugin);
+  }
+  else
+  {
+    plugin_path = g_build_filename (HCP_PLUGIN_DIR, priv->plugin, NULL);
+  }
+
+  if (!priv->handle)
+  {
+    priv->handle = dlopen (plugin_path, RTLD_LAZY);
+  }
+ 
+  g_free (plugin_path);
+
+  if (!priv->handle)
+  {
+    g_warning ("Could not load hildon-control-panel applet %s: %s",
+               priv->plugin,
+               dlerror());
+    return;
+  }
+
+  if (!priv->exec)
+  {
+    priv->exec = dlsym (priv->handle, HCP_PLUGIN_EXEC_SYMBOL);
+  }
+    
+  if (!priv->exec)
+  {
+    g_warning ("Could not find "HCP_PLUGIN_EXEC_SYMBOL" symbol in "
+               "hildon-control-panel applet %s: %s",
+               priv->plugin,
+               dlerror ());
+
+    dlclose (priv->handle);
+
+    priv->handle = NULL;
+	return;
+  }
+
+  if (!priv->save_state)
+  {
+    priv->save_state = dlsym (priv->handle, HCP_PLUGIN_SAVE_STATE_SYMBOL);
+  }
+}
+
+#if 0
+static void
+hcp_app_unload (HCPApp *app)
+{
+  HCPAppPrivate *priv;
+
+  g_return_if_fail (app);
+  g_return_if_fail (HCP_IS_APP (app));
+  g_return_if_fail (plugin->handle);
+
+  priv = app->priv; 
+
+  if (dlclose (priv->handle))
+  {
+      g_warning ("An error occurred when unloading hildon-control-panel "
+                 "applet %s: %s",
+                 priv->plugin,
+                 dlerror ());
+  }
+}
+#endif
+
+static gboolean
+hcp_app_idle_launch (PluginLaunchData *d)
+{
+  HCPAppPrivate *priv;
+  HCPProgram *program = hcp_program_get_instance ();
+
+  g_return_val_if_fail (d, FALSE);
+  g_return_val_if_fail (d->app, FALSE);
+  g_return_val_if_fail (HCP_IS_APP (d->app), FALSE);
+
+  priv = d->app->priv;
+
+  /* required for checking eg. save_state availability and to be on the safe side */
+  hcp_app_load (d->app);
+
+  if (!priv->handle)
+    goto cleanup;
+
+  priv->is_running = TRUE;
+
+  /* Always use hcp->window as parent. */
+
+  priv->exec (program->osso, program->window, d->user_activated);
+
+  priv->is_running = FALSE;
+
+  program->execute = 0;
+
+#if 0
+  /* Do not close the module and reuse it to avoid GType related
+   * errors. */
+  hcp_app_unload (d->app, p);
+#endif
+  
+  /* HCP was launched window less, so we can exit once we are done
+   * with this applet */
+  if (!program->window)
+     gtk_main_quit ();
+
+cleanup:
+  g_object_unref (d->app);
+  g_free (d);
+
+  return FALSE;
 }
 
 static void
@@ -124,12 +248,6 @@ hcp_app_finalize (GObject *object)
   {
     g_free (priv->plugin);
     priv->plugin = NULL;
-  }
-
-  if (priv->wm_class != NULL) 
-  {
-    g_free (priv->wm_class);
-    priv->wm_class = NULL;
   }
 
   if (priv->icon != NULL) 
@@ -213,21 +331,6 @@ hcp_app_get_property (GObject    *gobject,
   }
 }
 
-static gchar *
-wm_class_from_so_name (const gchar* so_name)
-{
-  char* ret = g_path_get_basename (so_name);
-  int i, len = strlen (ret);
-  for (i = 0; i < len; i++)
-  {
-    if (!isalpha (ret[i]))
-      ret[i] = '_';
-    else
-      ret[i] = toupper (ret[i]);
-  }
-  return (gchar*) ret;
-}
-
 static void
 hcp_app_set_property (GObject      *gobject,
                       guint        prop_id,
@@ -248,8 +351,6 @@ hcp_app_set_property (GObject      *gobject,
     case PROP_PLUGIN:
       g_free (priv->plugin);
       priv->plugin = g_strdup (g_value_get_string (value));
-      g_free (priv->wm_class);
-      priv->wm_class =wm_class_from_so_name (priv->plugin);
       break;
 
     case PROP_ICON:
@@ -388,210 +489,30 @@ hcp_app_new ()
   return app;
 }
 
-static void
-search_window_r (gchar *wm_class, 
-                 Atom           atom, 
-		 Window         w, 
-		 GSList       **result)
-{
-  unsigned long  nItems;
-  unsigned long  bytesAfter;
-  unsigned char *prop = NULL;
-  Atom           type;
-  int            format;
-  Window         root;
-  Window         parent;
-  Window        *children;
-  unsigned int   count;
-  unsigned int   i;
-
-  /* to avoid HCP exiting on X error ... */
-  gdk_error_trap_push ();
-
-  /* Get the _NET_WM_PID property ... */
-  if (XGetWindowProperty (GDK_DISPLAY (), w, atom,
-                          0, 200, False, XA_STRING, &type, &format, &nItems,
-			  &bytesAfter, &prop) == Success)
-  {
-    /* in case of hit, prepend to result list  */
-    if (prop)
-    {
-      if (strcasecmp ((char*) prop, wm_class) == 0)
-      {
-        XWindowAttributes attrs = { 0 };
-        XGetWindowAttributes(GDK_DISPLAY (), w, &attrs);
-        /* we should ignore unmapped applet windows ... */
-        if (attrs.map_state != IsUnmapped)
-          *result = g_slist_append (*result, GUINT_TO_POINTER (w));
-      }
-      XFree (prop);
-    }
-  }
-
-  /* On X error, should not try query the actual window tree */
-  gdk_flush (); /* for trap_pop */
-  if (gdk_error_trap_pop ())
-    return; /* Current 'w' Window is closed meanwhile ... */
-
-  /* Recursion to child windows ... */
-  if (XQueryTree(GDK_DISPLAY (), w, &root, &parent, &children, &count))
-  {
-    for (i = 0; i < count; i++)
-      search_window_r (wm_class, atom, children[i], result);
-  }
-}
-
-static Window
-get_xid_by_wm_class (gchar *wm_class)
-{
-  GdkAtom atom_pid;
-  GSList *results = NULL;
-  Window  ret;
-  atom_pid = gdk_atom_intern ("WM_CLASS", FALSE);
-  search_window_r (wm_class, gdk_x11_atom_to_xatom (atom_pid),
-                   GDK_ROOT_WINDOW (), &results);
-
-  if (!results)
-    ret = None;
-  else
-  {
-   /* Return the topmost window xid */
-    ret = GPOINTER_TO_UINT (results->data);
-    g_slist_free (results);
-  }
-
-  return ret; 
-}
-
-static gboolean
-try_focus (HCPApp *app)
-{
-  XClientMessageEvent  xclient;
-  HCPProgram          *program = hcp_program_get_instance ();
-  g_return_val_if_fail (hcp_app_is_running (app), FALSE);
-
-  /* 'app' is already the topmost -> no need to raising */
-  if (!program->running_applets ||
-      (g_list_last (program->running_applets)->data == app))
-    return FALSE;
-
-  if (app->priv->xid == None)
-    app->priv->xid = get_xid_by_wm_class (app->priv->wm_class);
-
-  g_debug ("applet xid: 0x%lx", (unsigned long) app->priv->xid);
-
-  if (app->priv->xid == None)
-    return FALSE; /* plugin window isn't exists anymore ...*/
-
-  /* Topping window: */
-#ifndef HD_PROPERLY_RAISING
-  /* XXX: HACK: force restacking with quickly unmapping / mapping */
-  gdk_error_trap_push ();
-  XUnmapWindow (GDK_DISPLAY (), app->priv->xid);
-  gdk_error_trap_pop ();
-
-  gdk_error_trap_push ();
-  XMapRaised (GDK_DISPLAY (), app->priv->xid);
-  gdk_error_trap_pop ();
-#else /* HD_PROPERLY_RAISING */
-  gdk_error_trap_push ();
-  XRaiseWindow (GDK_DISPLAY (), app->priv->xid);
-  gdk_error_trap_pop ();
-#endif
-
-  /* Focusing window */
-  memset (&xclient, 0, sizeof (xclient));
-  xclient.type = ClientMessage;
-  xclient.window = app->priv->xid;
-  xclient.message_type = gdk_x11_get_xatom_by_name ("_NET_ACTIVE_WINDOW");
-  xclient.format = 32;
-  xclient.data.l[0] = 1; /* requestor type; we're an app */
-  xclient.data.l[1] = 0;
-  xclient.data.l[2] = None; /* currently active window */
-  xclient.data.l[3] = 0; 
-  xclient.data.l[4] = 0; 
-  
-  gdk_error_trap_push ();
-  XSendEvent (GDK_DISPLAY (), GDK_ROOT_WINDOW (), False,
-              SubstructureRedirectMask | SubstructureNotifyMask,
-              (XEvent *)&xclient);
-  gdk_error_trap_pop ();
-
-  /* move to the end of the list (to save proper ordering...) */
-  program->running_applets = g_list_remove (program->running_applets,
-                                            (gconstpointer) app);
-  program->running_applets = g_list_append (program->running_applets,
-                                            (gpointer) app);
-
-  return TRUE;
-}
-
-static void
-cpa_child_watch (GPid pid,
-                 gint status,
-		 PluginLaunchData *d)
-{
-  HCPApp      *app = d->app;
-  HCPProgram  *program = hcp_program_get_instance ();
-
-  app->priv->is_running = FALSE;
-  app->priv->xid = None;
-  program->running_applets = g_list_remove (program->running_applets,
-                                            (gconstpointer) app);
-
-  g_debug ("CPA process exited with status = '%d'", status);
-
-  g_object_unref (app);
-  g_free (d->hcp_xid);
-  g_free (d);
-  return;
-}
-
 void
 hcp_app_launch (HCPApp *app, gboolean user_activated)
 {
+  PluginLaunchData *d;
+  HCPProgram *program = hcp_program_get_instance ();
+
   g_return_if_fail (app);
   g_return_if_fail (HCP_IS_APP (app));
+  g_return_if_fail (!hcp_app_is_running (app));
 
-  char             *argv[6];
-  PluginLaunchData *d;
-  HCPProgram       *program = hcp_program_get_instance ();
-
-  if (hcp_app_is_running (app))
+  if (!program->execute)
   {
-    try_focus (app);
-    return;
+      program->execute = 1;
+
+      d = g_new0 (PluginLaunchData, 1);
+
+      d->user_activated = user_activated;
+      d->app = g_object_ref (app);
+
+      /* We launch plugins inside an idle loop so we are still able
+       * to receive DBus messages */
+      g_idle_add ((GSourceFunc) hcp_app_idle_launch, d);
   }
-
-  program->running_applets = g_list_append (program->running_applets,
-                                            (gpointer) app);
-
-  d = g_new0 (PluginLaunchData, 1);
-
-  d->user_activated = user_activated;
-  d->app = g_object_ref (app);
-  d->hcp_xid = g_strdup_printf ("%lu", (unsigned long) GDK_WINDOW_XID 
-                                       (GTK_WIDGET (program->window)->window));
-
-  app->priv->is_running = TRUE;
-  app->priv->xid = None;
-
-  argv[0] = "/usr/bin/cpa_loader";
-  argv[1] = app->priv->plugin;
-  argv[2] = app->priv->wm_class;
-  argv[3] = ( d->user_activated ? "1" : "0" );
-  argv[4] = d->hcp_xid;
-  argv[5] = NULL;
-
-  g_spawn_async (NULL, (char**) argv, NULL,
-                 (GSpawnFlags) G_SPAWN_DO_NOT_REAP_CHILD,
-                 NULL, NULL, &app->priv->pid, NULL);
-
-  /* For watching applet exiting ... */
-  g_child_watch_add (app->priv->pid, 
-                     (GChildWatchFunc) cpa_child_watch, d);
 }
-
 
 void
 hcp_app_focus (HCPApp *app)
@@ -617,16 +538,16 @@ hcp_app_focus (HCPApp *app)
 void
 hcp_app_save_state (HCPApp *app)
 {
+  HCPAppPrivate *priv;
+  HCPProgram *program = hcp_program_get_instance ();
+
   g_return_if_fail (app);
   g_return_if_fail (HCP_IS_APP (app));
-  g_return_if_fail (hcp_app_is_running (app));
 
-  if (app->priv->pid > 0)
-  {
-    /* Kill SIGTERM to plugin (to save state ... ) */
-    kill ((pid_t) app->priv->pid, 15);
-/*    g_debug ("hcp_app_save_state ('%s')", app->priv->name); */
-  }
+  priv = app->priv;
+
+  if (priv->save_state)
+    priv->save_state (program->osso, NULL);
 }
 
 gboolean
@@ -645,8 +566,14 @@ hcp_app_is_running (HCPApp *app)
 gboolean
 hcp_app_can_save_state (HCPApp *app)
 {
-  /* Lets cpa_loader to decide applet can save itself state */
-  return TRUE;
+  HCPAppPrivate *priv;
+
+  g_return_val_if_fail (app, FALSE);
+  g_return_val_if_fail (HCP_IS_APP (app), FALSE);
+
+  priv = app->priv;
+
+  return (priv->save_state != NULL);
 }
 
 gint
@@ -661,13 +588,3 @@ hcp_app_sort_func (const HCPApp *a, const HCPApp *b)
 
   return ret;
 }
-
-gchar *
-hcp_app_get_plugin (HCPApp *app)
-{
-  g_return_val_if_fail (app, NULL);
-  g_return_val_if_fail (HCP_IS_APP (app), NULL);
-
-  return app->priv->plugin;
-}
-

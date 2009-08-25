@@ -1,3 +1,10 @@
+hildon-control-panel (1:2.2.15-1) unstable; urgency=low
+
+  Reverted changes since 2.2.12-1.
+  * Fixes: NB#131500 - Control panel layout incorrect
+
+ -- Peter Aradi <peter.aradi@maemo.org>  Tue, 25 Aug 2009 09:30:14 +0100
+
 hildon-control-panel (1:2.2.14-1) unstable; urgency=low
 
   Regression fixes [ David Kedves ]

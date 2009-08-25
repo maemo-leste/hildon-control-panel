@@ -1,3 +1,11 @@
+2009-08-25 Peter Aradi <peter.aradi@maemo.org>
+
+	Reverted David's changes.
+	* src/hcp-app-view.c:
+	* src/hcp-grid.[ch]:
+	* src/hcp-window.c:
+	Updated layout.
+
 2009-08-11 David Kedves <dkedves@blumsoft.eu>
 
 	* src/hcp-app.c:

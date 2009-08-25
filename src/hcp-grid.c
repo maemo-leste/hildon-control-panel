@@ -41,10 +41,10 @@
 
 G_DEFINE_TYPE (HCPGrid, hcp_grid, GTK_TYPE_ICON_VIEW)
 
-#define HCP_GRID_ITEM_WIDTH  328 
+#define HCP_GRID_ITEM_WIDTH  372 
 #define HCP_GRID_X_PADDING   4
 #define HCP_GRID_Y_PADDING   2
-#define HCP_ICON_SIZE        HILDON_ICON_PIXEL_SIZE_THUMB
+#define HCP_ICON_SIZE        HILDON_ICON_PIXEL_SIZE_FINGER
 
 struct _HCPGridPrivate {
   GtkCellRenderer *text_cell;
@@ -157,9 +157,9 @@ hcp_grid_init (HCPGrid *grid)
                                   NULL);
 
   grid->priv->text_cell = gtk_cell_renderer_text_new ();
-  gtk_cell_renderer_set_fixed_size (grid->priv->text_cell, 248,-1);
+  gtk_cell_renderer_set_fixed_size (grid->priv->text_cell, 300 ,-1);
 
-  /* FIXME: it seems that text truncation only works with GtkLabel */
+  /* NOTE: it seems that text truncation only works with GtkLabel */
   g_object_set (G_OBJECT(grid->priv->text_cell), "ellipsize", PANGO_ELLIPSIZE_END, NULL);
 
   gtk_cell_renderer_text_set_fixed_height_from_font (GTK_CELL_RENDERER_TEXT(grid->priv->text_cell),1);
@@ -179,7 +179,7 @@ hcp_grid_init (HCPGrid *grid)
 
   gtk_icon_view_set_margin (GTK_ICON_VIEW (grid), 0);
 
-  gtk_icon_view_set_column_spacing (GTK_ICON_VIEW (grid), 8);
+  gtk_icon_view_set_column_spacing (GTK_ICON_VIEW (grid), HILDON_MARGIN_DOUBLE);
   gtk_icon_view_set_row_spacing (GTK_ICON_VIEW (grid), 0);
   gtk_icon_view_set_spacing (GTK_ICON_VIEW (grid), 6);
 

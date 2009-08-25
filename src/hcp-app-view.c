@@ -30,7 +30,6 @@
 
 #include "hcp-app-view.h"
 #include "hcp-app-list.h"
-#include "hcp-program.h"
 #include "hcp-app.h"
 #include "hcp-grid.h"
 #include "hcp-marshalers.h"
@@ -78,6 +77,8 @@ hcp_app_view_create_grid ()
 
   grid = hcp_grid_new (HILDON_UI_MODE_NORMAL);
   gtk_widget_set_name (grid, "hildon-control-panel-grid");
+  /* margins are HILDON_MARGIN_DOUBLE, allocate rest of the space to view*/
+  gtk_widget_set_size_request (GTK_WIDGET (grid), 760, -1);
 
   return grid;
 }
@@ -89,6 +90,7 @@ hcp_app_view_create_separator (const gchar *label)
   GtkWidget *separator_1 = gtk_hseparator_new ();
   GtkWidget *separator_2 = gtk_hseparator_new ();
   GtkWidget *label_1 = gtk_label_new (label);
+  gtk_widget_set_size_request (hbox, -1, 35);
 
   gtk_widget_set_name (separator_1, "hildon-control-panel-separator");
   gtk_widget_set_name (separator_2, "hildon-control-panel-separator");
@@ -132,12 +134,6 @@ hcp_app_view_launch_app (GtkWidget *widget,
                          GtkTreePath *path, 
                          gpointer user_data)
 {
-  HCPProgram* program = hcp_program_get_instance ();
-
-  /* Users should able to start only one applet at a time
-   * from HCP main window (more can be started by libosso) */
-  if (program->running_applets)
-    return;
 
   HCPApp *app = hcp_app_view_get_selected_app (widget, path);
 
@@ -209,7 +205,10 @@ hcp_app_view_add_category (HCPCategory *category, HCPAppView *view)
 
     /* Pack the separator and the corresponding grid to the vbox */
     gtk_box_pack_start (GTK_BOX (view), separator, FALSE, FALSE, 0);
-    gtk_box_pack_start (GTK_BOX (view), grid, FALSE, TRUE, 0);
+    GtkWidget *align = gtk_alignment_new (0,0,0,0);
+    gtk_alignment_set_padding (GTK_ALIGNMENT(align),0,35,0,0);
+    gtk_container_add (GTK_CONTAINER(align), GTK_WIDGET(grid));
+    gtk_box_pack_start (GTK_BOX (view), align, FALSE, FALSE, 0);
 
     gtk_container_get_focus_chain (GTK_CONTAINER (view), &focus_chain);
     focus_chain = g_list_append (focus_chain, grid);

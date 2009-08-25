@@ -33,7 +33,7 @@
 #include <glib/gi18n.h>
 #include <libgnomevfs/gnome-vfs.h>
 #include <hildon/hildon.h>
-#include <locale.h>
+
 #include "hcp-program.h"
 
 int main (int argc, char **argv)

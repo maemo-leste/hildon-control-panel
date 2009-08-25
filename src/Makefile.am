@@ -33,7 +33,7 @@ hcp-marshalers.h: hcp-marshalers.list
 hcp-marshalers.c: hcp-marshalers.list
 	$(GLIB_GENMARSHAL) $< --header --body --prefix=hcp_marshal > $@
 
-bin_PROGRAMS = controlpanel cpa_loader
+bin_PROGRAMS = controlpanel
 
 controlpanel_SOURCES = \
 	$(BUILT_SOURCES) \
@@ -53,9 +53,6 @@ controlpanel_SOURCES = \
 	hcp-grid.c \
 	hildon-cp-plugin-interface.h
 
-cpa_loader_SOURCES = \
-        hcp-app-loader.c
-
 if USE_MAEMO_TOOLS
 controlpanel_SOURCES += \
 	hcp-rfs.c \
@@ -67,11 +64,8 @@ BUILT_SOURCES = hcp-marshalers.c \
 
 controlpanel_LDFLAGS = $(MAEMO_LAUNCHER_LDFLAGS)
 
-controlpanel_LDADD = $(HCP_DEPS_LIBS)
-
-cpa_loader_LDFLAGS = $(MAEMO_LAUNCHER_LDFLAGS)
-
-cpa_loader_LDADD = $(HCP_DEPS_LIBS)
+controlpanel_LDADD = \
+	$(HCP_DEPS_LIBS)
 
 hildon_cp_pluginincludeinstdir=$(includedir)/hildon-cp-plugin
 hildon_cp_pluginincludeinst_DATA = hildon-cp-plugin-interface.h

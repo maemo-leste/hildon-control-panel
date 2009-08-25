@@ -37,7 +37,7 @@ typedef struct _HCPGridPrivate HCPGridPrivate;
 #define HCP_IS_GRID_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), HCP_TYPE_GRID))
 #define HCP_GRID_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), HCP_TYPE_GRID, HCPGridClass))
 
-#define HCP_DEFAULT_ICON_BASENAME  "qgn_list_gene_unknown_file"
+#define HCP_DEFAULT_ICON_BASENAME  "filemanager_unknown_file"
 
 #define HCP_GRID_NUM_COLUMNS       2
 
