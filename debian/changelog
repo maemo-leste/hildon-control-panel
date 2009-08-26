@@ -27,11 +27,11 @@ hildon-control-panel (1:2.2.12-1) unstable; urgency=low
   * Applets now running in separate processes from HCP
   * Applets always transient for hildon-control-panel
   * State saving support for multiple applets
-  * Fixes: NB#98750 - Two instances of Language and Regional settings CPA is
+  * Fixes NB#98750 - Two instances of Language and Regional settings CPA is
     shown
-  * Fixes: NB#96278 - Closing one instance of the applet does not close the
+  * Fixes NB#96278 - Closing one instance of the applet does not close the
     other.
-  * Fixes: NB#102740 - The maesync CP dialog is not closed when clicked on the
+  * Fixes NB#102740 - The maesync CP dialog is not closed when clicked on the
     status area.
 
  -- Kimmo Hämäläinen <kimmo.hamalainen@nokia.com>  Thu, 06 Aug 2009 12:26:37 +0300
