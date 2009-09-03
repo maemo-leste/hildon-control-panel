@@ -34,6 +34,8 @@
 #include "hcp-grid.h"
 #include "hcp-marshalers.h"
 #include <hildon/hildon-gtk.h>
+#include <hildon/hildon-helper.h>
+
 #define HCP_APP_VIEW_GET_PRIVATE(object) \
         (G_TYPE_INSTANCE_GET_PRIVATE ((object), HCP_TYPE_APP_VIEW, HCPAppViewPrivate))
 
@@ -90,7 +92,7 @@ hcp_app_view_create_separator (const gchar *label)
   GtkWidget *separator_1 = gtk_hseparator_new ();
   GtkWidget *separator_2 = gtk_hseparator_new ();
   GtkWidget *label_1 = gtk_label_new (label);
-  gtk_widget_set_size_request (hbox, -1, 35);
+  gtk_widget_set_size_request (hbox, 768, 35);
 
   gtk_widget_set_name (separator_1, "hildon-control-panel-separator");
   gtk_widget_set_name (separator_2, "hildon-control-panel-separator");
@@ -204,11 +206,18 @@ hcp_app_view_add_category (HCPCategory *category, HCPAppView *view)
     separator = hcp_app_view_create_separator (_(category->name));
 
     /* Pack the separator and the corresponding grid to the vbox */
-    gtk_box_pack_start (GTK_BOX (view), separator, FALSE, FALSE, 0);
-    GtkWidget *align = gtk_alignment_new (0,0,0,0);
-    gtk_alignment_set_padding (GTK_ALIGNMENT(align),0,35,0,0);
-    gtk_container_add (GTK_CONTAINER(align), GTK_WIDGET(grid));
-    gtk_box_pack_start (GTK_BOX (view), align, FALSE, FALSE, 0);
+	if (!view->priv->first_grid)
+	{
+      /* first group */
+      GtkWidget *align = gtk_alignment_new (0,0,0,0);
+	  gtk_alignment_set_padding (GTK_ALIGNMENT(align),HILDON_MARGIN_DEFAULT,0,0,0);
+      gtk_container_add (GTK_CONTAINER (align), separator);
+      gtk_box_pack_start (GTK_BOX (view), align, FALSE, FALSE, 0);
+ 	} else {
+      gtk_box_pack_start (GTK_BOX (view), separator, FALSE, FALSE, 0);
+	} 
+   	
+	gtk_box_pack_start (GTK_BOX (view), GTK_WIDGET(grid), FALSE, FALSE, 0);
 
     gtk_container_get_focus_chain (GTK_CONTAINER (view), &focus_chain);
     focus_chain = g_list_append (focus_chain, grid);
@@ -222,8 +231,9 @@ hcp_app_view_add_category (HCPCategory *category, HCPAppView *view)
                      (GFunc) hcp_app_view_add_app,
                      grid);
 
-  hcp_grid_refresh_icons (HCP_GRID(grid));
+    hcp_grid_refresh_icons (HCP_GRID(grid));
 
+    /* first group */
     if (!view->priv->first_grid)
       view->priv->first_grid = grid;
   }

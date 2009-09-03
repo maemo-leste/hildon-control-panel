@@ -141,6 +141,8 @@ hcp_grid_init (HCPGrid *grid)
   grid->priv->icon_size = HCP_ICON_SIZE;
 
   grid->priv->pixbuf_cell = gtk_cell_renderer_pixbuf_new ();
+  gtk_cell_renderer_set_fixed_size (grid->priv->pixbuf_cell,
+									HCP_ICON_SIZE+2*HCP_GRID_X_PADDING , -1);
 
   gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (grid), 
 		  	      grid->priv->pixbuf_cell, 
@@ -157,12 +159,10 @@ hcp_grid_init (HCPGrid *grid)
                                   NULL);
 
   grid->priv->text_cell = gtk_cell_renderer_text_new ();
-  gtk_cell_renderer_set_fixed_size (grid->priv->text_cell, 300 ,-1);
+  gtk_cell_renderer_set_fixed_size (grid->priv->text_cell, 300 , 60);
 
   /* NOTE: it seems that text truncation only works with GtkLabel */
   g_object_set (G_OBJECT(grid->priv->text_cell), "ellipsize", PANGO_ELLIPSIZE_END, NULL);
-
-  gtk_cell_renderer_text_set_fixed_height_from_font (GTK_CELL_RENDERER_TEXT(grid->priv->text_cell),1);
 
   gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (grid), 
 		  	      grid->priv->text_cell, 

@@ -1,3 +1,9 @@
+2009-09-03 Peter Aradi <peter.aradi@maemo.org>
+
+	* src/hcp-app-view.c:
+	* src/hcp-grid.c:
+	Updated layout.
+
 2009-08-25 Peter Aradi <peter.aradi@maemo.org>
 
 	Reverted David's changes.
