@@ -1,3 +1,9 @@
+hildon-control-panel (1:2.2.17-1) unstable; urgency=low
+
+  * Fixes: NB#139895 - Control panel needs to take a screenshot
+
+ -- Peter Aradi <peter.aradi@maemo.org>  Thu, 23 Sep 2009 18:42:17 +0100
+
 hildon-control-panel (1:2.2.16-1) unstable; urgency=low
 
   * Fixes: NB#131500 - Control panel layout incorrect

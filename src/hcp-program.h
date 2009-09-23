@@ -55,6 +55,9 @@ struct _HCPProgram
   HCPAppList     *al;
   osso_context_t *osso;
   gint            execute;
+  /* signal handler id, currently used for screenshot when window is visible
+   * with it's contents */
+  gulong          handler_id;
 };
 
 struct _HCPProgramClass 

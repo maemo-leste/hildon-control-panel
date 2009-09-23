@@ -83,6 +83,7 @@ struct _HCPWindowPrivate
 
 #define HCP_CUD_WARNING        _("cud_ia_text")
 #define HCP_CUD_SCRIPT         "/usr/sbin/osso-app-killer-cud.sh"
+#define HCP_SCREENSHOT_PATH    "/home/user/.cache/launch/com.nokia.controlpanel.pvr"
 
 static void 
 hcp_window_enforce_state (HCPWindow *window)
@@ -455,7 +456,7 @@ hcp_window_app_list_updated_cb (HCPAppList *al, HCPWindow *window)
   hcp_app_view_populate (HCP_APP_VIEW (priv->view), al);
 
   gtk_widget_show_all (priv->view);
-
+    
   if (priv->focused_item == NULL)
     return;
 	  
@@ -496,6 +497,29 @@ static void hcp_window_quit (GtkWidget *widget, HCPWindow *window)
   gtk_widget_destroy (GTK_WIDGET (window));
 
   gtk_main_quit ();
+}
+
+static gboolean
+hcp_take_screenshot (gpointer data)
+{
+
+  if (!g_file_test(HCP_SCREENSHOT_PATH, G_FILE_TEST_EXISTS)){
+    g_debug("taking screenshot");
+    hildon_gtk_window_take_screenshot(GTK_WINDOW(data), TRUE);
+  }
+  return FALSE;
+}
+
+static gboolean
+_expose_cb (GtkWidget *widget, GdkEventExpose *event, gpointer data)
+{
+  HCPProgram *program = hcp_program_get_instance ();
+  
+  g_timeout_add (80, hcp_take_screenshot, program->window);
+
+  /* we only need to call this once */
+  g_signal_handler_disconnect(G_OBJECT(data), program->handler_id);
+  return FALSE;
 }
 
 static void 
@@ -601,7 +625,6 @@ hcp_window_construct_ui (HCPWindow *window)
   hildon_pannable_area_add_with_viewport (
           HILDON_PANNABLE_AREA (scrolled_window),
           align);
-
 }
 
 static void
@@ -634,6 +657,9 @@ hcp_window_init (HCPWindow *window)
   hcp_window_construct_ui (window);
 
   hcp_app_view_populate (HCP_APP_VIEW (priv->view), priv->al);
+
+  program->handler_id = g_signal_connect_after (G_OBJECT (priv->view), "expose-event",
+                          G_CALLBACK (_expose_cb), priv->view);
 }
 
 static void
