@@ -85,6 +85,9 @@ struct _HCPWindowPrivate
 #define HCP_CUD_SCRIPT         "/usr/sbin/osso-app-killer-cud.sh"
 #define HCP_SCREENSHOT_PATH    "/home/user/.cache/launch/com.nokia.controlpanel.pvr"
 
+#define HCP_WITH_ROS           1
+#define HCP_WITH_CUD           0
+
 static void 
 hcp_window_enforce_state (HCPWindow *window)
 {
@@ -369,6 +372,7 @@ hcp_window_keyboard_listener (GtkWidget * widget,
 }
 
 #ifdef MAEMO_TOOLS
+#if HCP_WITH_CUD
 static gboolean 
 hcp_window_clear_user_data (GtkWidget *widget, HCPWindow *window)
 {
@@ -378,7 +382,8 @@ hcp_window_clear_user_data (GtkWidget *widget, HCPWindow *window)
 
   return TRUE;
 }
-
+#endif
+#if HCP_WITH_ROS
 static gboolean 
 hcp_window_reset_factory_settings (GtkWidget *widget, HCPWindow *window)
 {
@@ -388,7 +393,7 @@ hcp_window_reset_factory_settings (GtkWidget *widget, HCPWindow *window)
 
   return TRUE;
 }
-
+#endif
 #endif
 
 static void 
@@ -576,28 +581,35 @@ hcp_window_construct_ui (HCPWindow *window)
 #ifdef MAEMO_TOOLS
 
   /* Reset Factory Settings */
-  mi = hildon_button_new_with_text (HILDON_SIZE_AUTO_WIDTH |
-									HILDON_SIZE_FINGER_HEIGHT, 
-									HILDON_BUTTON_ARRANGEMENT_VERTICAL,
-									HCP_MENU_RFS, NULL);
+#if HCP_WITH_ROS
+  mi = hildon_button_new (HILDON_SIZE_AUTO_WIDTH |
+						  HILDON_SIZE_FINGER_HEIGHT,
+  						  HILDON_BUTTON_ARRANGEMENT_VERTICAL);
+
+  GtkWidget *ros_label = gtk_label_new (HCP_MENU_RFS);
+  gtk_label_set_justify (GTK_LABEL(ros_label), GTK_JUSTIFY_CENTER );
+
+  gtk_container_add (GTK_CONTAINER(mi), ros_label);
+ 
   hildon_helper_set_logical_font (mi, "SmallSystemFont");
  
   hildon_app_menu_append (menu, GTK_BUTTON(mi));
 
   g_signal_connect (mi, "clicked",
                     G_CALLBACK (hcp_window_reset_factory_settings), window);
-
+#endif
   /* Clean User Data */
+#if HCP_WITH_CUD
   mi = hildon_button_new_with_text (HILDON_SIZE_AUTO_WIDTH |
 									HILDON_SIZE_FINGER_HEIGHT, 
 									HILDON_BUTTON_ARRANGEMENT_VERTICAL,
 									HCP_MENU_CUD, NULL);
-  hildon_helper_set_logical_font (mi, "SmallSystemFont");
 
   hildon_app_menu_append (menu, GTK_BUTTON(mi));
 
   g_signal_connect (mi, "clicked",
                     G_CALLBACK (hcp_window_clear_user_data), window);
+#endif
 #endif
   
   gtk_widget_show_all (GTK_WIDGET (menu));

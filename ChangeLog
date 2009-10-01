@@ -1,3 +1,14 @@
+2009-09-30  Peter Aradi <peter.aradi@maemo.org>
+
+	Release 2.2.18
+
+	* configure.ac: 2.2.18
+
+2009-09-30  Peter Aradi <peter.aradi@maemo.org>
+
+	* src/hcp-window.c:
+	removed item from app menu
+
 2009-09-23  Peter Aradi <peter.aradi@maemo.org>
 
 	Release 2.2.17
