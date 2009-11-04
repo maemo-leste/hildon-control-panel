@@ -1,3 +1,9 @@
+hildon-control-panel (1:2.2.19-1~unreleased) unstable; urgency=low
+
+  * unreleasing
+
+ -- Peter Aradi <peter.aradi@maemo.org>  Thu, 29 Oct 2009 14:47:27 +0100
+
 hildon-control-panel (1:2.2.18-1) unstable; urgency=low
 
   * Fixes: NB#141348 - Remove clear device

@@ -8,7 +8,7 @@ Standards-Version: 3.6.0
 Package: hildon-control-panel
 Section: x11
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, ${launcher:Depends}, hildon-control-panel-l10n-mr | hildon-control-panel-l10n-mr0, osso-app-killer (>= 1.1), osso-system-lock-l10n-mr | osso-system-lock-l10n-mr0
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${launcher:Depends}, hildon-control-panel-l10n-mr | hildon-control-panel-l10n-mr0, osso-app-killer (>= 1.1), osso-system-lock-l10n-mr | osso-system-lock-l10n-mr0, osso-connectivity-ui-l10n-mr | osso-connectivity-ui-l10n-mr0
 Recommends: hildon-theme-alpha, hildon-keyboard, matchbox-window-manager
 Suggests: hildon-tests
 Conflicts: hildon-base

@@ -1,3 +1,9 @@
+2009-10-04  Peter Aradi <peter.aradi@maemo.org>
+
+	* debian/control:
+	* src/hcp-window.c:
+	added unlock button to app menu
+
 2009-09-30  Peter Aradi <peter.aradi@maemo.org>
 
 	Release 2.2.18

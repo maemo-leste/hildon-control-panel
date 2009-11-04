@@ -37,6 +37,7 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 #include <gconf/gconf-client.h>
+#include <dbus/dbus-glib.h>
 
 #include "hcp-window.h"
 #include "hcp-program.h"
@@ -50,25 +51,11 @@
 #include "hcp-rfs.h"
 #endif
 
-#define HCP_WINDOW_GET_PRIVATE(object) \
-        (G_TYPE_INSTANCE_GET_PRIVATE ((object), HCP_TYPE_WINDOW, HCPWindowPrivate))
-
-G_DEFINE_TYPE (HCPWindow, hcp_window, HILDON_TYPE_STACKABLE_WINDOW);
-
-struct _HCPWindowPrivate 
-{
-  HCPApp         *focused_item;
-  HCPAppList     *al;
-  GtkWidget      *view;
-
-  /* For state save data */
-  gchar          *saved_focused_filename;
-  gint            scroll_value;
-};
-
 #define HCP_TITLE             _("copa_ap_cp_name")
 #define HCP_MENU_RFS          _("copa_me_tools_rfs")
 #define HCP_MENU_CUD          _("copa_me_tools_cud")
+#define HCP_MENU_SIM          dgettext("osso-connectivity-ui",\
+                                  "conn_ti_enter_sim_unlock_code")
 
 #define HCP_STATE_GROUP         "HildonControlPanel"
 #define HCP_STATE_FOCUSED       "Focussed"
@@ -85,8 +72,49 @@ struct _HCPWindowPrivate
 #define HCP_CUD_SCRIPT         "/usr/sbin/osso-app-killer-cud.sh"
 #define HCP_SCREENSHOT_PATH    "/home/user/.cache/launch/com.nokia.controlpanel.pvr"
 
+#define HCP_SIM_SCRIPT         "/usr/bin/startup-pin-query"
+
 #define HCP_WITH_ROS           1
 #define HCP_WITH_CUD           0
+#define HCP_WITH_SIM           1
+
+#if HCP_WITH_SIM
+#define	 HCP_SIMLOCK_NAME          "com.nokia.phone.SIM"
+#define	 HCP_SIMLOCK_PATH          "/com/nokia/phone/SIM"
+#define	 HCP_SIMLOCK_INTERFACE     "Phone.Sim"
+#define  HCP_SIMLOCK_CHECK_METHOD  "read_simlock_status"
+
+enum simlock_restriction_status{
+  HCP_SIMLOCK_RESTRICTED = 2,
+  HCP_SIMLOCK_RESTRICTION_ON = 3,
+  HCP_SIMLOCK_RESTRICTION_PENDING = 4
+};
+#endif /* if HCP_WITH_SIM */
+
+#define HCP_WINDOW_GET_PRIVATE(object) \
+        (G_TYPE_INSTANCE_GET_PRIVATE ((object), HCP_TYPE_WINDOW, HCPWindowPrivate))
+
+G_DEFINE_TYPE (HCPWindow, hcp_window, HILDON_TYPE_STACKABLE_WINDOW);
+
+struct _HCPWindowPrivate 
+{
+  HCPApp         *focused_item;
+  HCPAppList     *al;
+  GtkWidget      *view;
+
+  /* For state save data */
+  gchar          *saved_focused_filename;
+  gint            scroll_value;
+
+#if HCP_WITH_SIM
+  GtkWidget      *mi_simlock;
+#endif
+};
+
+#if HCP_WITH_SIM
+static void
+hcp_window_check_simlock (HCPWindow *window);
+#endif
 
 static void 
 hcp_window_enforce_state (HCPWindow *window)
@@ -394,7 +422,41 @@ hcp_window_reset_factory_settings (GtkWidget *widget, HCPWindow *window)
   return TRUE;
 }
 #endif
-#endif
+#if HCP_WITH_SIM
+static void
+_child_pinquery_cb (GPid pid, gint status, HCPWindow *window)
+{
+  hcp_window_check_simlock (window);
+  g_spawn_close_pid (pid);
+}
+
+static gboolean 
+hcp_window_sim_unlock (GtkWidget *widget, HCPWindow *window)
+{
+  textdomain(PACKAGE);
+  /* launch startup-pin-query, it will take care of the rest */
+  GError *error = NULL;
+  GPid pid;
+  gchar *cmd[1];
+  cmd[0] = g_strdup (HCP_SIM_SCRIPT);
+
+  if (!g_spawn_async (NULL, cmd, NULL,
+                      G_SPAWN_DO_NOT_REAP_CHILD,
+                      NULL, NULL, &pid, &error)) {
+    if (error) {
+      g_warning (error->message);
+      g_error_free (error);
+    }
+  }
+  g_child_watch_add (pid, (GChildWatchFunc)_child_pinquery_cb, window);
+  /* call this in a callback, once child has returned */
+  hcp_window_check_simlock (window);
+
+  g_free (cmd[0]);
+  return TRUE;
+}
+#endif /* if HCP_WITH_SIM */
+#endif /* ifdef MAEMO_TOOLS */
 
 static void 
 hcp_window_topmost_status_change (GObject *gobject, 
@@ -526,7 +588,74 @@ _expose_cb (GtkWidget *widget, GdkEventExpose *event, gpointer data)
   g_signal_handler_disconnect(G_OBJECT(data), program->handler_id);
   return FALSE;
 }
+#if HCP_WITH_SIM
+static void
+_simlock_cb (DBusGProxy* proxy, DBusGProxyCall* call, HCPWindow *window)
+{
+  gint ret;
+  GError *err = NULL;
 
+  HCPWindowPrivate *priv;
+  GtkWidget *mi;
+
+  g_return_if_fail (window);
+  g_return_if_fail (HCP_IS_WINDOW (window));
+
+  priv = window->priv;
+
+  mi = priv->mi_simlock;
+  g_return_if_fail (mi);
+  g_return_if_fail (GTK_IS_WIDGET (mi));
+
+  if (!dbus_g_proxy_end_call (proxy, call,
+                          &err, G_TYPE_INT,
+                          &ret, G_TYPE_INVALID)) {
+    g_warning ("unlock - communication error: %s\n", err->message);
+    g_error_free (err);
+  } else {
+    if ( ret == HCP_SIMLOCK_RESTRICTED          ||
+         ret == HCP_SIMLOCK_RESTRICTION_ON      ||
+         ret == HCP_SIMLOCK_RESTRICTION_PENDING  ) { 
+      /* show unlock button */
+      gtk_widget_set_no_show_all (mi, FALSE);
+      gtk_widget_show_all (mi);
+    } else {
+      /* hide unlock button */
+      gtk_widget_hide (mi);
+      gtk_widget_set_no_show_all (mi, TRUE);
+    }
+  }
+}
+
+static void
+hcp_window_check_simlock (HCPWindow* window)
+{
+  g_return_if_fail (window);
+  g_return_if_fail (HCP_IS_WINDOW (window));
+
+  DBusGConnection *conn;
+  GError *err = NULL;
+
+  conn = dbus_g_bus_get (DBUS_BUS_SYSTEM, &err);
+  if (!conn) {
+    g_warning ("Could not connect to dbus: %s\n", err->message);
+    g_error_free (err);
+  } else {
+    DBusGProxy *proxy;
+    proxy = dbus_g_proxy_new_for_name (conn,
+                                       HCP_SIMLOCK_NAME,
+                                       HCP_SIMLOCK_PATH,
+                                       HCP_SIMLOCK_INTERFACE);
+
+    dbus_g_proxy_begin_call (proxy,
+                             HCP_SIMLOCK_CHECK_METHOD,
+                             (DBusGProxyCallNotify)_simlock_cb,
+                             window,
+                             NULL,
+                             G_TYPE_INVALID);
+  }
+}
+#endif /* if HCP_WITH_SIM */
 static void 
 hcp_window_construct_ui (HCPWindow *window)
 {
@@ -598,7 +727,7 @@ hcp_window_construct_ui (HCPWindow *window)
   g_signal_connect (mi, "clicked",
                     G_CALLBACK (hcp_window_reset_factory_settings), window);
 #endif
-  /* Clean User Data */
+  /* Clear User Data */
 #if HCP_WITH_CUD
   mi = hildon_button_new_with_text (HILDON_SIZE_AUTO_WIDTH |
 									HILDON_SIZE_FINGER_HEIGHT, 
@@ -610,7 +739,29 @@ hcp_window_construct_ui (HCPWindow *window)
   g_signal_connect (mi, "clicked",
                     G_CALLBACK (hcp_window_clear_user_data), window);
 #endif
-#endif
+  /* unlock device */
+#if HCP_WITH_SIM
+  mi = hildon_button_new (HILDON_SIZE_AUTO_WIDTH |
+						  HILDON_SIZE_FINGER_HEIGHT,
+  						  HILDON_BUTTON_ARRANGEMENT_VERTICAL);
+
+  GtkWidget *sim_label = gtk_label_new (HCP_MENU_SIM);
+  gtk_label_set_justify (GTK_LABEL(sim_label), GTK_JUSTIFY_CENTER );
+
+  gtk_container_add (GTK_CONTAINER(mi), sim_label);
+
+  hildon_helper_set_logical_font (mi, "SmallSystemFont");
+
+  hildon_app_menu_append (menu, GTK_BUTTON(mi));
+
+  g_signal_connect (mi, "clicked",
+                    G_CALLBACK (hcp_window_sim_unlock), window);
+
+  gtk_widget_set_no_show_all(mi,TRUE);
+  priv->mi_simlock = mi;
+  hcp_window_check_simlock (window);
+#endif /* if HCP_WITH_SIM */
+#endif /* ifdef MAEMO_TOOLS */
   
   gtk_widget_show_all (GTK_WIDGET (menu));
 
@@ -652,7 +803,9 @@ hcp_window_init (HCPWindow *window)
   priv->focused_item = NULL;
   priv->saved_focused_filename = NULL;
   priv->scroll_value = 0;
-
+#if HCP_WITH_SIM
+  priv->mi_simlock = NULL;
+#endif
   priv->al = g_object_ref (program->al);
 
   hcp_window_retrieve_configuration (window);
