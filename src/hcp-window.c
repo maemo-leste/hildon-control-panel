@@ -449,8 +449,6 @@ hcp_window_sim_unlock (GtkWidget *widget, HCPWindow *window)
     }
   }
   g_child_watch_add (pid, (GChildWatchFunc)_child_pinquery_cb, window);
-  /* call this in a callback, once child has returned */
-  hcp_window_check_simlock (window);
 
   g_free (cmd[0]);
   return TRUE;
