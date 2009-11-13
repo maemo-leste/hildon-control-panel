@@ -24,7 +24,12 @@
 #ifndef __HCP_RFS_H__
 #define __HCP_RFS_H__
 
+#define   HCP_WITH_SIM    1
+
 gboolean hcp_rfs (const char *warning, 
                   const char *script); 
+#if HCP_WITH_SIM
+gboolean hcp_rfs_simlock (void);
+#endif
 
 #endif

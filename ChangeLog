@@ -1,3 +1,11 @@
+2009-11-13  Peter Aradi <peter.aradi@maemo.org>
+
+	* debian/control:
+	moved language package to 'Recommends'
+	* src/hcp-rfs.[ch]:
+	* src/hcp-window.c:
+	unlock button always visible. sends dbus message to sim interface.
+
 2009-10-05  Peter Aradi <peter.aradi@maemo.org>
 
 	Release 2.2.19

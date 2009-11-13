@@ -31,6 +31,7 @@
 #include <hildon/hildon-code-dialog.h>
 #include <hildon/hildon-note.h>
 #include <hildon/hildon-banner.h>
+#include <dbus/dbus-glib.h>
 #include <codelockui.h>
 #include <libosso.h>
 
@@ -42,6 +43,21 @@
 #define HCP_RFS_IB_WRONG_LOCKCODE  dgettext("osso-system-lock", "secu_info_incorrectcode")
 
 #define HCP_RFC_WARNING_DIALOG_WIDTH 450
+
+#if HCP_WITH_SIM
+#define HCP_SIM_DIALOG_TITLE          dgettext("osso-connectivity-ui",\
+                                        "conn_ti_enter_sim_unlock_code")
+#define  HCP_RFS_SIMLOCK_FAIL         dgettext("hildon-common-strings",\
+                                        "sfil_ni_operation_failed")
+#define  HCP_RFS_SIMLOCK_OK         dgettext("hildon-common-strings",\
+                                       "sfil_ni_operation_failed_ok")
+
+#define	 HCP_SIMLOCK_NAME          "com.nokia.phone.SIM"
+#define	 HCP_SIMLOCK_PATH          "/com/nokia/phone/SIM/security"
+#define	 HCP_SIMLOCK_INTERFACE     "Phone.Sim.Security"
+#define  HCP_SIMLOCK_UNLOCK_METHOD  "deactivate_simlock"
+#endif /* if HCP_WITH_SIM */
+
 
 /*
  * Asks the user for confirmation, returns TRUE if confirmed
@@ -178,3 +194,103 @@ hcp_rfs (const gchar *warning, const gchar *script)
     return TRUE;
   }
 }
+
+#if HCP_WITH_SIM
+gboolean hcp_rfs_simlock ()
+{
+  CodeLockUI clui;
+  GtkWidget *dialog;
+  HCPProgram *program = hcp_program_get_instance ();
+
+  if (!codelockui_init (program->osso))
+  {
+    g_warning ("codelockui init error!");
+    return FALSE;
+  }
+
+  dialog = codelock_create_dialog (&clui, TIMEOUT_FOOBAR, FALSE);
+
+  gtk_window_set_title (GTK_WINDOW(dialog), HCP_SIM_DIALOG_TITLE);
+
+  gtk_widget_show_all (dialog);
+
+  gtk_window_set_transient_for (GTK_WINDOW (dialog),
+                                GTK_WINDOW (program->window));
+
+  gboolean password_correct = FALSE;
+  gint ret;
+
+  while (!password_correct)
+  {
+    gtk_widget_set_sensitive (dialog, TRUE);
+
+    ret = gtk_dialog_run (GTK_DIALOG (dialog));
+
+    gtk_widget_set_sensitive (dialog, FALSE);
+
+    if (ret == GTK_RESPONSE_CANCEL ||
+      ret == GTK_RESPONSE_DELETE_EVENT) {
+      codelock_destroy_dialog (&clui);
+
+      return FALSE;
+    }
+
+    DBusGConnection *conn;
+    GError *err = NULL;
+
+    conn = dbus_g_bus_get (DBUS_BUS_SYSTEM, &err);
+    if (!conn) {
+      g_warning ("Could not connect to dbus: %s\n", err->message);
+      g_error_free (err);
+      return FALSE;
+    }
+
+    gchar *code  = (gchar*)codelock_get_code(&clui);
+    if (code == NULL) {
+      g_warning ("Could not get code");
+      continue;
+    }
+
+    guchar level = (guchar)g_ascii_digit_value(code[strlen(code)-1]);
+    code[strlen(code)-1] = '\0';
+
+    g_debug ("%s %u", code, level);
+
+    DBusGProxy *proxy;
+    proxy = dbus_g_proxy_new_for_name (conn,
+                                       HCP_SIMLOCK_NAME,
+                                       HCP_SIMLOCK_PATH,
+                                       HCP_SIMLOCK_INTERFACE);
+
+    if (!dbus_g_proxy_call (proxy, HCP_SIMLOCK_UNLOCK_METHOD,
+                            &err,
+                            G_TYPE_UCHAR, level,
+                            G_TYPE_STRING, code,
+                            G_TYPE_INVALID,
+                            G_TYPE_INT, &ret,
+                            G_TYPE_INVALID))
+    {
+      g_warning ("unlock - communication error: %s\n", err->message);
+      g_error_free (err);
+    } else {
+      g_debug ("%d", ret);
+      /*FIXME: where the hell is PHONE_OK defined?!? */
+      if (1000<=ret || ret<=1018) {
+        hildon_banner_show_information (NULL,
+                                        NULL,
+                                        HCP_RFS_SIMLOCK_FAIL);
+        codelock_clear_code (&clui);
+        password_correct = FALSE;
+      } else {
+        hildon_banner_show_information (NULL,
+                                        NULL,
+                                       HCP_RFS_SIMLOCK_OK);
+        password_correct = TRUE;
+      }
+    }
+  }
+
+  codelock_destroy_dialog (&clui);
+  return TRUE;
+}
+#endif
