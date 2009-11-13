@@ -1,5 +1,11 @@
 2009-11-13  Peter Aradi <peter.aradi@maemo.org>
 
+	Release 2.2.20
+
+	* configure.ac: 2.2.20
+
+2009-11-13  Peter Aradi <peter.aradi@maemo.org>
+
 	* debian/control:
 	moved language package to 'Recommends'
 	* src/hcp-rfs.[ch]:

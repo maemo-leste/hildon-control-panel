@@ -1,8 +1,8 @@
-hildon-control-panel (1:2.2.20-1~unreleased) unstable; urgency=low
+hildon-control-panel (1:2.2.20-1) unstable; urgency=low
 
-  * unreleasing
+  * Fixes: NB#143863 - Impossible to unlock SIM card.
 
- -- Peter Aradi <peter.aradi@maemo.org>  Fri, 13 Nov 2009 12:34:15 +0100
+ -- Peter Aradi <peter.aradi@maemo.org>  Fri, 13 Nov 2009 13:01:41 +0100
 
 hildon-control-panel (1:2.2.19-1) unstable; urgency=low
 
