@@ -33,6 +33,7 @@
 #include <hildon/hildon-banner.h>
 #include <dbus/dbus-glib.h>
 #include <codelockui.h>
+#include <clui-code-dialog.h>
 #include <libosso.h>
 
 #include <glib/gi18n.h>
@@ -196,6 +197,26 @@ hcp_rfs (const gchar *warning, const gchar *script)
 }
 
 #if HCP_WITH_SIM
+
+static GtkWidget* hcp_rfs_get_clui_entry (GtkWidget* w) {
+  int i;
+  GtkWidget* ret = NULL;
+  if (GTK_IS_CONTAINER(w)) {
+    GList* l = gtk_container_get_children (GTK_CONTAINER(w));
+    for (i=0; i<g_list_length(l); i++, l=l->next)
+    {
+      ret = hcp_rfs_get_clui_entry(GTK_WIDGET(l->data));
+      if (ret) return ret;
+    }
+  }
+  g_debug ("%s", gtk_widget_get_name (w));
+  if (GTK_IS_ENTRY(w)) {
+    g_debug("entry found");
+    return w;
+  }
+  return NULL;
+}
+
 gboolean hcp_rfs_simlock ()
 {
   CodeLockUI clui;
@@ -208,9 +229,11 @@ gboolean hcp_rfs_simlock ()
     return FALSE;
   }
 
-  dialog = codelock_create_dialog (&clui, TIMEOUT_FOOBAR, FALSE);
+  dialog = codelock_create_dialog (&clui, 30000, FALSE);
 
   gtk_window_set_title (GTK_WINDOW(dialog), HCP_SIM_DIALOG_TITLE);
+
+  clui_code_dialog_set_max_code_length(CLUI_CODE_DIALOG(dialog),16);
 
   gtk_widget_show_all (dialog);
 
@@ -219,6 +242,13 @@ gboolean hcp_rfs_simlock ()
 
   gboolean password_correct = FALSE;
   gint ret;
+
+  /* FIXME: workaround for setting the entered code visible */
+  GtkWidget *entry = hcp_rfs_get_clui_entry(dialog);
+
+  if (entry) {
+    gtk_entry_set_visibility (GTK_ENTRY(entry), TRUE);
+  }
 
   while (!password_correct)
   {

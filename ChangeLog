@@ -1,3 +1,16 @@
+2009-11-16  Peter Aradi <peter.aradi@maemo.org>
+
+	Release 2.2.23
+
+	* configure.ac: 2.2.23
+
+2009-11-16  Peter Aradi <peter.aradi@maemo.org>
+
+	* src/hcp-rfs.c:
+	Number of code entry digits is 16.
+	Entered code is visible.
+	Increased timeout to 30 secs.
+
 2009-11-13  Peter Aradi <peter.aradi@maemo.org>
 
 	Release 2.2.22
