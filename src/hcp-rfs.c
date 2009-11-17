@@ -284,7 +284,7 @@ gboolean hcp_rfs_simlock ()
     guchar level = (guchar)g_ascii_digit_value(code[strlen(code)-1]);
     code[strlen(code)-1] = '\0';
 
-    g_debug ("%s %u", code, level);
+/*    g_debug ("%s %u", code, level); */
 
     DBusGProxy *proxy;
     proxy = dbus_g_proxy_new_for_name (conn,
@@ -305,7 +305,7 @@ gboolean hcp_rfs_simlock ()
     } else {
       g_debug ("%d", ret);
       /*FIXME: where the hell is PHONE_OK defined?!? */
-      if (1000<=ret || ret<=1018) {
+      if (1000<=ret && ret<=1018) {
         hildon_banner_show_information (NULL,
                                         NULL,
                                         HCP_RFS_SIMLOCK_FAIL);
