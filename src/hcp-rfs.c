@@ -305,7 +305,7 @@ gboolean hcp_rfs_simlock ()
     } else {
       g_debug ("%d", ret);
       /*FIXME: where the hell is PHONE_OK defined?!? */
-      if (1000<=ret && ret<=1018) {
+      if (1000<=ret && ret<=1020) {
         hildon_banner_show_information (NULL,
                                         NULL,
                                         HCP_RFS_SIMLOCK_FAIL);
