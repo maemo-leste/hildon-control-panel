@@ -1,8 +1,9 @@
 2009-11-17  Peter Aradi <peter.aradi@maemo.org>
 
-	Release 2.2.24
+        Re-tag
+	Release 2.2.25
 
-	* configure.ac: 2.2.24
+	* configure.ac: 2.2.25
 
 2009-11-16  Peter Aradi <peter.aradi@maemo.org>
 
