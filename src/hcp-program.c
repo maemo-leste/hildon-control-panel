@@ -307,3 +307,4 @@ hcp_program_run (HCPProgram *program)
   /* Always start the user interface for now */
   hcp_program_show_window (program);
 }
+

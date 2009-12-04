@@ -39,6 +39,8 @@
 #define HCP_APP_VIEW_GET_PRIVATE(object) \
         (G_TYPE_INSTANCE_GET_PRIVATE ((object), HCP_TYPE_APP_VIEW, HCPAppViewPrivate))
 
+#define DEF_SCREEN      gdk_display_get_default_screen (gdk_display_get_default ())
+
 G_DEFINE_TYPE (HCPAppView, hcp_app_view, GTK_TYPE_VBOX);
 
 typedef enum
@@ -79,8 +81,6 @@ hcp_app_view_create_grid ()
 
   grid = hcp_grid_new (HILDON_UI_MODE_NORMAL);
   gtk_widget_set_name (grid, "hildon-control-panel-grid");
-  /* margins are HILDON_MARGIN_DOUBLE, allocate rest of the space to view*/
-  gtk_widget_set_size_request (GTK_WIDGET (grid), 760, -1);
 
   return grid;
 }
@@ -92,7 +92,6 @@ hcp_app_view_create_separator (const gchar *label)
   GtkWidget *separator_1 = gtk_hseparator_new ();
   GtkWidget *separator_2 = gtk_hseparator_new ();
   GtkWidget *label_1 = gtk_label_new (label);
-  gtk_widget_set_size_request (hbox, 768, 35);
 
   gtk_widget_set_name (separator_1, "hildon-control-panel-separator");
   gtk_widget_set_name (separator_2, "hildon-control-panel-separator");
@@ -205,18 +204,7 @@ hcp_app_view_add_category (HCPCategory *category, HCPAppView *view)
      * it in the separator */
     separator = hcp_app_view_create_separator (_(category->name));
 
-    /* Pack the separator and the corresponding grid to the vbox */
-	if (!view->priv->first_grid)
-	{
-      /* first group */
-      GtkWidget *align = gtk_alignment_new (0,0,0,0);
-	  gtk_alignment_set_padding (GTK_ALIGNMENT(align),HILDON_MARGIN_DEFAULT,0,0,0);
-      gtk_container_add (GTK_CONTAINER (align), separator);
-      gtk_box_pack_start (GTK_BOX (view), align, FALSE, FALSE, 0);
- 	} else {
-      gtk_box_pack_start (GTK_BOX (view), separator, FALSE, FALSE, 0);
-	} 
-   	
+    gtk_box_pack_start (GTK_BOX (view), separator, FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX (view), GTK_WIDGET(grid), FALSE, FALSE, 0);
 
     gtk_container_get_focus_chain (GTK_CONTAINER (view), &focus_chain);
@@ -240,11 +228,49 @@ hcp_app_view_add_category (HCPCategory *category, HCPAppView *view)
 }
 
 static void
+hcp_app_view_set_n_columns  (GtkWidget      *widget,
+                             gpointer        data)
+{
+    gint n_columns;
+
+    if (! HCP_IS_GRID (widget))
+        return;
+
+    n_columns = GPOINTER_TO_INT (data);
+
+    /* grid view, set proper no. of colunms */
+    gtk_icon_view_set_columns (GTK_ICON_VIEW (widget), n_columns);
+    gtk_icon_view_set_item_width (GTK_ICON_VIEW (widget),
+                                  (n_columns == 1) ? 436 : 372);
+    hcp_grid_refresh_icons (HCP_GRID (widget));
+}
+
+static void
+hcp_app_view_size_changed   (GdkScreen          *screen,
+                             HCPAppView         *view)
+{
+    gint    columns = 2;
+    if (gdk_screen_get_width (screen) < 800)
+        columns = 1;
+
+    gtk_container_foreach (GTK_CONTAINER (view),
+                           hcp_app_view_set_n_columns, 
+                           GINT_TO_POINTER (columns));
+}
+
+static void
 hcp_app_view_init (HCPAppView *view)
 {
   view->priv = HCP_APP_VIEW_GET_PRIVATE (view);
 
   view->priv->first_grid = NULL;
+
+  /* Connect to screen size changes in order to receive
+   * the orientation changes */
+  g_signal_connect (DEF_SCREEN,
+                    "size-changed",
+                    G_CALLBACK (hcp_app_view_size_changed),
+                    view);
 
   g_object_set (G_OBJECT (view), 
                 "homogeneous", FALSE,
@@ -346,4 +372,10 @@ hcp_app_view_populate (HCPAppView *view, HCPAppList *al)
                    (GFunc) hcp_app_view_add_category,
                    view);
 
+  /*
+   * Init columns in grids with the proper number
+   * (accoording to the current orientation)
+   */
+  hcp_app_view_size_changed (DEF_SCREEN, view);
 }
+

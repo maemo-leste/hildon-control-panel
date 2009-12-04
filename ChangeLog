@@ -10,6 +10,25 @@
 
 	Re-enable CUD functionality
 
+2009-12-04  David Kedves  <kedazo@gmail.com>
+
+	* src/hcp-app-view.c:
+	  - remove fixed size-requests
+	  - remove top-alignment
+	  - added code about portrait stuff
+	    (on portrait mode only one column should be there)
+	* src/hcp-grid.[ch]:
+	  - remove hardcoded sizes
+	  - dropped HCP_GRID_NUM_CLUMNS (its now varying)
+	* src/hcp-window.c:
+	  - Added a menu-item to test portrait mode
+	    (can be disabled throught HCP_PORTRAIT_DEBUG flag)
+	  - added the top alignment here	
+	  - removed fixed size-requests
+	  - do size-request on aligment (which contains the man view),
+	    when window size changed
+	  - Turn on HILDON_PORTRAIT_MODE_SUPPORT by default
+
 2009-11-17  Peter Aradi <peter.aradi@maemo.org>
 
 	Release 2.2.26

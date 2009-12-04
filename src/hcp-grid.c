@@ -41,7 +41,6 @@
 
 G_DEFINE_TYPE (HCPGrid, hcp_grid, GTK_TYPE_ICON_VIEW)
 
-#define HCP_GRID_ITEM_WIDTH  372 
 #define HCP_GRID_X_PADDING   4
 #define HCP_GRID_Y_PADDING   2
 #define HCP_ICON_SIZE        HILDON_ICON_PIXEL_SIZE_FINGER
@@ -155,7 +154,7 @@ hcp_grid_init (HCPGrid *grid)
 
   gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (grid),
                                   grid->priv->pixbuf_cell, 
-			          "pixbuf", 0,
+                                  "pixbuf", 0,
                                   NULL);
 
   grid->priv->text_cell = gtk_cell_renderer_text_new ();
@@ -186,18 +185,13 @@ hcp_grid_init (HCPGrid *grid)
   gtk_icon_view_set_orientation (GTK_ICON_VIEW (grid), 
                                  GTK_ORIENTATION_HORIZONTAL);
 
-  gtk_icon_view_set_columns (GTK_ICON_VIEW (grid),
-                             HCP_GRID_NUM_COLUMNS);
-
-  /* FIXME: This should not be hardcoded. It should be defined 
-     based on HCPAppView width. */
-  gtk_icon_view_set_item_width (GTK_ICON_VIEW (grid), 
-		  		HCP_GRID_ITEM_WIDTH);
+  /* Set default column number (for landscape view) */
+  gtk_icon_view_set_columns (GTK_ICON_VIEW (grid), 2);
 }
 
 void
 hcp_grid_refresh_icons (HCPGrid* grid)
-{
+{ 
   GtkTreeModel* model;
 
   model = gtk_icon_view_get_model (GTK_ICON_VIEW (grid));

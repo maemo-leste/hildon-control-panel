@@ -79,6 +79,7 @@
 
 #define HCP_WITH_ROS           1
 #define HCP_WITH_CUD           1
+#define HCP_PORTRAIT_DEBUG     0 /* Only for debugging purposes */
 
 #if HCP_WITH_SIM
 #define	 HCP_SIMLOCK_NAME          "com.nokia.phone.SIM"
@@ -107,6 +108,7 @@ struct _HCPWindowPrivate
   HCPApp         *focused_item;
   HCPAppList     *al;
   GtkWidget      *view;
+  GtkWidget      *align;
 
   /* For state save data */
   gchar          *saved_focused_filename;
@@ -437,6 +439,24 @@ hcp_window_sim_unlock (GtkWidget *widget, HCPWindow *window)
   return TRUE;
 }
 #endif
+#if HCP_PORTRAIT_DEBUG
+static gboolean
+hcp_portrait_debug (GtkWidget *widget, HCPWindow *window)
+{
+    gint   flag = 0;
+    static gboolean portrait = FALSE;
+
+    portrait = ! portrait;
+
+    if (portrait)
+        flag = HILDON_PORTRAIT_MODE_REQUEST;
+
+    g_debug ("Portrait mode = %s", portrait ? "true" : "false");
+    hildon_gtk_window_set_portrait_flags (GTK_WINDOW (window), flag);
+
+    return TRUE;
+}
+#endif
 #endif /* ifdef MAEMO_TOOLS */
 
 static void 
@@ -743,6 +763,19 @@ hcp_window_construct_ui (HCPWindow *window)
   priv->mi_simlock = mi;
   hcp_window_check_simlock (window);
 #endif /* if HCP_WITH_SIM */
+
+#if HCP_PORTRAIT_DEBUG
+  mi = hildon_button_new_with_text (HILDON_SIZE_AUTO_WIDTH |
+									HILDON_SIZE_FINGER_HEIGHT, 
+									HILDON_BUTTON_ARRANGEMENT_VERTICAL,
+									"Portrait debug", NULL);
+
+  hildon_app_menu_append (menu, GTK_BUTTON (mi));
+
+  g_signal_connect (mi, "clicked",
+                    G_CALLBACK (hcp_portrait_debug), window);
+#endif
+
 #endif /* ifdef MAEMO_TOOLS */
   
   gtk_widget_show_all (GTK_WIDGET (menu));
@@ -758,19 +791,33 @@ hcp_window_construct_ui (HCPWindow *window)
 
   gtk_container_add (GTK_CONTAINER (window), scrolled_window);
 
-  GtkWidget *align = gtk_alignment_new (0,0,0,0);
-  gtk_alignment_set_padding (GTK_ALIGNMENT(align),0,0,
-     HILDON_MARGIN_DOUBLE,HILDON_MARGIN_DOUBLE);
+  window->priv->align = gtk_alignment_new (0,0,0,0);
+  gtk_alignment_set_padding (GTK_ALIGNMENT (window->priv->align),
+                             HILDON_MARGIN_DOUBLE, 
+                             0,
+                             HILDON_MARGIN_DOUBLE,
+                             HILDON_MARGIN_DOUBLE);
 
-  /* margins are HILDON_MARGIN_DOUBLE, allocate rest of the space to view*/
-  gtk_widget_set_size_request (GTK_WIDGET (priv->view), 760, -1);
-  gtk_container_add (GTK_CONTAINER(align), GTK_WIDGET(priv->view));
+  gtk_container_add (GTK_CONTAINER(window->priv->align),
+                     GTK_WIDGET(priv->view));
 
-  /*gtk_container_add (GTK_CONTAINER(view), align); */
   hildon_pannable_area_add_with_viewport (
           HILDON_PANNABLE_AREA (scrolled_window),
-          align);
+          window->priv->align);
 }
+
+static void
+hcp_window_size_request (HCPWindow          *window,
+                         GtkRequisition     *requisition,
+                         gpointer            user_data)
+{
+    if (G_UNLIKELY (! window->priv->view))
+        return;
+
+    gtk_widget_set_size_request (window->priv->align,
+                                 requisition->width - HILDON_MARGIN_DEFAULT,
+                                 -1);
+}                  
 
 static void
 hcp_window_init (HCPWindow *window)
@@ -792,12 +839,21 @@ hcp_window_init (HCPWindow *window)
 
   hcp_window_retrieve_configuration (window);
 
+  /* Turn on portrait mode support flag
+   * XXX: maybe this useless here, but when the screen already rotated
+   *      its needed to HCP starting in rotated mode.*/
+  hildon_gtk_window_set_portrait_flags (GTK_WINDOW (window),
+                                        HILDON_PORTRAIT_MODE_SUPPORT);
+
   priv->view = hcp_app_view_new ();
   g_signal_connect (G_OBJECT (priv->view), "focus-changed",
                     G_CALLBACK (hcp_window_app_view_focus_cb), window);
 
   g_signal_connect (G_OBJECT (priv->al), "updated",
                     G_CALLBACK (hcp_window_app_list_updated_cb), window);
+
+  g_signal_connect (G_OBJECT (window), "size-request",
+                    G_CALLBACK (hcp_window_size_request), NULL);
 
   hcp_window_retrieve_state (window);
 
@@ -893,3 +949,4 @@ hcp_window_close (HCPWindow *window)
 
   hcp_window_quit (NULL, window);
 }
+

@@ -39,8 +39,6 @@ typedef struct _HCPGridPrivate HCPGridPrivate;
 
 #define HCP_DEFAULT_ICON_BASENAME  "filemanager_unknown_file"
 
-#define HCP_GRID_NUM_COLUMNS       2
-
 typedef struct {
   GtkIconView parent;
   HCPGridPrivate* priv;
