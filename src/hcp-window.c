@@ -77,7 +77,7 @@
 #define HCP_SIM_SCRIPT         "/usr/bin/startup-pin-query"
 
 #define HCP_WITH_ROS           1
-#define HCP_WITH_CUD           0
+#define HCP_WITH_CUD           1
 
 #define HCP_WINDOW_GET_PRIVATE(object) \
         (G_TYPE_INSTANCE_GET_PRIVATE ((object), HCP_TYPE_WINDOW, HCPWindowPrivate))
