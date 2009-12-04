@@ -12,6 +12,8 @@
 
 2009-12-04  David Kedves  <kedazo@gmail.com>
 
+	DISCLAIMER: Applets still doesn't support portrait mode,
+	            so these changes are very experimental
 	* src/hcp-app-view.c:
 	  - remove fixed size-requests
 	  - remove top-alignment

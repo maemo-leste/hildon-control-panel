@@ -233,7 +233,7 @@ hcp_app_view_set_n_columns  (GtkWidget      *widget,
 {
     gint n_columns;
 /* 4px is the HCP_GRID_X_PADDING */
-#define PORTRAIT_WIDTH 480 - 3 * HILDON_MARGIN_DEFAULT
+#define PORTRAIT_WIDTH   480      - 3 * HILDON_MARGIN_DOUBLE
 #define LANDSCAPE_WIDTH (800 / 2) - 2 * HILDON_MARGIN_DOUBLE
 
     if (! HCP_IS_GRID (widget))

@@ -12,6 +12,7 @@ AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_PROG_LIBTOOL
+PKG_PROG_PKG_CONFIG
 
 AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal)
 
@@ -81,3 +82,4 @@ AC_OUTPUT(Makefile \
 	data/hildon-control-panel.pc \
 	data/hildon-control-panel.desktop \
 	data/com.nokia.controlpanel.service )
+
