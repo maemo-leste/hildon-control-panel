@@ -232,16 +232,25 @@ hcp_app_view_set_n_columns  (GtkWidget      *widget,
                              gpointer        data)
 {
     gint n_columns;
+/* 4px is the HCP_GRID_X_PADDING */
+#define PORTRAIT_WIDTH 480 - 3 * HILDON_MARGIN_DEFAULT
+#define LANDSCAPE_WIDTH (800 / 2) - 2 * HILDON_MARGIN_DOUBLE
 
     if (! HCP_IS_GRID (widget))
         return;
 
     n_columns = GPOINTER_TO_INT (data);
 
+/*
+ * g_debug ("WIDTH = %d", (n_columns == 1) ? PORTRAIT_WIDTH : LANDSCAPE_WIDTH);
+ */
+
     /* grid view, set proper no. of colunms */
     gtk_icon_view_set_columns (GTK_ICON_VIEW (widget), n_columns);
     gtk_icon_view_set_item_width (GTK_ICON_VIEW (widget),
-                                  (n_columns == 1) ? 436 : 372);
+                                  (n_columns == 1) ? 
+                                   PORTRAIT_WIDTH : 
+                                   LANDSCAPE_WIDTH);
     hcp_grid_refresh_icons (HCP_GRID (widget));
 }
 
