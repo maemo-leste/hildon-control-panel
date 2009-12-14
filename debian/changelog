@@ -1,3 +1,9 @@
+hildon-control-panel (1:2.2.26-3~unreleased) unstable; urgency=low
+
+  * FILLME 
+
+ -- David Kedves <kedazo@gmail.com>  Mon, 14 Dec 2009 13:44:20 +0100
+
 hildon-control-panel (1:2.2.26-2) unstable; urgency=low
 
   * Fixes: NB#149539 - Enable clear user data
