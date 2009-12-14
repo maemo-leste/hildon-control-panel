@@ -1,8 +1,8 @@
-hildon-control-panel (1:2.2.26-2~unreleased) unstable; urgency=low
+hildon-control-panel (1:2.2.26-2) unstable; urgency=low
 
   * Fixes: NB#149539 - Enable clear user data
 
- -- David Kedves <kedazo@gmail.com>  Fri, 04 Dec 2009 14:59:06 +0100
+ -- David Kedves <kedazo@gmail.com>  Mon, 14 Dec 2009 13:42:12 +0100
 
 hildon-control-panel (1:2.2.26-1) unstable; urgency=low
 
