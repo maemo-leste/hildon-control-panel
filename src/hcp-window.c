@@ -37,6 +37,7 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 #include <gconf/gconf-client.h>
+#include <dbus/dbus-glib.h>
 
 #include "hcp-window.h"
 #include "hcp-program.h"
@@ -79,6 +80,23 @@
 #define HCP_WITH_ROS           1
 #define HCP_WITH_CUD           1
 
+#if HCP_WITH_SIM
+#define	 HCP_SIMLOCK_NAME          "com.nokia.phone.SIM"
+#define	 HCP_SIMLOCK_PATH          "/com/nokia/phone/SIM"
+#define	 HCP_SIMLOCK_INTERFACE     "Phone.Sim"
+#define  HCP_SIMLOCK_CHECK_METHOD  "read_simlock_status"
+
+enum simlock_restriction_status{
+  HCP_SIMLOCK_RESTRICTED = 2,
+  HCP_SIMLOCK_RESTRICTION_ON = 3,
+  HCP_SIMLOCK_RESTRICTION_PENDING = 4,
+  HCP_SIMLOCK_STATE_NOT_INITIALIZED = 5,
+  HCP_SIMLOCK_NO_SERVICE = 6,
+  HCP_SIMLOCK_NOT_READY = 7,
+  HCP_SIMLOCK_ERROR = 8
+};
+#endif /* if HCP_WITH_SIM */
+
 #define HCP_WINDOW_GET_PRIVATE(object) \
         (G_TYPE_INSTANCE_GET_PRIVATE ((object), HCP_TYPE_WINDOW, HCPWindowPrivate))
 
@@ -93,7 +111,16 @@ struct _HCPWindowPrivate
   /* For state save data */
   gchar          *saved_focused_filename;
   gint            scroll_value;
+
+#if HCP_WITH_SIM
+  GtkWidget      *mi_simlock;
+#endif
 };
+
+#if HCP_WITH_SIM
+static void
+hcp_window_check_simlock (HCPWindow *window);
+#endif
 
 static void 
 hcp_window_enforce_state (HCPWindow *window)
@@ -542,7 +569,75 @@ _expose_cb (GtkWidget *widget, GdkEventExpose *event, gpointer data)
   g_signal_handler_disconnect(G_OBJECT(data), program->handler_id);
   return FALSE;
 }
+#if HCP_WITH_SIM
+static void
+_simlock_cb (DBusGProxy* proxy, DBusGProxyCall* call, HCPWindow *window)
+{
+  gint ret;
+  GError *err = NULL;
 
+  HCPWindowPrivate *priv;
+  GtkWidget *mi;
+
+  g_return_if_fail (window);
+  g_return_if_fail (HCP_IS_WINDOW (window));
+
+  priv = window->priv;
+
+  mi = priv->mi_simlock;
+  g_return_if_fail (mi);
+  g_return_if_fail (GTK_IS_WIDGET (mi));
+
+  if (!dbus_g_proxy_end_call (proxy, call,
+                          &err, G_TYPE_INT,
+                          &ret, G_TYPE_INVALID)) {
+    g_warning ("unlock - communication error: %s\n", err->message);
+    g_error_free (err);
+  } else {
+    if ( ret != HCP_SIMLOCK_STATE_NOT_INITIALIZED &&
+         ret != HCP_SIMLOCK_NO_SERVICE &&
+         ret != HCP_SIMLOCK_NOT_READY &&
+         ret != HCP_SIMLOCK_ERROR ) {
+      /* show unlock button */
+      gtk_widget_set_no_show_all (mi, FALSE);
+      gtk_widget_show_all (mi);
+    } else {
+      /* hide unlock button */
+      gtk_widget_hide (mi);
+      gtk_widget_set_no_show_all (mi, TRUE);
+    }
+  }
+}
+
+static void
+hcp_window_check_simlock (HCPWindow* window)
+{
+  g_return_if_fail (window);
+  g_return_if_fail (HCP_IS_WINDOW (window));
+
+  DBusGConnection *conn;
+  GError *err = NULL;
+
+  conn = dbus_g_bus_get (DBUS_BUS_SYSTEM, &err);
+  if (!conn) {
+    g_warning ("Could not connect to dbus: %s\n", err->message);
+    g_error_free (err);
+  } else {
+    DBusGProxy *proxy;
+    proxy = dbus_g_proxy_new_for_name (conn,
+                                       HCP_SIMLOCK_NAME,
+                                       HCP_SIMLOCK_PATH,
+                                       HCP_SIMLOCK_INTERFACE);
+
+    dbus_g_proxy_begin_call (proxy,
+                             HCP_SIMLOCK_CHECK_METHOD,
+                             (DBusGProxyCallNotify)_simlock_cb,
+                             window,
+                             NULL,
+                             G_TYPE_INVALID);
+  }
+}
+#endif /* if HCP_WITH_SIM */
 static void 
 hcp_window_construct_ui (HCPWindow *window)
 {
@@ -643,6 +738,10 @@ hcp_window_construct_ui (HCPWindow *window)
 
   g_signal_connect (mi, "clicked",
                     G_CALLBACK (hcp_window_sim_unlock), window);
+
+  gtk_widget_set_no_show_all(mi,TRUE);
+  priv->mi_simlock = mi;
+  hcp_window_check_simlock (window);
 #endif /* if HCP_WITH_SIM */
 #endif /* ifdef MAEMO_TOOLS */
   
@@ -686,7 +785,9 @@ hcp_window_init (HCPWindow *window)
   priv->focused_item = NULL;
   priv->saved_focused_filename = NULL;
   priv->scroll_value = 0;
-
+#if HCP_WITH_SIM
+  priv->mi_simlock = NULL;
+#endif
   priv->al = g_object_ref (program->al);
 
   hcp_window_retrieve_configuration (window);

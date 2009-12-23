@@ -1,3 +1,9 @@
+2009-12-23  Peter Aradi <peter.aradi@maemo.org>
+
+	* src/hcp-window.c:
+	unlock button only visible if sim lock is active.
+	queries status on dbus from sim interface.
+
 2009-12-14  David Kedves  <kedazo@gmail.com>
 
 	Release 2.2.26-2
