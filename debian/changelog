@@ -1,3 +1,9 @@
+hildon-control-panel (1:2.2.26-4~unreleased) unstable; urgency=low
+
+  * FILLME
+
+ -- David Kedves <kedazo@gmail.com>  Mon, 11 Jan 2010 15:28:30 +0100
+
 hildon-control-panel (1:2.2.26-3) unstable; urgency=low
 
   * Fixes: NB#148173 - "Enter code for unlocking SIM card" option is always
