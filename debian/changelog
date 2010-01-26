@@ -1,8 +1,9 @@
-hildon-control-panel (1:2.2.26-4~unreleased) unstable; urgency=low
+hildon-control-panel (1:2.2.27-0) unstable; urgency=low
 
-  * FILLME
+  * Portrait mode support
+  * Fixes: NB#152780 -Dialogs to support portrait mode
 
- -- David Kedves <dkedves@blumsoft.eu>  Tue, 26 Jan 2010 10:39:05 +0100
+ -- David Kedves <dkedves@blumsoft.eu>  Tue, 26 Jan 2010 10:44:03 +0100
 
 hildon-control-panel (1:2.2.26-3) unstable; urgency=low
 
