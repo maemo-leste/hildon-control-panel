@@ -1,8 +1,8 @@
 hildon-control-panel (1:2.2.27-2) unstable; urgency=low
 
-  * FILLME
+  * Fixes NB#154642 - Hide FMTX applet in HCP when its disabled
 
- -- David Kedves <dkedves@blumsoft.eu>  Wed, 27 Jan 2010 13:28:20 +0100
+ -- David Kedves <dkedves@blumsoft.eu>  Wed, 27 Jan 2010 15:58:39 +0100
 
 hildon-control-panel (1:2.2.27-1) unstable; urgency=low
 

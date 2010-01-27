@@ -1,3 +1,9 @@
+2010-01-27  David Kedves  <dkedves@blumsoft.eu>
+
+	* Hide FMTX applet when device has disabled FM transmitter
+	  (This change based on an example
+	   by Ronkko Pekka <ext-pekka.1.ronkko@nokia.com>)
+
 2010-01-26  David Kedves  <dkedves@blumsoft.eu>
 
 	* Merging portait-mode-support branch

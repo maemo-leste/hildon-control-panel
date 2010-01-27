@@ -34,6 +34,7 @@
 #include <gconf/gconf-client.h>
 #include <glib/gi18n.h>
 #include <libgnomevfs/gnome-vfs.h>
+#include <dbus/dbus-glib.h>
 
 #include "hcp-app-list.h"
 #include "hcp-app.h"
@@ -359,6 +360,73 @@ hcp_app_list_class_init (HCPAppListClass *class)
   g_type_class_add_private (g_object_class, sizeof (HCPAppListPrivate));
 }
 
+/* for fmtx pp-bit handling */
+#define SYSINFO_SERVICE_DBUS "com.nokia.SystemInfo"
+#define SYSINFO_PATH_DBUS "/com/nokia/SystemInfo"
+#define SYSINFO_INTERFACE_DBUS "com.nokia.SystemInfo"
+#define SYSINFO_METHOD "GetConfigValue"
+#define SYSINFO_KEY_FMTX "/certs/ccc/pp/fmtx-raw"
+
+/*
+ * Nasty hack in HCP... 
+ * i think this should be somewhere else...
+ * but well on the devices which has disabled FMTX
+ * there is no sense to show this applet ...
+ */
+static gboolean
+hcp_app_is_fmtx_enabled ()
+{
+    DBusGConnection  *connection;
+    DBusGProxy       *proxy = NULL;
+
+    GError           *error = NULL;
+    GArray           *array = NULL;
+    gboolean          result = FALSE;
+    unsigned char     type;
+
+    connection = dbus_g_bus_get (DBUS_BUS_SYSTEM, NULL);
+
+    if (connection == NULL || error)
+        return FALSE;
+
+    proxy = dbus_g_proxy_new_for_name (connection,
+                                       SYSINFO_SERVICE_DBUS,
+                                       SYSINFO_PATH_DBUS,
+                                       SYSINFO_INTERFACE_DBUS);
+    if (proxy == NULL)
+    {
+        g_warning ("hcp_app_is_fmtx_disabled: "
+                   "Couldn't create the proxy object\n");
+        return FALSE;
+    }
+
+    result = dbus_g_proxy_call (proxy, SYSINFO_METHOD, &error,
+                                G_TYPE_STRING,
+                                SYSINFO_KEY_FMTX,
+                                G_TYPE_INVALID,
+                                dbus_g_type_get_collection ("GArray", G_TYPE_UCHAR),
+                                &array, G_TYPE_INVALID);
+    if (!result || error)
+    {
+        g_warning ("hcp_app_is_fmtx_disabled: "
+                   "Unable to get stored fmtx settings\n");
+        g_clear_error (&error);
+        return FALSE;
+    }
+    else
+    {
+        type = g_array_index (array, unsigned char, 0);
+        g_array_free (array, TRUE);
+    }
+
+    g_object_unref (proxy);
+
+    if (type == 1) /* fmtx disabled */
+        return FALSE;
+
+    return TRUE;
+}
+
 static void 
 hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
 {
@@ -410,6 +478,11 @@ hcp_app_list_read_desktop_entries (HCPAppList *al, const gchar *dir_path)
 
     /* Only consider .desktop files */
     if (!g_str_has_suffix (filename, ".desktop"))
+      continue;
+
+    /* Do not load fmtx applet when its disabled */
+    if (g_strrstr (filename, "cpfmtx") &&
+        ! hcp_app_is_fmtx_enabled ())
       continue;
 
     desktop_path = g_build_filename (dir_path, filename, NULL);
