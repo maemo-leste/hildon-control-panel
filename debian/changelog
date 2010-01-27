@@ -1,3 +1,9 @@
+hildon-control-panel (1:2.2.27-2) unstable; urgency=low
+
+  * FILLME
+
+ -- David Kedves <dkedves@blumsoft.eu>  Wed, 27 Jan 2010 13:28:20 +0100
+
 hildon-control-panel (1:2.2.27-1) unstable; urgency=low
 
   * Again... but do not enable portrait mode by default
