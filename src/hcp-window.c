@@ -841,10 +841,9 @@ hcp_window_init (HCPWindow *window)
 
   /* Turn on portrait mode support flag */
   /* TODO FIXME XXX Turn on this flag when applets ready... */
-#if 0
+  /* Most applets support portrait mode, flag enabled ~MohammadAG */
   hildon_gtk_window_set_portrait_flags (GTK_WINDOW (window),
                                         HILDON_PORTRAIT_MODE_SUPPORT);
-#endif
 
   priv->view = hcp_app_view_new ();
   g_signal_connect (G_OBJECT (priv->view), "focus-changed",
