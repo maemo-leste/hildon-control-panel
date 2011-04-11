@@ -73,7 +73,6 @@
 
 #define HCP_CUD_WARNING        _("cud_ia_text")
 #define HCP_CUD_SCRIPT         "/usr/sbin/osso-app-killer-cud.sh"
-#define HCP_SCREENSHOT_PATH    "/home/user/.cache/launch/com.nokia.controlpanel.pvr"
 
 #define HCP_SIM_SCRIPT         "/usr/bin/startup-pin-query"
 
@@ -570,11 +569,8 @@ static void hcp_window_quit (GtkWidget *widget, HCPWindow *window)
 static gboolean
 hcp_take_screenshot (gpointer data)
 {
-
-  if (!g_file_test(HCP_SCREENSHOT_PATH, G_FILE_TEST_EXISTS)){
-    g_debug("taking screenshot");
-    hildon_gtk_window_take_screenshot(GTK_WINDOW(data), TRUE);
-  }
+  g_debug("taking screenshot");
+  hildon_gtk_window_take_screenshot(GTK_WINDOW(data), TRUE);
   return FALSE;
 }
 
