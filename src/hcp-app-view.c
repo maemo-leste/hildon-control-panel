@@ -293,10 +293,6 @@ hcp_app_view_get_property (GObject    *gobject,
                            GValue     *value,
                            GParamSpec *pspec)
 {
-  HCPAppViewPrivate *priv;
-
-  priv = HCP_APP_VIEW (gobject)->priv;
-
   switch (prop_id)
   {
     default:
@@ -311,10 +307,6 @@ hcp_app_view_set_property (GObject      *gobject,
                            const GValue *value,
                            GParamSpec   *pspec)
 {
-  HCPAppViewPrivate *priv;
-
-  priv = HCP_APP_VIEW (gobject)->priv;
-  
   switch (prop_id)
   {
     default:

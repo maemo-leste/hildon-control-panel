@@ -33,8 +33,8 @@
 #include <gtk/gtk.h>
 #include <gconf/gconf-client.h>
 #include <glib/gi18n.h>
-#include <libgnomevfs/gnome-vfs.h>
 #include <dbus/dbus-glib.h>
+#include <gio/gio.h>
 
 #include "hcp-app-list.h"
 #include "hcp-app.h"
@@ -64,7 +64,7 @@ struct _HCPAppListPrivate
 {
   GHashTable             *apps;
   GSList                 *categories;
-  GnomeVFSMonitorHandle  *monitor;
+  GFileMonitor *monitor;
 };
 
 #define HCP_SEPARATOR_DEFAULT _("copa_ia_extras")
@@ -92,10 +92,10 @@ hcp_monitor_reread_desktop_entries (HCPAppList *al)
 }
 
 static void 
-hcp_monitor_callback_f (GnomeVFSMonitorHandle *handle,
-                        const gchar *monitor_uri,
-                        const gchar *info_uri,
-                        GnomeVFSMonitorEventType event_type,
+hcp_monitor_callback_f (GFileMonitor *monitor,
+                        GFile *file,
+                        GFile *other_file,
+                        GFileMonitorEvent event_type,
                         HCPAppList *al)
 {
   if (!callback_pending) 
@@ -109,24 +109,27 @@ hcp_monitor_callback_f (GnomeVFSMonitorHandle *handle,
 static int 
 hcp_init_monitor (HCPAppList *al, const gchar *path)
 {
-  GnomeVFSResult ret;
+  GFile *file;
 
-  g_return_val_if_fail (al, GNOME_VFS_ERROR_GENERIC);
-  g_return_val_if_fail (HCP_IS_APP_LIST (al), GNOME_VFS_ERROR_GENERIC);
-  g_return_val_if_fail (path, GNOME_VFS_ERROR_GENERIC);
+  g_return_val_if_fail (al, -1);
+  g_return_val_if_fail (HCP_IS_APP_LIST (al), -1);
+  g_return_val_if_fail (path, -1);
 
-  ret = gnome_vfs_monitor_add  (&al->priv->monitor, 
-                                path,
-                                GNOME_VFS_MONITOR_DIRECTORY,
-                                (GnomeVFSMonitorCallback) hcp_monitor_callback_f,
-                                al);
+  file = g_file_new_for_path(path);
 
-  if (ret != GNOME_VFS_OK)
+  al->priv->monitor =
+      g_file_monitor_directory(file, G_FILE_MONITOR_NONE, NULL, NULL);
+
+  g_object_unref(file);
+
+  if (al->priv->monitor)
   {
-      return ret;
+    g_signal_connect (al->priv->monitor, "changed",
+                      G_CALLBACK (hcp_monitor_callback_f), al);
+    return 0;
   }
 
-  return GNOME_VFS_OK;
+  return -1;
 }
 
 static void
@@ -293,7 +296,7 @@ hcp_app_list_finalize (GObject *object)
 
   if (priv->monitor)
   {
-    gnome_vfs_monitor_cancel (priv->monitor);
+    g_object_unref (priv->monitor);
   }
     
   G_OBJECT_CLASS (hcp_app_list_parent_class)->finalize (object);

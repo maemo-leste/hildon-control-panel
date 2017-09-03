@@ -273,6 +273,7 @@ hcp_window_save_state (HCPWindow *window, gboolean clear_state)
   HCPWindowPrivate *priv;
   HCPProgram *program = hcp_program_get_instance ();
   osso_state_t state = { 0, };
+  gsize size;
   GKeyFile *keyfile = NULL;
   osso_return_t ret;
   gchar *focused = NULL;
@@ -320,8 +321,10 @@ hcp_window_save_state (HCPWindow *window, gboolean clear_state)
                           program->execute);
 
   state.state_data = g_key_file_to_data (keyfile,
-                                         &state.state_size,
+                                         &size,
                                          &error);
+
+  state.state_size = size;
 
   if (error)
     goto cleanup;
@@ -358,14 +361,11 @@ cleanup:
 static void 
 hcp_window_retrieve_configuration (HCPWindow *window)
 {
-  HCPWindowPrivate *priv;
   GConfClient *client = NULL;
   GError *error = NULL;
 
   g_return_if_fail (window);
   g_return_if_fail (HCP_IS_WINDOW (window));
-
-  priv = window->priv;
 
   client = gconf_client_get_default ();
 
@@ -385,14 +385,8 @@ hcp_window_keyboard_listener (GtkWidget * widget,
                               GdkEventKey * keyevent, 
 		              gpointer data)
 {
-  HCPWindow *window;
-  HCPWindowPrivate *priv;
-
   g_return_val_if_fail (widget, FALSE);
   g_return_val_if_fail (HCP_IS_WINDOW (widget), FALSE);
-
-  window = HCP_WINDOW (widget);
-  priv = window->priv;
 
   if (keyevent->type == GDK_KEY_RELEASE) 
   {

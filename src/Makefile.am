@@ -65,7 +65,7 @@ BUILT_SOURCES = hcp-marshalers.c \
 controlpanel_LDFLAGS = $(MAEMO_LAUNCHER_LDFLAGS)
 
 controlpanel_LDADD = \
-	$(HCP_DEPS_LIBS)
+	$(HCP_DEPS_LIBS) -ldl
 
 hildon_cp_pluginincludeinstdir=$(includedir)/hildon-cp-plugin
 hildon_cp_pluginincludeinst_DATA = hildon-cp-plugin-interface.h
