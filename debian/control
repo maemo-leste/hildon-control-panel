@@ -26,6 +26,6 @@ Description: Hildon Control Panel development files.
 Package: hildon-control-panel-dbg
 Section: libs
 Architecture: any
-Depends: hildon-control-panel (=${Source-Version})
+Depends: hildon-control-panel (=${source:Version})
 Description: Debug symbols for hildon-control-panel
  Debug symbols for the Hildon Control Panel
