@@ -20,7 +20,7 @@ ifeq (,$(findstring nolauncher,$(DEB_BUILD_OPTIONS)))
 	LAUNCHER_DEPENDS = -Vlauncher:Depends="maemo-launcher"
 	LAUNCHER_CFLAGS = $(shell pkg-config --cflags maemo-launcher-app)
 	LAUNCHER_LDFLAGS = $(shell pkg-config --libs maemo-launcher-app)
-endif 
+endif
 
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
@@ -53,14 +53,14 @@ build-stamp:  config.status
 # Add here commands to compile the package.
 	$(MAKE) \
 	MAEMO_LAUNCHER_CFLAGS="$(LAUNCHER_CFLAGS)" \
-	MAEMO_LAUNCHER_LDFLAGS="$(LAUNCHER_LDFLAGS)" 
+	MAEMO_LAUNCHER_LDFLAGS="$(LAUNCHER_LDFLAGS)"
 
 	touch build-stamp
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp 
+	rm -f build-stamp
 
 # Add here commands to clean up after the build process.
 	-$(MAKE) distclean
@@ -72,7 +72,7 @@ ifneq "$(wildcard /usr/share/misc/config.guess)" ""
 endif
 
 
-	dh_clean 
+	dh_clean
 
 configure: configure-stamp
 
@@ -84,7 +84,7 @@ configure-stamp:
 install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k 
+	dh_clean -k
 	dh_installdirs
 
 # Add here commands to install the package into debian/build
@@ -102,7 +102,7 @@ ifeq "$(strip $(LAUNCHER))" "yes"
     $(CURDIR)/debian/build/usr/bin/controlpanel.launch
 	ln -s /usr/bin/maemo-invoker \
               $(CURDIR)/debian/build/usr/bin/controlpanel
-endif 
+endif
 
 
 # Build architecture-independent files here.
@@ -113,12 +113,12 @@ binary-indep: build install
 binary-arch: build install
 	dh_testdir
 	dh_testroot
-	dh_installchangelogs 
+	dh_installchangelogs
 #	dh_installexamples
 	dh_installdocs
 	dh_install --sourcedir=debian/build -v
 #	dh_installmenu
-#	dh_installdebconf	
+#	dh_installdebconf
 #	dh_installlogrotate
 #	dh_installemacsen
 #	dh_installpam
@@ -136,9 +136,9 @@ binary-arch: build install
 	dh_makeshlibs -V
 	dh_installdeb
 	dh_shlibdeps
-	dh_gencontrol -- $(LAUNCHER_DEPENDS) 
+	dh_gencontrol -- $(LAUNCHER_DEPENDS)
 	dh_md5sums
 	dh_builddeb
 
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install 
+.PHONY: build clean binary-indep binary-arch binary install
