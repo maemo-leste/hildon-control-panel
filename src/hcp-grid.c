@@ -36,11 +36,6 @@
 #include <hildon/hildon-gtk.h>
 #include <hildon/hildon.h>
 
-#define HCP_GRID_GET_PRIVATE(object) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((object), HCP_TYPE_GRID, HCPGridPrivate))
-
-G_DEFINE_TYPE (HCPGrid, hcp_grid, GTK_TYPE_ICON_VIEW)
-
 #define HCP_GRID_X_PADDING   4
 #define HCP_GRID_Y_PADDING   2
 #define HCP_ICON_SIZE        HILDON_ICON_PIXEL_SIZE_FINGER
@@ -53,6 +48,9 @@ struct _HCPGridPrivate {
 /*  gint             row_height;*/
   gint             icon_size;
 };
+
+G_DEFINE_TYPE_WITH_CODE (HCPGrid, hcp_grid, GTK_TYPE_ICON_VIEW, G_ADD_PRIVATE(HCPGrid))
+
 
 static gboolean
 hcp_grid_update_icon (GtkTreeModel *model,
@@ -125,14 +123,12 @@ static void
 hcp_grid_class_init (HCPGridClass *klass)
 {
 
-  g_type_class_add_private (klass, sizeof (HCPGridPrivate));
-
 }
 
 static void
 hcp_grid_init (HCPGrid *grid)
 {
-  grid->priv = HCP_GRID_GET_PRIVATE (grid);
+  grid->priv = (HCPGridPrivate*)hcp_grid_get_instance_private(grid);
  
   grid->priv->can_move_focus = FALSE;
   grid->priv->focused_in = FALSE;
