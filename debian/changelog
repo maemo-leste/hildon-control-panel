@@ -1,3 +1,9 @@
+hildon-control-panel (1:2.2.28-1) unstable; urgency=medium
+
+  * Port to newer gtk2
+
+ -- Merlijn Wajer <merlijn@wizzup.org>  Sun, 19 Jan 2020 15:26:13 +0100
+
 hildon-control-panel (1:2.2.27-6) unstable; urgency=medium
 
   * enable git builds
