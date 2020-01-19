@@ -40,10 +40,6 @@
 #include "hcp-app.h"
 #include "hcp-config-keys.h"
 
-#define HCP_APP_LIST_GET_PRIVATE(object) \
-        (G_TYPE_INSTANCE_GET_PRIVATE ((object), HCP_TYPE_APP_LIST, HCPAppListPrivate))
-
-G_DEFINE_TYPE (HCPAppList, hcp_app_list, G_TYPE_OBJECT);
 
 typedef enum
 {
@@ -66,6 +62,8 @@ struct _HCPAppListPrivate
   GSList                 *categories;
   GFileMonitor *monitor;
 };
+
+G_DEFINE_TYPE_WITH_CODE (HCPAppList, hcp_app_list, G_TYPE_OBJECT, G_ADD_PRIVATE(HCPAppList));
 
 #define HCP_SEPARATOR_DEFAULT _("copa_ia_extras")
 
@@ -216,7 +214,7 @@ cleanup:
 static void
 hcp_app_list_init (HCPAppList *al)
 {
-  al->priv = HCP_APP_LIST_GET_PRIVATE (al);
+  al->priv = (HCPAppListPrivate*)hcp_app_list_get_instance_private(al);
 
   HCPCategory *extras_category = g_new0 (HCPCategory, 1);
 
@@ -359,8 +357,6 @@ hcp_app_list_class_init (HCPAppListClass *class)
                                                          "Categories",
                                                          "Categories List",
                                                          G_PARAM_READABLE));
-
-  g_type_class_add_private (g_object_class, sizeof (HCPAppListPrivate));
 }
 
 /* for fmtx pp-bit handling */
