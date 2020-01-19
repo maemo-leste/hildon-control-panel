@@ -36,12 +36,7 @@
 #include <hildon/hildon-gtk.h>
 #include <hildon/hildon-helper.h>
 
-#define HCP_APP_VIEW_GET_PRIVATE(object) \
-        (G_TYPE_INSTANCE_GET_PRIVATE ((object), HCP_TYPE_APP_VIEW, HCPAppViewPrivate))
-
 #define DEF_SCREEN      gdk_display_get_default_screen (gdk_display_get_default ())
-
-G_DEFINE_TYPE (HCPAppView, hcp_app_view, GTK_TYPE_VBOX);
 
 typedef enum
 {
@@ -60,6 +55,9 @@ struct _HCPAppViewPrivate
 {
   GtkWidget   *first_grid;
 };
+
+G_DEFINE_TYPE_WITH_CODE (HCPAppView, hcp_app_view, GTK_TYPE_VBOX, G_ADD_PRIVATE(HCPAppView));
+
 
 static GtkListStore*
 hcp_app_view_create_store ()
@@ -270,7 +268,7 @@ hcp_app_view_size_changed   (GdkScreen          *screen,
 static void
 hcp_app_view_init (HCPAppView *view)
 {
-  view->priv = HCP_APP_VIEW_GET_PRIVATE (view);
+  view->priv = hcp_app_view_get_instance_private(view);
 
   view->priv->first_grid = NULL;
 
@@ -332,8 +330,6 @@ hcp_app_view_class_init (HCPAppViewClass *class)
                       g_cclosure_marshal_VOID__OBJECT,
                       G_TYPE_NONE, 1,
                       HCP_TYPE_APP);
-
-  g_type_class_add_private (g_object_class, sizeof (HCPAppViewPrivate));
 }
 
 GtkWidget *
