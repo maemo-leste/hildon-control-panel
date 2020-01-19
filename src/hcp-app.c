@@ -36,10 +36,6 @@
 #include "hcp-program.h"
 #include "hcp-app.h"
 
-#define HCP_APP_GET_PRIVATE(object) \
-        (G_TYPE_INSTANCE_GET_PRIVATE ((object), HCP_TYPE_APP, HCPAppPrivate))
-
-G_DEFINE_TYPE (HCPApp, hcp_app, G_TYPE_OBJECT);
 
 enum
 {
@@ -70,6 +66,8 @@ struct _HCPAppPrivate
     hcp_plugin_save_state_f *save_state;
 };
 
+G_DEFINE_TYPE_WITH_CODE (HCPApp, hcp_app, G_TYPE_OBJECT, G_ADD_PRIVATE(HCPApp));
+
 typedef struct _PluginLaunchData
 {
   HCPApp     *app;
@@ -82,7 +80,7 @@ typedef struct _PluginLaunchData
 static void
 hcp_app_init (HCPApp *app)
 {
-  app->priv = HCP_APP_GET_PRIVATE (app);
+  app->priv = (HCPAppPrivate*)hcp_app_get_instance_private(app);
 
   app->priv->name = NULL;
   app->priv->plugin = NULL;
@@ -477,8 +475,6 @@ hcp_app_class_init (HCPAppClass *class)
                                                         "Set app's text domain",
                                                         NULL,
                                                         (G_PARAM_READABLE | G_PARAM_WRITABLE)));
- 
-  g_type_class_add_private (g_object_class, sizeof (HCPAppPrivate));
 }
 
 GObject *
