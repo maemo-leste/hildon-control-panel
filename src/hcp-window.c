@@ -97,11 +97,6 @@ enum simlock_restriction_status{
 };
 #endif /* if HCP_WITH_SIM */
 
-#define HCP_WINDOW_GET_PRIVATE(object) \
-        (G_TYPE_INSTANCE_GET_PRIVATE ((object), HCP_TYPE_WINDOW, HCPWindowPrivate))
-
-G_DEFINE_TYPE (HCPWindow, hcp_window, HILDON_TYPE_STACKABLE_WINDOW);
-
 struct _HCPWindowPrivate 
 {
   HCPApp         *focused_item;
@@ -117,6 +112,9 @@ struct _HCPWindowPrivate
   GtkWidget      *mi_simlock;
 #endif
 };
+
+G_DEFINE_TYPE_WITH_CODE (HCPWindow, hcp_window, HILDON_TYPE_STACKABLE_WINDOW, G_ADD_PRIVATE(HCPWindow));
+
 
 #if HCP_WITH_SIM
 static void
@@ -815,7 +813,7 @@ hcp_window_init (HCPWindow *window)
   HCPProgram *program = hcp_program_get_instance ();
   HCPWindowPrivate *priv = NULL;
 
-  window->priv = HCP_WINDOW_GET_PRIVATE (window);
+  window->priv = (HCPWindowPrivate*)hcp_window_get_instance_private(window);
 
   priv = window->priv;
 
@@ -919,8 +917,6 @@ hcp_window_class_init (HCPWindowClass *class)
   g_object_class->finalize = hcp_window_finalize;
 
   widget_class->size_allocate = hcp_window_size_allocate;
-
-  g_type_class_add_private (g_object_class, sizeof (HCPWindowPrivate));
 }
  
 GtkWidget *
