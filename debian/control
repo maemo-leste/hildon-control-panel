@@ -11,8 +11,7 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, ${launcher:Depends}, hildon-control-panel-l10n-mr | hildon-control-panel-l10n-mr0, osso-app-killer (>= 1.1), osso-system-lock-l10n-mr | osso-system-lock-l10n-mr0
 Recommends: hildon-theme-alpha, hildon-keyboard, matchbox-window-manager, osso-connectivity-ui-l10n-mr | osso-connectivity-ui-l10n-mr0
 Suggests: hildon-tests
-Conflicts: hildon-base
-Replaces: hildon-base, hildon-navigator (<= 0.8.10)
+Replaces: hildon-navigator (<= 0.8.10)
 Description: Hildon Control Panel
  Control panel to configure the Hildon Desktop
 

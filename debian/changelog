@@ -1,3 +1,9 @@
+hildon-control-panel (1:2.2.28-2) unstable; urgency=medium
+
+  * Remove conflict on hildon-base
+
+ -- Merlijn Wajer <merlijn@wizzup.org>  Wed, 22 Jan 2020 16:51:23 +0100
+
 hildon-control-panel (1:2.2.28-1) unstable; urgency=medium
 
   * Port to newer gtk2
