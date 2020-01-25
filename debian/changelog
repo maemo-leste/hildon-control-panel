@@ -1,3 +1,9 @@
+hildon-control-panel (1:2.2.29-1) unstable; urgency=medium
+
+  * Remove old osso-af-settings support, hopefully fix .desktop installation
+
+ -- Merlijn Wajer <merlijn@wizzup.org>  Wed, 22 Jan 2020 16:51:23 +0100
+
 hildon-control-panel (1:2.2.28-2) unstable; urgency=medium
 
   * Remove conflict on hildon-base
