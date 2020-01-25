@@ -47,14 +47,11 @@ if test "x$enable_maemo_tools" = "xyes"; then
     AC_DEFINE([MAEMO_TOOLS],[1],[Define to enable mobile operator, clear and restore user data tools])
 fi
 
-PKG_CHECK_MODULES(OSSOSETTINGS, 
-		  [osso-af-settings >= 0.9.0],
+PKG_CHECK_MODULES(OSSOSETTINGS,
+		  [osso-af-settings],
 		  [
 		  localedir=`pkg-config osso-af-settings --variable=localedir`
                   hildondesktopentrydir=`pkg-config osso-af-settings --variable=desktopentrydir`
-		  ],[
-		  localedir="${datadir}/locale"
-                  hildondesktopentrydir="${datadir}/applications"
 		  ])
 
 AC_SUBST(hildondesktopentrydir)
