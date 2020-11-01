@@ -19,7 +19,7 @@ ifeq (,$(findstring nolauncher,$(DEB_BUILD_OPTIONS)))
 	LAUNCHER = yes
 	LAUNCHER_DEPENDS = -Vlauncher:Depends="maemo-launcher"
 	LAUNCHER_CFLAGS = $(shell pkg-config --cflags maemo-launcher-app)
-	LAUNCHER_LDFLAGS = $(shell pkg-config --libs maemo-launcher-app)
+	LAUNCHER_LDFLAGS = -Xcompiler "\""$(shell pkg-config --libs maemo-launcher-app)"\""
 endif
 
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
