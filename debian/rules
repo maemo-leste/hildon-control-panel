@@ -117,6 +117,7 @@ binary-arch: build install
 #	dh_installexamples
 	dh_installdocs
 	dh_install --sourcedir=debian/build -v
+	dh_gconf
 #	dh_installmenu
 #	dh_installdebconf
 #	dh_installlogrotate
