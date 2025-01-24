@@ -1,3 +1,9 @@
+hildon-control-panel (1:2.2.31-1) unstable; urgency=medium
+
+  * Move gconf schema to /usr/share/...
+
+ -- Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>  Fri, 24 Jan 2025 06:18:32 +0200
+
 hildon-control-panel (1:2.2.30-2) unstable; urgency=medium
 
   * Make sure libtool does not interfere with maemo-launcher linker flags
