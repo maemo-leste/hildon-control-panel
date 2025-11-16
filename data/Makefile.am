@@ -21,8 +21,7 @@
 
 EXTRA_DIST = hildon-control-panel.pc.in \
 	com.nokia.controlpanel.service.in \
-	hildon-control-panel.desktop.in \
-	applets.desktop
+	hildon-control-panel.desktop.in
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = hildon-control-panel.pc
@@ -34,6 +33,9 @@ gconfschemasdir=$(sysconfdir)/gconf/schemas
 gconfschemas_DATA=hildon-control-panel.schemas
 
 hildondesktopentry_DATA = hildon-control-panel.desktop
+
+hildoncontrolpanelapporder_DATA = applets.desktop
+hildoncontrolpanelapporderdir = $(datadir)/applications/hildon-control-panel/apporder
 
 hildon_othersmenudir = $(sysconfdir)/others-menu
 

@@ -1,2 +1,2 @@
 usr/include
-usr/lib/pkgconfig/hildon-control-panel.pc
+usr/lib/*/pkgconfig/hildon-control-panel.pc
