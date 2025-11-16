@@ -1,3 +1,10 @@
+hildon-control-panel (1:2.2.32-2) unstable; urgency=medium
+
+  * Fix compilation with new cflags
+  * Port to debhelper 12
+
+ -- Merlijn Wajer <merlijn@wizzup.org>  Sun, 16 Nov 2025 13:37:40 +0100
+
 hildon-control-panel (1:2.2.30-2) unstable; urgency=medium
 
   * Make sure libtool does not interfere with maemo-launcher linker flags
